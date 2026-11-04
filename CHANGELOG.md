@@ -4,6 +4,10 @@ All notable changes to Azure Local Trailwright are recorded here. The format fol
 
 ## [Unreleased]
 
+### Changed
+- Integrated the pending dependency updates, including React 19 with matching DOM and type packages, Tailwind CSS 4 with its PostCSS plugin and explicit configuration, ESLint 10 with compatible hooks tooling, jsdom 30, Node type definitions and the pinned setup-node action.
+- Updated the React element type annotation for React 19 and regenerated the npm lockfile after reconciling the dependency branches.
+
 ## [1.0.0] - 2026-10-15
 
 First complete release. Plans against Azure Local 12.2609 (latest).

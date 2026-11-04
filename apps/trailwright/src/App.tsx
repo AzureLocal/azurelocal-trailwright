@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
 import { version } from '../package.json';
@@ -25,7 +26,7 @@ import { OperationsScreen } from './screens/OperationsScreen';
 import { ReviewScreen } from './screens/ReviewScreen';
 import { AsBuiltScreen } from './screens/AsBuiltScreen';
 
-const built: Record<string, JSX.Element> = {
+const built: Record<string, ReactElement> = {
   project: <ProjectScreen />,
   deployment: <DeploymentScreen />,
   hardware: <HardwareScreen />,

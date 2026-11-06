@@ -31,7 +31,8 @@ const q = (s: string): string => `'${s.replace(/'/g, "''")}'`;
 export function buildDisconnectedScript(p: Project): string {
   const d = p.disconnected;
   const mgmtIntent = p.networking.intents.find((i) => i.traffic.includes('management'))?.name ?? 'ManagementComputeStorage';
-  const version = targetSolutionVersions[p.release.version] ?? '';
+  // Learn lists a target solution version per disconnected operations release; a release it doesn't list yet is CHANGE-ME.
+  const version = targetSolutionVersions[p.release.version] ?? 'CHANGE-ME';
   const ldapPort = d.ldaps ? 3269 : 3268;
   const L: string[] = [];
   L.push(
@@ -55,6 +56,7 @@ export function buildDisconnectedScript(p: Project): string {
     `$applianceCloudName = 'azure.local'`,
     `$subscriptionName = ${q(d.operatorSubscriptionName)}`,
     `$resourceGroup = ${q(d.resourceGroup)}`,
+    ...(version === 'CHANGE-ME' ? [`# Microsoft Learn lists no disconnected operations target solution version for 12.${p.release.version} yet: set it before NodeInit.`] : []),
     `$targetSolutionVersion = ${q(version)}`,
     '',
     'switch ($Phase) {',

@@ -1,6 +1,6 @@
 import type { Rule } from './types';
 
-const F = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2609';
+const F = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2610';
 const D1 = `${F}#decision-1-determine-connectivity-mode`;
 const D2 = `${F}#decision-2-determine-architecture`;
 const D3 = `${F}#decision-3-determine-cluster-topology`;

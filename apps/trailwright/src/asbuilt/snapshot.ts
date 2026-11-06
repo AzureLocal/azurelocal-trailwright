@@ -15,7 +15,7 @@ export const snapshotSchema = z.object({
   cluster: z
     .object({
       name: z.string().optional(),
-      // The deployed release, for example 12.2609.1003.7 (or the 12.2609 train).
+      // The deployed release, for example 12.2610.1004.50 (or the 12.2610 train).
       release: z.string().optional(),
     })
     .optional(),

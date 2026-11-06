@@ -20,7 +20,7 @@ Every section except `schema` is optional. Leave out what your tool did not capt
   "schema": "as-built-snapshot.v1",
   "capturedAt": "2026-10-15T09:20:00Z",
   "source": { "tool": "ranger", "version": "2.0.0", "note": "" },
-  "cluster": { "name": "example-azl-01", "release": "12.2609.1003.7" },
+  "cluster": { "name": "example-azl-01", "release": "12.2610.1004.50" },
   "identity": { "model": "local-identity-key-vault", "domain": "lab.example.com" },
   "witness": { "type": "cloud" },
   "nodes": [ { "name": "node1", "managementIp": "192.0.2.11", "storageIps": ["198.51.100.11", "203.0.113.11"], "serial": "EXAMPLE-0001" } ],
@@ -40,7 +40,7 @@ Allowed values: `identity.model` is `active-directory` or `local-identity-key-va
 | Snapshot | Ranger manifest path | Note |
 |---|---|---|
 | `cluster.name` | `domains.clusterNode.cluster.name`, else `target.clusterName` | |
-| `cluster.release` | not in the manifest | Pass `-Release 12.2609.x.y`; the manifest has the OS version only |
+| `cluster.release` | not in the manifest | Pass `-Release 12.2610.x.y`; the manifest has the OS version only |
 | `identity.model` | `topology.identityMode` | `ad` is `active-directory`; `local-key-vault` is `local-identity-key-vault` |
 | `identity.domain` | `domains.clusterNode.cluster.domain` | |
 | `witness.type` | `domains.clusterNode.quorum.witnessDetail.type`, else `quorum.quorumType` | CloudWitness, FileShareWitness |

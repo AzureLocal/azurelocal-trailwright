@@ -16,8 +16,8 @@ describe('docs/RULES.md', () => {
     for (const rule of rules) expect(doc).toContain(`| ${rule.id} |`);
     expect(rules.every((r) => r.learnUrl.startsWith('https://learn.microsoft.com/'))).toBe(true);
   });
-  it('states the release as 12.2609 (latest) and never names a private build', () => {
-    expect(doc).toContain('12.2609 (latest)');
+  it('states the release as 12.2610 (latest) and never names a private build', () => {
+    expect(doc).toContain('12.2610 (latest)');
     expect(doc).not.toMatch(/26[9]0/);
   });
 });

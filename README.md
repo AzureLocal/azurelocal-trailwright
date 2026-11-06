@@ -1,6 +1,6 @@
 # Azure Local Trailwright
 
-Design Azure Local deployments, validate the choices against the current release (12.2609, latest) and export files for automation. [Azure Local Surveyor](https://github.com/AzureLocal/azurelocal-surveyor) answers "does it fit"; Trailwright answers "how is it built". Neither tool deploys anything, and Trailwright never stores a secret.
+Design Azure Local deployments, validate the choices against the current release (12.2610, latest) and export files for automation. [Azure Local Surveyor](https://github.com/AzureLocal/azurelocal-surveyor) answers "does it fit"; Trailwright answers "how is it built". Neither tool deploys anything, and Trailwright never stores a secret.
 
 **Use it now:** https://labs.hybridsolutions.cloud/azurelocal-trailwright/ (runs in your browser; nothing is sent to a server).
 

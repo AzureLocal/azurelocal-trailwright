@@ -11,7 +11,7 @@
 .PARAMETER OutPath
     Where to write the snapshot.
 .PARAMETER Release
-    The deployed release build (for example 12.2609.1003.7). The manifest does not carry the Azure Local release, so supply it when known.
+    The deployed release build (for example 12.2610.1004.50). The manifest does not carry the Azure Local release, so supply it when known.
 #>
 [CmdletBinding()]
 param(

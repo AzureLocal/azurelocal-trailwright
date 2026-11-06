@@ -38,10 +38,10 @@ describe('AZ-002: machine and instance name character set', () => {
 });
 
 describe('REL-001: release build', () => {
-  it('accepts a 12.2609 build and an empty build, and warns for another train or a malformed build', () => {
-    expect(ids({ release: { build: '12.2609.1003.7' } }, 'REL-001')).toEqual([]);
+  it('accepts a 12.2610 build and an empty build, and warns for another train or a malformed build', () => {
+    expect(ids({ release: { build: '12.2610.1004.50' } }, 'REL-001')).toEqual([]);
     expect(ids({ release: { build: '' } }, 'REL-001')).toEqual([]);
-    expect(ids({ release: { build: '12.2610.1.1' } }, 'REL-001')).toHaveLength(1);
-    expect(ids({ release: { build: '12.2609' } }, 'REL-001')).toHaveLength(1);
+    expect(ids({ release: { build: '12.2611.1.1' } }, 'REL-001')).toHaveLength(1);
+    expect(ids({ release: { build: '12.2610' } }, 'REL-001')).toHaveLength(1);
   });
 });

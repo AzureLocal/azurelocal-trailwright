@@ -1,10 +1,10 @@
 import type { Rule } from './types';
 
-const RELEASES = ['2607', '2608', '2609'];
-const RACK_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/rack-aware-cluster-requirements?view=azloc-2609#supported-node-configurations';
-const ADD_NODE_URL = 'https://learn.microsoft.com/azure/azure-local/manage/add-server?view=azloc-2609#supported-scenarios';
+const RELEASES = ['2607', '2608', '2609', '2610'];
+const RACK_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/rack-aware-cluster-requirements?view=azloc-2610#supported-node-configurations';
+const ADD_NODE_URL = 'https://learn.microsoft.com/azure/azure-local/manage/add-server?view=azloc-2610#supported-scenarios';
 
-const SAN_URL = 'https://learn.microsoft.com/azure/azure-local/plan/fiber-channel-no-backup-disaggregated-pattern?view=azloc-2609#when-to-use-this-pattern';
+const SAN_URL = 'https://learn.microsoft.com/azure/azure-local/plan/fiber-channel-no-backup-disaggregated-pattern?view=azloc-2610#when-to-use-this-pattern';
 
 export const storageRules: Rule[] = [
   {

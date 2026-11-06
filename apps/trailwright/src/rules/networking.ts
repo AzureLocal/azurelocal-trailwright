@@ -1,12 +1,12 @@
 import type { Rule } from './types';
 
-const RELEASES = ['2607', '2608', '2609'];
+const RELEASES = ['2607', '2608', '2609', '2610'];
 
-const FOUR_NODE_SW_URL = 'https://learn.microsoft.com/azure/azure-local/plan/four-node-switchless-two-switches-two-links?view=azloc-2609';
-const THREE_NODE_SW_URL = 'https://learn.microsoft.com/azure/azure-local/plan/three-node-switchless-two-switches-two-links?view=azloc-2609#logical-networks';
-const DISCONNECTED_URL = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2609#deploy-workload-clusters';
-const TWO_NODE_SW_URL = 'https://learn.microsoft.com/azure/azure-local/plan/two-node-switchless-two-switches?view=azloc-2609#logical-connectivity-components';
-const ATC_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/network-atc-overview?view=azloc-2609';
+const FOUR_NODE_SW_URL = 'https://learn.microsoft.com/azure/azure-local/plan/four-node-switchless-two-switches-two-links?view=azloc-2610';
+const THREE_NODE_SW_URL = 'https://learn.microsoft.com/azure/azure-local/plan/three-node-switchless-two-switches-two-links?view=azloc-2610#logical-networks';
+const DISCONNECTED_URL = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2610#deploy-workload-clusters';
+const TWO_NODE_SW_URL = 'https://learn.microsoft.com/azure/azure-local/plan/two-node-switchless-two-switches?view=azloc-2610#logical-connectivity-components';
+const ATC_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/network-atc-overview?view=azloc-2610';
 
 export const networkingRules: Rule[] = [
   {

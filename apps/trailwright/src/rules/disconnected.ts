@@ -1,11 +1,11 @@
 import type { Finding, Rule } from './types';
 import { inRange, maskBits, toNum } from '../network/ip';
 
-const DEPLOY = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2609#checklist-for-deploying-disconnected-operations';
-const NETWORK = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-network?view=azloc-2609#network-checklist';
-const IDENTITY = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-identity?view=azloc-2609';
-const PKI = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-pki?view=azloc-2609#pki-requirements';
-const PREPARE = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-prepare?view=azloc-2609#prepare-azure-local-machines';
+const DEPLOY = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2610#checklist-for-deploying-disconnected-operations';
+const NETWORK = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-network?view=azloc-2610#network-checklist';
+const IDENTITY = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-identity?view=azloc-2610';
+const PKI = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-pki?view=azloc-2610#pki-requirements';
+const PREPARE = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-prepare?view=azloc-2610#prepare-azure-local-machines';
 
 const f = (id: string, severity: Finding['severity'], field: string, message: string, learnUrl: string): Finding => ({ id, severity, field, message, learnUrl });
 const on = (p: Parameters<Rule['check']>[0]): boolean => p.deployment.mode === 'disconnected';
@@ -80,10 +80,10 @@ export const disconnectedRules: Rule[] = [
   },
   {
     id: 'DOP-006',
-    learnUrl: 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2609#tasks-after-deploying-disconnected-operations',
+    learnUrl: 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2610#tasks-after-deploying-disconnected-operations',
     check: (p) =>
       on(p) && p.disconnected.role === 'management'
-        ? [f('DOP-006', 'info', 'disconnected.role', 'After deployment: back up the BitLocker recovery keys (without them the appliance cannot be restored), export and back up the host guardian service certificates, register the management cluster, assign extra operators, lock down the management cluster against workloads, and remove any bootstrap data disks.', 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2609#tasks-after-deploying-disconnected-operations')]
+        ? [f('DOP-006', 'info', 'disconnected.role', 'After deployment: back up the BitLocker recovery keys (without them the appliance cannot be restored), export and back up the host guardian service certificates, register the management cluster, assign extra operators, lock down the management cluster against workloads, and remove any bootstrap data disks.', 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2610#tasks-after-deploying-disconnected-operations')]
         : [],
   },
 ];

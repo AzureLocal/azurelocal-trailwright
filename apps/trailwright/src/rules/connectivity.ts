@@ -1,10 +1,10 @@
 import type { Rule } from './types';
 
-const RELEASES = ['2607', '2608', '2609'];
-const OUTBOUND_URL = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2609#decision-10-determine-outbound-connectivity';
-const PRIVATE_PATH_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-with-azure-arc-gateway-private-path?view=azloc-2609';
+const RELEASES = ['2607', '2608', '2609', '2610'];
+const OUTBOUND_URL = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2610#decision-10-determine-outbound-connectivity';
+const PRIVATE_PATH_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-with-azure-arc-gateway-private-path?view=azloc-2610';
 
-const GATEWAY_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-arc-gateway-overview?view=azloc-2609#supported-and-unsupported-scenarios';
+const GATEWAY_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-arc-gateway-overview?view=azloc-2610#supported-and-unsupported-scenarios';
 
 const usesProxy = (path: string): boolean => path === 'proxy' || path === 'proxy-arc-gateway';
 

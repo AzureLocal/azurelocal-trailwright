@@ -2,7 +2,7 @@ import type { Rule } from './types';
 import { usesS2d } from './types';
 import { patternFor, patterns, portsRequired } from '../network/patterns';
 
-const CATALOGUE_URL = 'https://learn.microsoft.com/azure/azure-local/plan/choose-network-pattern?view=azloc-2609';
+const CATALOGUE_URL = 'https://learn.microsoft.com/azure/azure-local/plan/choose-network-pattern?view=azloc-2610';
 
 const signature = (traffic: string[]): string => [...traffic].sort().join('+');
 

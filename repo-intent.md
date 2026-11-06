@@ -4,7 +4,7 @@
 
 ## What this repo is
 
-Surveyor answers "does it fit" for sizing. Trailwright answers "how is it built". It captures a design (hardware, storage, network intents and VLANs, management network, outbound connectivity, identity, security, Azure resources, operations), validates every choice against the current release (12.2609, latest) with a Microsoft Learn source for each rule, and exports:
+Surveyor answers "does it fit" for sizing. Trailwright answers "how is it built". It captures a design (hardware, storage, network intents and VLANs, management network, outbound connectivity, identity, security, Azure resources, operations), validates every choice against the current release (12.2610, latest) with a Microsoft Learn source for each rule, and exports:
 
 - the ARM and Bicep parameters for Microsoft's deployment templates (all eight templates, contract-tested);
 - `infrastructure.yml` with a published JSON Schema;

@@ -2,7 +2,7 @@ import type { Project } from '../model/schema';
 import { makeIntent, type Intent } from '../model/defaults';
 
 // Network ATC intent groupings and port layouts, from decisions 6 and 7 of the Microsoft network design framework
-// (Learn, "Network considerations for cloud deployment for Azure Local", view azloc-2609).
+// (Learn, "Network considerations for cloud deployment for Azure Local", view azloc-2610).
 
 type Grouping = Project['networking']['intentGrouping'];
 type Traffic = 'management' | 'compute' | 'storage';

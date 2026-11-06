@@ -2,7 +2,7 @@ import type { Rule } from './types';
 import { usesS2d } from './types';
 import { disaggregatedPortsNeeded, groupingLabels, groupingSupported, portChoices, storageKind } from '../network/intents';
 
-const F = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2609';
+const F = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2610';
 const D6 = `${F}#decision-6-determine-network-adapter-ports-and-configuration`;
 const D7 = `${F}#decision-7-determine-network-traffic-intents`;
 
@@ -83,11 +83,11 @@ export const intentRules: Rule[] = [
   },
   {
     id: 'INT-008',
-    learnUrl: 'https://learn.microsoft.com/windows-server/networking/network-atc/manage-network-atc?view=azloc-2609#update-or-override-network-settings',
+    learnUrl: 'https://learn.microsoft.com/windows-server/networking/network-atc/manage-network-atc?view=azloc-2610#update-or-override-network-settings',
     check: (p) => {
       const names = p.networking.intents.filter((i) => i.overrideQos || i.overrideAdapter || i.overrideVSwitch).map((i) => i.name);
       return names.length
-        ? [{ id: 'INT-008', severity: 'info', field: 'networking.intents', message: `${names.join(', ')}: Network ATC overrides are set. Microsoft recommends the defaults, and the QoS values (priority 7 for cluster, 3 for SMB, 50% bandwidth for SMB) should only change on OEM guidance with OEM validation.`, learnUrl: 'https://learn.microsoft.com/windows-server/networking/network-atc/manage-network-atc?view=azloc-2609#update-or-override-network-settings' }]
+        ? [{ id: 'INT-008', severity: 'info', field: 'networking.intents', message: `${names.join(', ')}: Network ATC overrides are set. Microsoft recommends the defaults, and the QoS values (priority 7 for cluster, 3 for SMB, 50% bandwidth for SMB) should only change on OEM guidance with OEM validation.`, learnUrl: 'https://learn.microsoft.com/windows-server/networking/network-atc/manage-network-atc?view=azloc-2610#update-or-override-network-settings' }]
         : [];
     },
   },

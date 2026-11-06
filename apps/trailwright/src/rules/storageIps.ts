@@ -2,7 +2,7 @@ import type { Finding, Rule } from './types';
 import { usesS2d } from './types';
 import { inRange, isCidr, toNum } from '../network/ip';
 
-const CUSTOM_IP = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2609#custom-ips-for-storage';
+const CUSTOM_IP = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2610#custom-ips-for-storage';
 
 const f = (field: string, message: string): Finding => ({ id: 'SIP-001', severity: 'error', field, message, learnUrl: CUSTOM_IP });
 

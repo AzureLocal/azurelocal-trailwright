@@ -6,7 +6,7 @@ Azure Local Trailwright is a guided design tool for Azure Local. You answer ques
 
 Surveyor answers "does it fit" for sizing. Trailwright answers "how is it built." Neither tool deploys anything.
 
-Every question and every rule comes from Microsoft Learn and follows the current Azure Local release, 12.2609 (latest). There is no release to choose. If you know the full build you will deploy (for example 12.2609.x.y), you can enter it on the Project step; exports carry it as written and never guess it. The rules are listed in [RULES.md](RULES.md).
+Every question and every rule comes from Microsoft Learn and follows the current Azure Local release, 12.2610 (latest). There is no release to choose. If you know the full build you will deploy (for example 12.2609.x.y), you can enter it on the Project step; exports carry it as written and never guess it. The rules are listed in [RULES.md](RULES.md).
 
 ## Before you start
 

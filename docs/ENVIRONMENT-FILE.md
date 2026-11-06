@@ -9,13 +9,13 @@ Azure Local deploy automation reads an environment file (`environment/azure-loca
 
 Neither export is complete on its own, by design. Trailwright writes **what the design knows**. Everything else is `CHANGE-ME` with a `# TODO` comment next to it, or a commented example block at the end of the file. No value is invented, and no secret value is ever written: credentials are `keyvault://<vault>/<secret>` references.
 
-Release wording: the files say `12.2609` (latest). The full build string (`a.b.c.d`) is only written when you enter it on the Project step ("Release build"); otherwise the file carries `12.2609.0.0` and a TODO.
+Release wording: the files say `12.2610` (latest). The full build string (`a.b.c.d`) is only written when you enter it on the Project step ("Release build"); otherwise the file carries `12.2610.0.0` and a TODO.
 
 ## Field mapping
 
 | Environment file | From the design | Notes |
 |---|---|---|
-| `release.azure_local_version` | Project, release build | `12.2609.x.y` if entered, else `12.2609.0.0` + TODO |
+| `release.azure_local_version` | Project, release build | `12.2610.x.y` if entered, else `12.2610.0.0` + TODO |
 | `cluster_name` | Azure resources, instance name (else project name) | Lowercase NetBIOS, at most 15 characters; a note says when it was changed |
 | `subscription_id` | Azure resources, subscription ID | GUID checked |
 | `azl_rp_app_object_id` | Azure resources, resource provider object ID | GUID checked |

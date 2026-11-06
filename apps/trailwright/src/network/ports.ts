@@ -4,7 +4,7 @@ import { buildIntents, disaggregatedIntents } from './intents';
 
 // The physical side of the network design: cards with ports, a role per port, a proposal that spreads each group of ports across cards,
 // and the Network ATC intents derived from the roles. Port counts and layouts come from decisions 6 and 7 of Microsoft's network design
-// framework and from the disaggregated iSCSI and Fibre Channel patterns (Learn, Azure Local 2609).
+// framework and from the disaggregated iSCSI and Fibre Channel patterns (Learn, Azure Local 2610).
 
 export type Card = Project['networking']['cards'][number];
 export type Port = Card['ports'][number];

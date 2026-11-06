@@ -1,6 +1,6 @@
 import type { Project } from '../model/schema';
 
-// Storage Spaces Direct capacity maths, from Microsoft Learn (Azure Local 2609):
+// Storage Spaces Direct capacity maths, from Microsoft Learn (Azure Local 2610):
 //  - Plan volumes: reserve the equivalent of one capacity drive per server, up to four drives, unallocated for in-place repair.
 //  - Fault tolerance and storage efficiency: two-way mirror 50%, three-way mirror 33.3%, dual parity 50% (four servers) up to 80% (sixteen, all-flash; hybrid tops out at 72.7%);
 //    nested two-way mirror 25%. The footprint of a volume is its size divided by the efficiency.

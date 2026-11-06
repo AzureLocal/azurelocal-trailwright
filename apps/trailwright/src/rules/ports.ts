@@ -1,11 +1,11 @@
 import type { Finding, Rule } from './types';
 import { allPorts, neededGroups, roleOf } from '../network/ports';
 
-const F = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2609';
+const F = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2610';
 const D6 = `${F}#decision-6-determine-network-adapter-ports-and-configuration`;
-const HOST = 'https://learn.microsoft.com/azure/azure-local/concepts/host-network-requirements?view=azloc-2609#overview-of-key-network-adapter-capabilities';
-const ISCSI = 'https://learn.microsoft.com/azure/azure-local/plan/iscsi-6-network-adapters-disaggregated-pattern?view=azloc-2609#host-nic-configuration';
-const PATTERNS = 'https://learn.microsoft.com/azure/azure-local/plan/choose-network-pattern?view=azloc-2609';
+const HOST = 'https://learn.microsoft.com/azure/azure-local/concepts/host-network-requirements?view=azloc-2610#overview-of-key-network-adapter-capabilities';
+const ISCSI = 'https://learn.microsoft.com/azure/azure-local/plan/iscsi-6-network-adapters-disaggregated-pattern?view=azloc-2610#host-nic-configuration';
+const PATTERNS = 'https://learn.microsoft.com/azure/azure-local/plan/choose-network-pattern?view=azloc-2610';
 const FC = `${F}#fiber-channel-fc`;
 
 const f = (id: string, severity: Finding['severity'], field: string, message: string, learnUrl: string): Finding => ({ id, severity, field, message, learnUrl });

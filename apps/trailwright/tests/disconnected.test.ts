@@ -26,7 +26,10 @@ describe('disconnected operations', () => {
     const s = buildDisconnectedScript(dop());
     for (const cmd of ['New-ApplianceManagementNetworkConfiguration', 'New-ApplianceIngressNetworkConfiguration', 'New-ApplianceExternalIdentityConfiguration', 'New-ApplianceCertificatesConfiguration', 'Install-Appliance', 'Add-AzLocalEnvironment', 'Invoke-AzStackHciArcInitialization']) expect(s).toContain(cmd);
     expect(s).toContain("'autonomous.cloud.private'");
-    expect(s).toContain("'12.2609.1003.7'");
+    expect(s).toContain("$targetSolutionVersion = 'CHANGE-ME'");
+    const older = dop();
+    older.release = { ...older.release, version: '2609' };
+    expect(buildDisconnectedScript(older)).toContain("'12.2609.1003.7'");
     expect(s).toContain('LdapPort = 3269');
     expect(s).not.toMatch(/ConvertTo-SecureString|ConvertTo-Securestring/);
   });

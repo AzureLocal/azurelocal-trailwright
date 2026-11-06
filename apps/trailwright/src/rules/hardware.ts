@@ -1,14 +1,14 @@
 import type { Rule } from './types';
 
-const RELEASES = ['2607', '2608', '2609'];
+const RELEASES = ['2607', '2608', '2609', '2610'];
 
 const QUORUM_URL = 'https://learn.microsoft.com/windows-server/storage/storage-spaces/quorum#cluster-quorum-overview';
-const ARM_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-resource-manager-template?view=azloc-2609#arm-template-parameters-reference';
-const RACK_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/rack-aware-cluster-requirements?view=azloc-2609#supported-node-configurations';
-const SYSREQ_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/system-requirements-23h2?view=azloc-2609';
+const ARM_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-resource-manager-template?view=azloc-2610#arm-template-parameters-reference';
+const RACK_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/rack-aware-cluster-requirements?view=azloc-2610#supported-node-configurations';
+const SYSREQ_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/system-requirements-23h2?view=azloc-2610';
 
-const DISCONNECTED_URL = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2609#deploy-workload-clusters';
-const RACK_DEPLOY_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/rack-aware-cluster-deployment-via-template?view=azloc-2609#step-2-deploy-using-arm-template';
+const DISCONNECTED_URL = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2610#deploy-workload-clusters';
+const RACK_DEPLOY_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/rack-aware-cluster-deployment-via-template?view=azloc-2610#step-2-deploy-using-arm-template';
 
 export const hardwareRules: Rule[] = [
   {

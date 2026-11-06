@@ -1,10 +1,10 @@
 import type { Rule } from './types';
 
-const RELEASES = ['2607', '2608', '2609'];
-const ARM_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-resource-manager-template?view=azloc-2609#arm-template-parameters-reference';
-const OUTBOUND_URL = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2609#decision-10-determine-outbound-connectivity';
+const RELEASES = ['2607', '2608', '2609', '2610'];
+const ARM_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-resource-manager-template?view=azloc-2610#arm-template-parameters-reference';
+const OUTBOUND_URL = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2610#decision-10-determine-outbound-connectivity';
 
-const REGIONS_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/system-requirements-23h2?view=azloc-2609#azure-requirements';
+const REGIONS_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/system-requirements-23h2?view=azloc-2610#azure-requirements';
 
 export const landingZoneRules: Rule[] = [
   {

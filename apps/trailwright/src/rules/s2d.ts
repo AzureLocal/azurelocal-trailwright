@@ -1,7 +1,7 @@
 import type { Finding, Rule } from './types';
 import { capacitySummary, allowedResiliency } from '../storage/capacity';
 
-const SYSREQ = 'https://learn.microsoft.com/azure/azure-local/concepts/system-requirements-23h2?view=azloc-2609#data-drive-requirements';
+const SYSREQ = 'https://learn.microsoft.com/azure/azure-local/concepts/system-requirements-23h2?view=azloc-2610#data-drive-requirements';
 const HW = 'https://learn.microsoft.com/windows-server/storage/storage-spaces/storage-spaces-direct-hardware-requirements#drives';
 const CACHE = 'https://learn.microsoft.com/windows-server/storage/storage-spaces/cache';
 const CHOOSE = 'https://learn.microsoft.com/windows-server/storage/storage-spaces/choose-drives#sizing-considerations';

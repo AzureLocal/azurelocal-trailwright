@@ -3,7 +3,7 @@ import { intentsFor, matchPattern, patterns, portsRequired, storageSubnetsFor } 
 
 const choice = (nodes: number, storageConnectivity: 'switched' | 'switchless', torSwitches: 1 | 2 = 2, layout: 'dedicated' | 'converged' = 'dedicated', links: 'single' | 'dual' = 'dual') => ({ nodes, storageConnectivity, torSwitches, layout, links });
 
-describe('network reference patterns (Microsoft Learn, 2609)', () => {
+describe('network reference patterns (Microsoft Learn, 2610)', () => {
   it('matches each documented combination', () => {
     expect(matchPattern(choice(1, 'switched', 1))?.id).toBe('single-node');
     expect(matchPattern(choice(2, 'switchless', 1))?.id).toBe('two-node-switchless-single-tor');
@@ -54,7 +54,7 @@ describe('network reference patterns (Microsoft Learn, 2609)', () => {
     ]);
   });
 
-  it('every pattern has a Learn URL on the 2609 view', () => {
-    for (const p of patterns) expect(p.learnUrl).toMatch(/^https:\/\/learn\.microsoft\.com\/azure\/azure-local\/plan\/.+view=azloc-2609$/);
+  it('every pattern has a Learn URL on the 2610 view', () => {
+    for (const p of patterns) expect(p.learnUrl).toMatch(/^https:\/\/learn\.microsoft\.com\/azure\/azure-local\/plan\/.+view=azloc-2610$/);
   });
 });

@@ -1,7 +1,7 @@
 import type { Rule } from './types';
 import { isCidr } from '../network/ip';
 
-const ARM = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-resource-manager-template-disaggregated?view=azloc-2609#arm-template-parameters-reference';
+const ARM = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-resource-manager-template-disaggregated?view=azloc-2610#arm-template-parameters-reference';
 
 // The disaggregated ARM template (create-cluster-san) takes the infrastructure LUN identifiers and the cluster networks.
 export const disaggregatedRules: Rule[] = [

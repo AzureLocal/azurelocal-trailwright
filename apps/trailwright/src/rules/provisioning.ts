@@ -1,9 +1,9 @@
 import type { Rule } from './types';
 
-const SMP = 'https://learn.microsoft.com/azure/azure-local/deploy/simplified-machine-provisioning?view=azloc-2609';
-const PORTAL = 'https://learn.microsoft.com/azure/azure-local/deploy/deploy-via-portal?view=azloc-2609';
-const DA_OS = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-install-os-disaggregated?view=azloc-2609#prerequisites';
-const CUSTOM_IP = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2609#custom-ips-for-storage';
+const SMP = 'https://learn.microsoft.com/azure/azure-local/deploy/simplified-machine-provisioning?view=azloc-2610';
+const PORTAL = 'https://learn.microsoft.com/azure/azure-local/deploy/deploy-via-portal?view=azloc-2610';
+const DA_OS = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-install-os-disaggregated?view=azloc-2610#prerequisites';
+const CUSTOM_IP = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2610#custom-ips-for-storage';
 
 const usesGateway = (path: string): boolean => path === 'arc-gateway' || path === 'proxy-arc-gateway' || path === 'private-path';
 

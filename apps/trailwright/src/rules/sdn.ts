@@ -1,9 +1,9 @@
 import type { Finding, Rule } from './types';
 import { isCidr, toNum } from '../network/ip';
 
-const F = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2609#decision-11-determine-software-defined-networking-sdn';
-const OVERVIEW = 'https://learn.microsoft.com/azure/azure-local/concepts/sdn-overview?view=azloc-2609#supported-networking-patterns-for-sdn-enabled-by-arc';
-const ENABLE = 'https://learn.microsoft.com/azure/azure-local/deploy/enable-sdn-integration?view=azloc-2609';
+const F = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2610#decision-11-determine-software-defined-networking-sdn';
+const OVERVIEW = 'https://learn.microsoft.com/azure/azure-local/concepts/sdn-overview?view=azloc-2610#supported-networking-patterns-for-sdn-enabled-by-arc';
+const ENABLE = 'https://learn.microsoft.com/azure/azure-local/deploy/enable-sdn-integration?view=azloc-2610';
 
 const f = (id: string, severity: Finding['severity'], field: string, message: string, learnUrl: string): Finding => ({ id, severity, field, message, learnUrl });
 

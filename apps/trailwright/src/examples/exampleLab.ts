@@ -5,7 +5,7 @@ import { projectSchema, type Project } from '../model/schema';
 export function createExampleProject(): Project {
   return projectSchema.parse({
     meta: { schema: 1, name: 'Example lab', createdAt: '2026-10-07T00:00:00.000Z' },
-    release: { version: '2609' },
+    release: { version: '2610' },
     project: {
       customer: 'Example Company',
       owner: 'Design owner',

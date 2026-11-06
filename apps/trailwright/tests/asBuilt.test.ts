@@ -48,7 +48,7 @@ describe('as-built compare against a Ranger-derived snapshot', () => {
     const csv = buildCompareCsv(rows);
     expect(csv.split('\n')[0]).toBe('Area,Item,Design,As-built,Status,Severity');
     expect(csv.split('\n')).toHaveLength(rows.length + 1);
-    expect(buildCompareMarkdown(createExampleProject(), rows)).toContain('12.2609 (latest)');
+    expect(buildCompareMarkdown(createExampleProject(), rows)).toContain('12.2610 (latest)');
   });
 });
 
@@ -56,7 +56,7 @@ describe('as-built compare edge cases', () => {
   const p = createExampleProject();
 
   it('reports a designed node that was not built as missing, and a release from another train as drift', () => {
-    const rows = compareAsBuilt(p, load(JSON.stringify({ schema: 'as-built-snapshot.v1', cluster: { release: '12.2610.1.1' }, nodes: [{ name: 'node1' }] })));
+    const rows = compareAsBuilt(p, load(JSON.stringify({ schema: 'as-built-snapshot.v1', cluster: { release: '12.2611.1.1' }, nodes: [{ name: 'node1' }] })));
     expect(find(rows, 'node2')).toMatchObject({ status: 'missing', severity: 'error' });
     expect(find(rows, 'release')).toMatchObject({ status: 'drift', severity: 'error' });
     expect(find(rows, 'node count')).toMatchObject({ status: 'drift' });
@@ -68,8 +68,8 @@ describe('as-built compare edge cases', () => {
   });
   it('compares a build entered in the design exactly', () => {
     const q = createExampleProject();
-    q.release = { ...q.release, build: '12.2609.1003.7' };
-    expect(find(compareAsBuilt(q, load('{"schema":"as-built-snapshot.v1","cluster":{"release":"12.2609.1003.7"}}')), 'release')?.status).toBe('match');
+    q.release = { ...q.release, build: '12.2610.1004.50' };
+    expect(find(compareAsBuilt(q, load('{"schema":"as-built-snapshot.v1","cluster":{"release":"12.2610.1004.50"}}')), 'release')?.status).toBe('match');
     expect(find(compareAsBuilt(q, load('{"schema":"as-built-snapshot.v1","cluster":{"release":"12.2609.9.9"}}')), 'release')?.status).toBe('drift');
   });
   it('flags a missing designed VLAN and a changed intent, and matches an intent by traffic when the name differs', () => {

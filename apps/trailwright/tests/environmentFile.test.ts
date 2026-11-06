@@ -68,7 +68,7 @@ describe('environment file export', () => {
       return node;
     };
     const filled = fillIn(doc) as Doc;
-    filled.release.azure_local_version = '12.2609.1003.7';
+    filled.release.azure_local_version = '12.2610.1004.50';
     filled.vlans = {
       ...filled.vlans,
       compute: { id: 110, name: 'compute-110', subnet: '192.0.2.128/25', gateway: '192.0.2.129', routed: true },
@@ -125,11 +125,11 @@ describe('field mapping', () => {
 
   it('maps identity, release, cluster name, subscription, vault and nodes', () => {
     const d = doc({
-      release: { build: '12.2609.1003.7' },
+      release: { build: '12.2610.1004.50' },
       landingZone: { instanceName: 'Example_Cluster_Name_Is_Long', keyVaultName: 'kv-example-azl', keyVaultRetentionDays: 14 },
       hardware: { nodes: [{ name: 'NODE1', ip: '192.0.2.11', serial: 'SN1', cores: 16, memoryGiB: 256, drives: 4, storageIps: ['198.51.100.11', '203.0.113.11'] }] },
     });
-    expect(d.release.azure_local_version).toBe('12.2609.1003.7');
+    expect(d.release.azure_local_version).toBe('12.2610.1004.50');
     expect(d.cluster_name).toBe('example-cluster');
     expect(d.cluster_name.length).toBeLessThanOrEqual(15);
     expect(d.kv_azl_name).toBe('kv-example-azl');
@@ -139,9 +139,9 @@ describe('field mapping', () => {
     expect(d.nodes[0]).toMatchObject({ name: 'node1', management_ip: '192.0.2.11', service_tag: 'SN1', storage_ips: { smb1: '198.51.100.11', smb2: '203.0.113.11' } });
   });
 
-  it('keeps the 12.2609 train and marks the build as a TODO when the build is not known; rejects a build from another train', () => {
-    expect(buildEnvironmentFile(project())).toMatch(/azure_local_version: 12\.2609\.0\.0 # TODO/);
-    expect((parse(buildEnvironmentFile(project({ release: { build: '12.2610.1.1' } } as never))) as Doc).release.azure_local_version).toBe('12.2609.0.0');
+  it('keeps the 12.2610 train and marks the build as a TODO when the build is not known; rejects a build from another train', () => {
+    expect(buildEnvironmentFile(project())).toMatch(/azure_local_version: 12.2610.0.0 # TODO/);
+    expect((parse(buildEnvironmentFile(project({ release: { build: '12.2611.1.1' } } as never))) as Doc).release.azure_local_version).toBe('12.2610.0.0');
   });
 
   it('maps intents to the capitalised enums with overrides, and the intent adapters to anchored adapter_names', () => {

@@ -1,13 +1,13 @@
 import type { Finding, Rule } from './types';
 import { reservedRangeOf, sameSubnet, toNum } from '../network/ip';
 
-const AD_PREP = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-prep-active-directory?view=azloc-2609';
-const PORTAL = 'https://learn.microsoft.com/azure/azure-local/deploy/deploy-via-portal?view=azloc-2609';
-const FRAMEWORK = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2609';
+const AD_PREP = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-prep-active-directory?view=azloc-2610';
+const PORTAL = 'https://learn.microsoft.com/azure/azure-local/deploy/deploy-via-portal?view=azloc-2610';
+const FRAMEWORK = 'https://learn.microsoft.com/azure/azure-local/plan/cloud-deployment-network-considerations?view=azloc-2610';
 const D8 = `${FRAMEWORK}#decision-8-determine-management-ips-and-infrastructure-network`;
-const WITNESS = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-prerequisites?view=azloc-2609#complete-deployment-checklist';
-const SECURITY = 'https://learn.microsoft.com/azure/azure-local/manage/manage-secure-baseline?view=azloc-2609#configure-security-settings-during-deployment';
-const ARM = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-resource-manager-template?view=azloc-2609#arm-template-parameters-reference';
+const WITNESS = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-prerequisites?view=azloc-2610#complete-deployment-checklist';
+const SECURITY = 'https://learn.microsoft.com/azure/azure-local/manage/manage-secure-baseline?view=azloc-2610#configure-security-settings-during-deployment';
+const ARM = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-resource-manager-template?view=azloc-2610#arm-template-parameters-reference';
 
 const NAMES = 'https://learn.microsoft.com/troubleshoot/windows-server/active-directory/naming-conventions-for-computer-domain-site-ou#computer-names';
 const DEPLOYMENT_SETTINGS = 'https://learn.microsoft.com/azure/templates/microsoft.azurestackhci/2025-02-01-preview/clusters/deploymentsettings#property-values';

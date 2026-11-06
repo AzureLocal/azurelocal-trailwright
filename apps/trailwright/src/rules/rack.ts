@@ -1,9 +1,9 @@
 import type { Finding, Rule } from './types';
 import { zonesOf } from '../exports/createCluster';
 
-const REQ = 'https://learn.microsoft.com/azure/azure-local/concepts/rack-aware-cluster-requirements?view=azloc-2609#general-requirements';
-const DEPLOY = 'https://learn.microsoft.com/azure/azure-local/deploy/rack-aware-cluster-deploy-portal?view=azloc-2609#optionally-change-advanced-settings-and-apply-tags';
-const DOPS = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2609#deploy-a-rack-aware-cluster';
+const REQ = 'https://learn.microsoft.com/azure/azure-local/concepts/rack-aware-cluster-requirements?view=azloc-2610#general-requirements';
+const DEPLOY = 'https://learn.microsoft.com/azure/azure-local/deploy/rack-aware-cluster-deploy-portal?view=azloc-2610#optionally-change-advanced-settings-and-apply-tags';
+const DOPS = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2610#deploy-a-rack-aware-cluster';
 
 const f = (id: string, severity: Finding['severity'], field: string, message: string, learnUrl: string): Finding => ({ id, severity, field, message, learnUrl });
 const rack = (p: Parameters<Rule['check']>[0]): boolean => p.hardware.topology === 'rack-aware' && p.hardware.nodes.length > 0;

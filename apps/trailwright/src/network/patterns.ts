@@ -2,10 +2,10 @@ import type { Project } from '../model/schema';
 import { makeIntent, type Intent } from '../model/defaults';
 
 // Azure Local network reference patterns, from the "Azure Local network deployment patterns" articles on Microsoft Learn
-// (view azloc-2609). Each pattern lists what the article states: ports, top-of-rack (TOR) switches, Network ATC intents and constraints.
+// (view azloc-2610). Each pattern lists what the article states: ports, top-of-rack (TOR) switches, Network ATC intents and constraints.
 
 const BASE = 'https://learn.microsoft.com/azure/azure-local/plan/';
-const view = '?view=azloc-2609';
+const view = '?view=azloc-2610';
 
 export type IntentSpec = { name: string; traffic: ('management' | 'compute' | 'storage')[]; ports: number; teamed: boolean };
 

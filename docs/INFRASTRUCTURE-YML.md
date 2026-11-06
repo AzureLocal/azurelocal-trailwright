@@ -10,7 +10,7 @@ To deploy with the NIC deployment automation, use the **Environment file (deploy
 
 | Section | Fields | Source in the design |
 |---|---|---|
-| `_metadata` | `version`, `schema_version` (always `4.0.0`), `environment_name`, `generated_by`, `azure_local_release` (four digits, for example `2609`) | Project name, release |
+| `_metadata` | `version`, `schema_version` (always `4.0.0`), `environment_name`, `generated_by`, `azure_local_release` (four digits, for example `2610`) | Project name, release |
 | `site` | `name`, `owner` | Project: customer, owner |
 | `environment` | `env_name`, `azure_region`, `azure_cloud` (`public`, `government`), `connectivity_mode` (`connected`, `disconnected`), `architecture` (`hyperconverged`, `hybrid`, `disaggregated`) | Connectivity mode and architecture, Azure resources |
 | `azure_platform` | `subscriptions.{sub_azure_local_name, sub_azure_local_id}`, `tenant_id`, `resource_groups.rg_azurelocal_cluster`, `instance_name`, `naming_prefix`, `hci_resource_provider_object_id`, `custom_location`, `key_vault.{name, soft_delete_retention_days, audit_storage_account, audit_retention_days}`, `witness_storage_account` | Azure resources |

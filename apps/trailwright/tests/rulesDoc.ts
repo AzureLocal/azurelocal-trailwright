@@ -12,7 +12,7 @@ export function buildRulesDoc(): string {
     '',
     'Generated from the rule registry (`apps/trailwright/src/rules`); do not edit by hand. Regenerate with `npm run docs:rules` and commit the result. A test fails when this file is out of date.',
     '',
-    'Every rule follows the current Azure Local release, 12.2609 (latest), and carries the Microsoft Learn page its claim comes from. The example message is the one produced by the rule\'s test case.',
+    'Every rule follows the current Azure Local release, 12.2610 (latest), and carries the Microsoft Learn page its claim comes from. The example message is the one produced by the rule\'s test case.',
     '',
     `${rules.length} rules.`,
     '',

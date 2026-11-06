@@ -1,10 +1,10 @@
 import type { Rule } from './types';
 
-const VM_RESILIENCY_URL = 'https://learn.microsoft.com/azure/azure-local/manage/disaster-recovery-vm-resiliency?view=azloc-2609';
-const ASR_URL = 'https://learn.microsoft.com/azure/azure-local/manage/azure-site-recovery?view=azloc-2609';
-const INSIGHTS_URL = 'https://learn.microsoft.com/azure/azure-local/manage/monitor-single-23h2?view=azloc-2609#enable-insights';
-const ALERTS_URL = 'https://learn.microsoft.com/azure/azure-local/manage/health-alerts-via-azure-monitor-alerts?view=azloc-2609';
-const LIMITED_URL = 'https://learn.microsoft.com/azure/azure-local/update/import-discover-updates-offline-23h2?view=azloc-2609';
+const VM_RESILIENCY_URL = 'https://learn.microsoft.com/azure/azure-local/manage/disaster-recovery-vm-resiliency?view=azloc-2610';
+const ASR_URL = 'https://learn.microsoft.com/azure/azure-local/manage/azure-site-recovery?view=azloc-2610';
+const INSIGHTS_URL = 'https://learn.microsoft.com/azure/azure-local/manage/monitor-single-23h2?view=azloc-2610#enable-insights';
+const ALERTS_URL = 'https://learn.microsoft.com/azure/azure-local/manage/health-alerts-via-azure-monitor-alerts?view=azloc-2610';
+const LIMITED_URL = 'https://learn.microsoft.com/azure/azure-local/update/import-discover-updates-offline-23h2?view=azloc-2610';
 
 export const operationsRules: Rule[] = [
   {

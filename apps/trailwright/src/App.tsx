@@ -2,6 +2,7 @@ import { useEffect, type ReactElement } from 'react';
 import { Link, Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
 import { version } from '../package.json';
+import { ICON_URL } from './branding';
 import { exportKinds } from './exports';
 import { downloadFile } from './imports/download';
 import { steps, visibleSteps } from './steps/steps';
@@ -78,9 +79,12 @@ function ProjectShell() {
     <div className="min-h-screen bg-gray-50 text-gray-900 lg:flex">
       <aside className="no-print shrink-0 overflow-y-auto bg-[#0f3057] text-white lg:sticky lg:top-0 lg:h-screen lg:w-72">
         <div className="border-b border-white/10 p-5">
-          <Link to="/" aria-label="Trailwright home" className="block rounded-md hover:text-blue-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-            <span className="block text-xs uppercase tracking-widest text-blue-200">Azure Local</span>
-            <span className="text-xl font-bold">Trailwright</span>
+          <Link to="/" aria-label="Trailwright home" className="flex items-center gap-3 rounded-md hover:text-blue-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+            <img src={ICON_URL} alt="" width={40} height={40} className="h-10 w-10 shrink-0" />
+            <span className="leading-tight">
+              <span className="block text-xs uppercase tracking-widest text-blue-200">Azure Local</span>
+              <span className="text-xl font-bold">Trailwright</span>
+            </span>
           </Link>
           <span className="mt-1 block text-xs text-blue-200">Design your cluster · v{version}</span>
           <Link to="/" className="mt-3 inline-block text-xs text-blue-100 underline underline-offset-2 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">

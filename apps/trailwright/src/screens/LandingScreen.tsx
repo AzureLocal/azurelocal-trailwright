@@ -5,6 +5,7 @@ import { version } from '../../package.json';
 import { exportKinds } from '../exports';
 import { downloadFile } from '../imports/download';
 import { ImportPanel } from '../components/ImportPanel';
+import { COPYRIGHT, ICON_URL } from '../branding';
 import { createExampleProject } from '../examples/exampleLab';
 import { createEmptyProject } from '../model/defaults';
 import { isProjectStarted, lastStep } from '../model/progress';
@@ -77,9 +78,12 @@ export const LandingScreen: FC = () => {
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <header className="bg-[#0f3057] text-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
-          <p className="leading-tight">
-            <span className="block text-xs uppercase tracking-widest text-blue-200">Azure Local</span>
-            <span className="text-xl font-bold">Trailwright</span>
+          <p className="flex items-center gap-3 leading-tight">
+            <img src={ICON_URL} alt="" width={48} height={48} className="h-12 w-12 shrink-0" />
+            <span>
+              <span className="block text-xs uppercase tracking-widest text-blue-200">Azure Local</span>
+              <span className="text-xl font-bold">Trailwright</span>
+            </span>
           </p>
           <nav aria-label="Site" className="flex flex-wrap items-center gap-4 text-sm">
             <NewTab href={`${DOCS_URL}/USER-GUIDE.md`} className="text-blue-100 underline-offset-2 hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
@@ -263,6 +267,7 @@ export const LandingScreen: FC = () => {
       <footer className="border-t border-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2 px-4 py-4 text-xs text-gray-600 sm:px-6">
           <p>Design record only: Trailwright does not deploy anything.</p>
+          <p>{COPYRIGHT}</p>
           <p>
             Trailwright v{version} · MIT licensed · <NewTab href={`${REPO_URL}/blob/main/CHANGELOG.md`}>Changelog</NewTab>
           </p>

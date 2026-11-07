@@ -23,4 +23,4 @@ It is a design record, not a deployment tool and not a secret store.
 
 ## Status
 
-Version 1.0.0. Live at https://labs.hybridsolutions.cloud/azurelocal-trailwright/. See [CHANGELOG.md](CHANGELOG.md).
+Version 1.0.0. Live at https://azurelocal.cloud/azurelocal-trailwright/. See [CHANGELOG.md](CHANGELOG.md).

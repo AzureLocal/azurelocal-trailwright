@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://labs.hybridsolutions.cloud/azurelocal-trailwright/schema/infrastructure.schema.json",
+  "$id": "https://azurelocal.cloud/azurelocal-trailwright/schema/infrastructure.schema.json",
   "title": "Azure Local Trailwright infrastructure.yml",
   "description": "The file written by the infrastructure.yml export (src/exports/infrastructureYml.ts). It is a design record in the shape of a subset of the Azure Local Toolkit registry (schema_version 4.0.0); it is not the full Toolkit registry. Secrets are never values: they are keyvault://<vault>/<secret> references. A test validates every export fixture against this schema, and the build fails when the exporter and the schema drift apart.",
   "type": "object",

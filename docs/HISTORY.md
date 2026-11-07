@@ -24,7 +24,7 @@ The rebuild uses the same stack as Surveyor so the tools feel like one family: V
 | Surveyor import with a conflict preview | Done (project and plan formats), including nested two-way mirror volumes |
 | Browser journeys, a no-secrets test and a no-executable-export test | Done |
 | Spreadsheet export with the `xlsx` package | A small built-in writer, because the package has known vulnerabilities and no fix on npm |
-| Deploy to GitHub Pages from `main` | Done: https://labs.hybridsolutions.cloud/azurelocal-trailwright/ |
+| Deploy to GitHub Pages from `main` | Done: https://azurelocal.cloud/azurelocal-trailwright/ |
 
 Open questions from the plan, resolved: the field mapping from Surveyor is in `src/imports/surveyor.ts` (tested); the `infrastructure.yml` shape is in `docs/INFRASTRUCTURE-YML.md`; the PDF is a compact handoff of the schedules and findings.
 

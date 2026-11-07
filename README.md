@@ -1,8 +1,13 @@
 # Azure Local Trailwright
 
+![Azure Local Trailwright: design an Azure Local deployment, then hand it to automation](docs/assets/images/azurelocal-trailwright-banner.svg)
+
+[![Azure Local](https://img.shields.io/badge/Azure%20Local-azurelocal.cloud-0078D4?logo=microsoft-azure)](https://azurelocal.cloud)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Design Azure Local deployments, validate the choices against the current release (12.2610, latest) and export files for automation. [Azure Local Surveyor](https://github.com/AzureLocal/azurelocal-surveyor) answers "does it fit"; Trailwright answers "how is it built". Neither tool deploys anything, and Trailwright never stores a secret.
 
-**Use it now:** https://labs.hybridsolutions.cloud/azurelocal-trailwright/ (runs in your browser; nothing is sent to a server).
+**Use it now:** https://azurelocal.cloud/azurelocal-trailwright/ (runs in your browser; nothing is sent to a server).
 
 ## What you get
 

@@ -164,6 +164,67 @@ describe('options that the design rules out say why', () => {
   });
 });
 
+describe('the management port and the Arc machine name', () => {
+  const base = load('infrastructure.example.yml');
+  const iso = withScenario(base, { os_install: 'iso' });
+  const q = (id: string) => catalog.find((x) => x.id === id)!;
+  const withNodes = (d: Draft, change: (n: NonNullable<Draft['nodes']>[number], i: number) => NonNullable<Draft['nodes']>[number]): Draft => ({ ...d, nodes: d.nodes!.map(change) });
+
+  it('asks every design how the management port gets its address, recommends static, and offers the schema values', () => {
+    for (const d of [base, iso, withScenario(base, { storage_architecture: 'san' }), withScenario(iso, { connectivity: 'disconnected' })]) {
+      const [a] = ask(q('networking.management.ip_assignment'), d);
+      expect(a.applies).toBe(true);
+      expect(a.required).toBe(false);
+    }
+    expect(q('networking.management.ip_assignment').recommended?.(base)?.value).toBe('static');
+    expect(q('networking.management.ip_assignment').options!.map((o) => o.value)).toEqual((schemaAt('networking.management.ip_assignment') as { enum: string[] }).enum);
+    const off = { ...base, networking: { ...base.networking, management: { ...base.networking!.management, ip_assignment: 'auto' as never } } };
+    expect(ask(q('networking.management.ip_assignment'), off)[0].problem).toMatch(/isn't one of the choices/);
+  });
+
+  it('needs the management MAC on every machine with simplified provisioning, in every mode, and not with an ISO install', () => {
+    for (const mode of ['static', 'dhcp', 'preconfigured'] as const) {
+      const d = { ...base, networking: { ...base.networking, management: { ...base.networking!.management, ip_assignment: mode } } };
+      expect(ask(q('nodes.management.mac_address'), d).every((a) => a.required), mode).toBe(true);
+    }
+    expect(ask(q('nodes.management.mac_address'), iso).every((a) => !a.required)).toBe(true);
+  });
+
+  it('reports a management MAC used by two machines, in either notation', () => {
+    const d = withNodes(base, (n, i) => (i === 1 ? { ...n, management: { ...n.management, mac_address: base.nodes![0].management!.mac_address!.replace(/:/g, '-').toLowerCase() } } : n));
+    expect(ask(q('nodes.management.mac_address'), d).map((a) => a.problem)).toEqual([expect.stringMatching(/another machine/), expect.stringMatching(/another machine/)]);
+  });
+
+  it('asks for the Arc machine name only with simplified provisioning, optional, suggesting the host name', () => {
+    const asked = ask(q('nodes.arc_machine_name'), base);
+    expect(asked.every((a) => a.applies && !a.required)).toBe(true);
+    expect(asked.map((a) => q('nodes.arc_machine_name').suggest?.(base, a.index))).toEqual(base.nodes!.map((n) => n.name));
+    expect(applies(iso, 'nodes.arc_machine_name')).toBe(false);
+    expect(prune(iso).nodes!.every((n) => n.arc_machine_name === undefined)).toBe(true);
+  });
+
+  it.each([
+    ['has a space', 'node 01'],
+    ['ends in a dot', 'node-01.'],
+    ['is longer than 54 characters', 'a'.repeat(55)],
+  ])('rejects an Arc machine name that %s, as the schema does', (_case, name) => {
+    const d = withNodes(base, (n, i) => (i === 0 ? { ...n, arc_machine_name: name } : n));
+    expect(ask(q('nodes.arc_machine_name'), d)[0].problem).toMatch(/1-54/);
+    expect(validate(d)).toBe(false);
+  });
+
+  it('accepts a 54-character Arc machine name with dots and underscores', () => {
+    const d = withNodes(base, (n, i) => (i === 0 ? { ...n, arc_machine_name: `iic_azl.n01-${'a'.repeat(42)}` } : n));
+    expect(ask(q('nodes.arc_machine_name'), d)[0].problem).toBeUndefined();
+    expect(validate(d), JSON.stringify(validate.errors)).toBe(true);
+  });
+
+  it('reports an Arc machine name that another machine has, counting host names as the default', () => {
+    const d = withNodes(base, (n, i) => (i === 0 ? { name: n.name, management: n.management, serial_number: n.serial_number, bmc: n.bmc, rack: n.rack, rack_position: n.rack_position } : { ...n, arc_machine_name: base.nodes![0].name!.toUpperCase() }));
+    expect(ask(q('nodes.arc_machine_name'), d)[1].problem).toMatch(/another machine/);
+  });
+});
+
 describe('what is still needed', () => {
   it('an empty design lists the decisions first, grouped by who knows them', () => {
     const missing = missingByOwner({});

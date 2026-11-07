@@ -316,7 +316,7 @@ export interface AzureLocalInfrastructureYml {
        */
       gateway: string;
       /**
-       * 0 means untagged. Can't be changed after deployment.
+       * 0 means untagged. Can't be changed after deployment. With ip_assignment static, simplified provisioning also sets it on the management port (edge machine networkAdapters[].vlanId).
        */
       vlan_id?: number;
       /**
@@ -326,7 +326,11 @@ export interface AzureLocalInfrastructureYml {
        */
       dns_servers: [Ipv4, ...Ipv4[]];
       /**
-       * ARM useDhcp. Default false.
+       * How each machine's management address (nodes[].management.ip_address) is set before deployment, on the management port (nodes[].management.mac_address). static (default): the address, the subnet mask, the gateway, the DNS servers and vlan_id are set on that port. Simplified provisioning sets them at the OS install (edge machine siteDetails.deviceConfiguration.network.networkAdapters[], ipAssignmentType Manual, keyed by the MAC); for an ISO install the operator or the toolkit sets them. dhcp: the port stays on DHCP, so reserve each ip_address in DHCP for its MAC. preconfigured: the port is already configured, and the tools don't change it. Not the same as use_dhcp, which is the deployment's ARM useDhcp.
+       */
+      ip_assignment?: 'static' | 'dhcp' | 'preconfigured';
+      /**
+       * ARM useDhcp: the deployment takes the host and cluster addresses from DHCP instead of static addresses and the infrastructure_pool. Default false. A deployment setting, not how each machine's management port gets its address before deployment: that is ip_assignment.
        */
       use_dhcp?: boolean;
       /**
@@ -908,18 +912,24 @@ export interface AzureLocalInfrastructureYml {
 }
 export interface Node {
   /**
-   * Host name: up to 15 characters. Also the edge machine name and, for an ISO install, the Arc machine name.
+   * Host name: up to 15 characters. Also the edge machine name and, for an ISO install, the Arc machine name. With simplified provisioning the Arc machine name is arc_machine_name, which defaults to this.
    */
   name: string;
+  /**
+   * The machine's management port and address.
+   */
   management: {
     /**
-     * Static management address. ARM physicalNodesSettings[].ipv4Address. Simplified provisioning connects to it before it is set static, so reserve it in DHCP for the management MAC.
+     * Management address. ARM physicalNodesSettings[].ipv4Address. How it gets onto the management port before deployment is networking.management.ip_assignment: set on the port (static), reserved in DHCP for mac_address (dhcp), or already there (preconfigured).
      */
     ip_address: string;
     /**
-     * MAC of the management adapter: picks the adapter on the machine.
+     * MAC of the management port. Provisioning finds and targets the port by it: simplified provisioning names the port by this MAC when it sets the static address (edge machine networkAdapters[].macAddress), and node preparation finds the adapter by it. With ip_assignment dhcp, reserve ip_address for this MAC. Required with simplified provisioning.
      */
     mac_address?: string;
+    /**
+     * Name of the management port in the installed OS, for example 'SLOT 3 Port 1'. Optional: mac_address identifies the port. Simplified provisioning also sends it with the port's settings; leave it out unless you know the name the OS gives the port.
+     */
     adapter_name?: string;
   };
   /**
@@ -943,7 +953,12 @@ export interface Node {
    */
   storage_ips?: Ipv4[];
   /**
-   * The machine's Arc resource name when it isn't the host name, as after simplified provisioning. ARM arcNodeResourceIds.
+   * Name of the machine's Arc resource (Microsoft.HybridCompute/machines). Default: name. Simplified provisioning sets it when it claims the machine (edge machine arcMachineResourceId); without it the service names the Arc machine ROE1-<id>, and an Arc machine can't be renamed. The deployment uses it in ARM arcNodeResourceIds. An ISO install registers the Arc machine under the host name, so leave it out there. 1-54 letters, digits, '-', '_' and '.', not ending in '.'.
+   */
+  arc_machine_name?: string;
+  /**
+   * @deprecated
+   * Deprecated: use arc_machine_name. Read as arc_machine_name when that isn't set.
    */
   arc_resource_name?: string;
 }

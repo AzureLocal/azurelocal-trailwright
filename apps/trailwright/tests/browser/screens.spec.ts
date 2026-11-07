@@ -2,7 +2,7 @@ import { step } from './nav';
 import { expect, test } from '@playwright/test';
 
 test('a two-node cluster without a witness is flagged and the flag clears with a cloud witness', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Hardware and topology').click();
   await page.getByRole('button', { name: 'Add node' }).click();
   await page.getByRole('button', { name: 'Add node' }).click();
@@ -16,7 +16,7 @@ test('a two-node cluster without a witness is flagged and the flag clears with a
 });
 
 test('only a cloud witness or no witness is offered for connected deployments', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Hardware and topology').click();
   await expect(page.getByRole('radio', { name: 'Cloud witness' })).toBeVisible();
   await expect(page.getByRole('radio', { name: 'No witness' })).toBeVisible();
@@ -24,7 +24,7 @@ test('only a cloud witness or no witness is offered for connected deployments', 
 });
 
 test('local identity without a Key Vault name is flagged, with the Learn source', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Identity').click();
   await page.getByRole('radio', { name: 'Local identity with Key Vault' }).check();
 
@@ -37,7 +37,7 @@ test('local identity without a Key Vault name is flagged, with the Learn source'
 });
 
 test('the project file survives a reload', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await page.getByLabel('Project name').fill('Example design');
   await page.reload();
   await expect(page.getByLabel('Project name')).toHaveValue('Example design');

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { step } from './nav';
 
 test('the disconnected operations step appears only for a disconnected design', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await expect(step(page, 'Disconnected operations')).toHaveCount(0);
   await step(page, 'Connectivity mode and architecture').click();
   await page.getByText('Disconnected (air-gapped)').click();

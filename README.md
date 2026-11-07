@@ -27,7 +27,7 @@ npm install
 npm run dev            # http://localhost:5173
 ```
 
-Open the app, choose **Load the example project** on the Project step, and walk through the steps. Or import a plan from [Surveyor](https://github.com/AzureLocal/azurelocal-surveyor).
+Open the app, choose **Explore the example** on the landing page, and walk through the steps. Or import a plan from [Surveyor](https://github.com/AzureLocal/azurelocal-surveyor).
 
 ```powershell
 npm run check          # type check

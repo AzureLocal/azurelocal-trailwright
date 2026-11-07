@@ -12,7 +12,7 @@ Every question and every rule comes from Microsoft Learn and follows the current
 
 Trailwright runs in your browser. It saves the project in the browser's local storage, and nothing is sent to a server.
 
-You can start a clean design, import a plan from Surveyor, or load the bundled example.
+The app opens on a landing page that explains the tool and links this documentation. From there you can start a clean design, open a saved Trailwright project or a Surveyor plan, or load the bundled example. If the browser already holds a design, **Continue** takes you back to the step you last had open. Select **Trailwright** at the top of the sidebar to return to the landing page.
 
 ## The steps
 

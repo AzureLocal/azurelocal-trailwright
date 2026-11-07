@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { step } from './nav';
 
 test('simplified machine provisioning asks for the site, the machines and the preview limits', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Provisioning and deployment method').click();
   await expect(page.getByLabel('Time zone')).toHaveCount(0);
 
@@ -25,7 +25,7 @@ test('simplified machine provisioning asks for the site, the machines and the pr
 });
 
 test('the Arc gateway conflicts with simplified provisioning, and the ISO path registers with it', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Outbound connectivity').click();
   await page.getByRole('radio', { name: 'Arc gateway', exact: true }).check();
   await step(page, 'Provisioning and deployment method').click();
@@ -36,7 +36,7 @@ test('the Arc gateway conflicts with simplified provisioning, and the ISO path r
 });
 
 test('the portal cannot deploy a three-node switchless cluster', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Hardware and topology').click();
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Add node' }).click();
   await step(page, 'Network design').click();

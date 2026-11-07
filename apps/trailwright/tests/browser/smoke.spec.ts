@@ -2,7 +2,7 @@ import { step } from './nav';
 import { expect, test } from '@playwright/test';
 
 test('the guided flow lists the guided steps and states that nothing deploys', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   const steps = page.locator('nav a');
   await expect(steps).toHaveCount(16);
   await expect(steps.first()).toContainText('Project');
@@ -11,7 +11,7 @@ test('the guided flow lists the guided steps and states that nothing deploys', a
 });
 
 test('each step opens its own screen', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Intents, VLANs and IP plan').click();
   await expect(page.getByRole('heading', { name: 'Networking' })).toBeVisible();
 });

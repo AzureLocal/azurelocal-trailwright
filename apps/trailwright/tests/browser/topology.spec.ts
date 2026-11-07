@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { step } from './nav';
 
 test('the cabling diagram draws for the example', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await page.getByRole('button', { name: 'Load the example project' }).click();
   await page.getByRole('button', { name: 'Replace my design with the example' }).click();
   await step(page, 'Network design').click();

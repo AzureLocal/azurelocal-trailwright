@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { step } from './nav';
 
 test('three cards with two ports each: name them, propose roles, and the intents follow', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Hardware and topology').click();
   await page.getByRole('button', { name: 'Add node' }).click();
   await page.getByRole('button', { name: 'Add node' }).click();
@@ -31,7 +31,7 @@ test('three cards with two ports each: name them, propose roles, and the intents
 });
 
 test('a disaggregated iSCSI node needs one port for each cluster network and each iSCSI path', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Connectivity mode and architecture').click();
   await page.getByRole('radio', { name: 'Disaggregated', exact: true }).check();
   await page.getByRole('radio', { name: 'IP-based SAN (iSCSI)' }).check();

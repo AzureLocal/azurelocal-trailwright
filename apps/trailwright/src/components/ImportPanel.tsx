@@ -10,7 +10,8 @@ type Pending = { mode: 'project'; project: Project } | { mode: 'surveyor'; patch
 const button = 'action-secondary';
 
 // Open a Surveyor plan or a saved Trailwright project. Nothing is applied until the person confirms.
-export const ImportPanel: FC = () => {
+// onApplied runs after an import is applied; the landing page uses it to open the project.
+export const ImportPanel: FC<{ onApplied?: () => void }> = ({ onApplied }) => {
   const { project, replaceProject } = useProjectStore();
   const [pending, setPending] = useState<Pending | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -50,7 +51,7 @@ export const ImportPanel: FC = () => {
         <div className="space-y-2 rounded-md border border-gray-200 p-4">
           <p className="text-sm">Replace the current design with &ldquo;{pending.project.meta.name}&rdquo;?</p>
           <div className="flex gap-2">
-            <button type="button" className={button} onClick={() => { replaceProject(pending.project); setPending(null); }}>
+            <button type="button" className={button} onClick={() => { replaceProject(pending.project); setPending(null); onApplied?.(); }}>
               Replace design
             </button>
             <button type="button" className={button} onClick={() => setPending(null)}>
@@ -75,7 +76,7 @@ export const ImportPanel: FC = () => {
             </>
           )}
           <div className="flex gap-2">
-            <button type="button" className={button} onClick={() => { replaceProject(applyPatch(project, pending.patch)); setPending(null); }}>
+            <button type="button" className={button} onClick={() => { replaceProject(applyPatch(project, pending.patch)); setPending(null); onApplied?.(); }}>
               Apply import
             </button>
             <button type="button" className={button} onClick={() => setPending(null)}>

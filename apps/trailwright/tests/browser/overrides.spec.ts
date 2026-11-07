@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { step } from './nav';
 
 test('intent overrides and storage VLANs can be set and are flagged for OEM guidance', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await page.getByRole('button', { name: 'Load the example project' }).click();
   await page.getByRole('button', { name: 'Replace my design with the example' }).click();
   await step(page, 'Intents, VLANs and IP plan').click();

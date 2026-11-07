@@ -11,7 +11,7 @@ const manifest = {
 };
 
 test('review lists findings with Learn sources and exports files', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Hardware and topology').click();
   await page.getByRole('button', { name: 'Add node' }).click();
   await page.getByRole('button', { name: 'Add node' }).click();
@@ -31,7 +31,7 @@ test('review lists findings with Learn sources and exports files', async ({ page
 });
 
 test('a Surveyor plan shows its conflicts and applies on confirmation', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Review and export').click();
   await expect(page.getByRole('heading', { name: /Review/ }).first()).toBeVisible();
   await page.waitForLoadState('networkidle');
@@ -50,7 +50,7 @@ test('a Surveyor plan shows its conflicts and applies on confirmation', async ({
 });
 
 test('a file that is neither a project nor a plan is refused with a reason', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Review and export').click();
   await expect(page.getByRole('heading', { name: /Review/ }).first()).toBeVisible();
   await page.waitForLoadState('networkidle');
@@ -63,7 +63,7 @@ test('a file that is neither a project nor a plan is refused with a reason', asy
 });
 
 test('a saved Surveyor project file (as Surveyor 2.8.0 writes it) imports from the first screen', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await page.getByLabel('Open a Surveyor plan or a Trailwright project (JSON)').setInputFiles(resolve(process.cwd(), 'tests', 'fixtures', 'surveyor-project.json'));
   await expect(page.getByText(/Conflicts|No conflicts/)).toBeVisible();
   await page.getByRole('button', { name: 'Apply import' }).click();

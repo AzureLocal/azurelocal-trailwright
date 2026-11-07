@@ -2,7 +2,7 @@ import { step } from './nav';
 import { expect, test } from '@playwright/test';
 
 test('an as-built snapshot is compared with the design: matches, drift and a downloadable compare', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await page.getByRole('button', { name: 'Load the example project' }).click();
   await page.getByRole('button', { name: 'Replace my design with the example' }).click();
   await step(page, 'As-built compare').click();

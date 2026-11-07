@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { step } from './nav';
 
 test('the network design follows the node count, storage connectivity and switches', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Hardware and topology').click();
   await page.getByRole('button', { name: 'Add node' }).click();
   await page.getByRole('button', { name: 'Add node' }).click();
@@ -37,7 +37,7 @@ test('the network design follows the node count, storage connectivity and switch
 });
 
 test('intent groupings that need a switch are offered only where supported', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Hardware and topology').click();
   await page.getByRole('button', { name: 'Add node' }).click();
   await page.getByRole('button', { name: 'Add node' }).click();
@@ -51,7 +51,7 @@ test('intent groupings that need a switch are offered only where supported', asy
 });
 
 test('a disaggregated node shows its Ethernet ports and standalone cluster networks', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Connectivity mode and architecture').click();
   await page.getByRole('radio', { name: 'Disaggregated', exact: true }).check();
   await step(page, 'Network design').click();
@@ -65,7 +65,7 @@ test('a disaggregated node shows its Ethernet ports and standalone cluster netwo
 });
 
 test('applying the reference pattern fills the intents and ports', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Hardware and topology').click();
   await page.getByRole('button', { name: 'Add node' }).click();
   await page.getByRole('button', { name: 'Add node' }).click();

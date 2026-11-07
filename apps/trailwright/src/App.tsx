@@ -1,5 +1,5 @@
-import type { ReactElement } from 'react';
-import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
+import { useEffect, type ReactElement } from 'react';
+import { Link, Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
 import { version } from '../package.json';
 import { exportKinds } from './exports';
@@ -25,6 +25,8 @@ import { DisconnectedScreen } from './screens/DisconnectedScreen';
 import { OperationsScreen } from './screens/OperationsScreen';
 import { ReviewScreen } from './screens/ReviewScreen';
 import { AsBuiltScreen } from './screens/AsBuiltScreen';
+import { LandingScreen } from './screens/LandingScreen';
+import { rememberStep } from './model/progress';
 
 const built: Record<string, ReactElement> = {
   project: <ProjectScreen />,
@@ -45,9 +47,25 @@ const built: Record<string, ReactElement> = {
   review: <ReviewScreen />,
   'as-built': <AsBuiltScreen />,
 };
+// The landing page explains Trailwright and opens a project; every other path is a step of the project.
 export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<LandingScreen />} />
+      <Route path="*" element={<ProjectShell />} />
+    </Routes>
+  );
+}
+
+function ProjectShell() {
   const project = useProjectStore((s) => s.project);
   const setSection = useProjectStore((s) => s.setSection);
+  const { pathname } = useLocation();
+  const current = steps.find((s) => `/${s.path}` === pathname);
+  // Remember the open step so the landing page can offer to continue there.
+  useEffect(() => {
+    if (current) rememberStep(current.path);
+  }, [current]);
   const findings = runRules(project);
   const shown = visibleSteps(project);
   const issues = (fields: string[]) => findings.filter((f) => f.severity !== 'info' && fields.some((prefix) => f.field.startsWith(prefix))).length;
@@ -60,9 +78,14 @@ export default function App() {
     <div className="min-h-screen bg-gray-50 text-gray-900 lg:flex">
       <aside className="no-print shrink-0 overflow-y-auto bg-[#0f3057] text-white lg:sticky lg:top-0 lg:h-screen lg:w-72">
         <div className="border-b border-white/10 p-5">
-          <span className="block text-xs uppercase tracking-widest text-blue-200">Azure Local</span>
-          <span className="text-xl font-bold">Trailwright</span>
+          <Link to="/" aria-label="Trailwright home" className="block rounded-md hover:text-blue-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+            <span className="block text-xs uppercase tracking-widest text-blue-200">Azure Local</span>
+            <span className="text-xl font-bold">Trailwright</span>
+          </Link>
           <span className="mt-1 block text-xs text-blue-200">Design your cluster · v{version}</span>
+          <Link to="/" className="mt-3 inline-block text-xs text-blue-100 underline underline-offset-2 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
+            About Trailwright and the docs
+          </Link>
         </div>
         <nav aria-label="Steps" className="space-y-1 p-3">
           {shown.map((step, index) => {
@@ -117,11 +140,10 @@ export default function App() {
         </header>
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
           <Routes>
-            <Route path="/" element={<Navigate to="/project" replace />} />
             {steps.map((step) => (
               <Route
                 key={step.path}
-                path={`/${step.path}`}
+                path={step.path}
                 element={
                   step.visible(project) ? (
                     <>
@@ -138,6 +160,7 @@ export default function App() {
                 }
               />
             ))}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>

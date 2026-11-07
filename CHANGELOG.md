@@ -6,8 +6,10 @@ All notable changes to Azure Local Trailwright are recorded here. The format fol
 
 ### Added
 - Schema 5.1 questions: how each machine's management port gets its address before deployment (`networking.management.ip_assignment`: static, recommended, DHCP with a reservation, or already configured), and, with simplified provisioning, each machine's Arc machine name (`nodes[].arc_machine_name`, default the host name, checked against the Arc naming rule and for duplicates). The vendored schema, its generated types and the example fixtures follow the toolkit's 5.1 schema.
+- Landing page: the app now opens on a page that says what Trailwright is and who it is for, how it works, the exports (listed from the export registry), where it fits between Surveyor and the build automation, the release it plans against (from `CURRENT_RELEASE`) and links to the documentation. From it you start a new design, open a saved project or a Surveyor plan, or explore the example; a design in progress gets a **Continue** link back to the step you last had open, and replacing it asks first and offers to save a copy.
 
 ### Changed
+- The project steps sit behind the landing page: `/` is the landing page, each step keeps its own path (`#/project`, `#/storage` and so on), and an unknown path goes to the landing page. The sidebar title links back to the landing page.
 - The management MAC question says it is the management port that provisioning targets, and reports a MAC used by two machines. The `use_dhcp` question now says it is the deployment's ARM `useDhcp`, not how the port gets its address.
 - Integrated the pending dependency updates, including React 19 with matching DOM and type packages, Tailwind CSS 4 with its PostCSS plugin and explicit configuration, ESLint 10 with compatible hooks tooling, jsdom 30, Node type definitions and the pinned setup-node action.
 - Updated the React element type annotation for React 19 and regenerated the npm lockfile after reconciling the dependency branches.

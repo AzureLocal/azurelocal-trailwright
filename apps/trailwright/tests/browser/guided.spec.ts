@@ -2,7 +2,7 @@ import { step } from './nav';
 import { expect, test } from '@playwright/test';
 
 test('a file share witness is offered only for disconnected operations', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Hardware and topology').click();
   await expect(page.getByRole('radio', { name: /file share/i })).toHaveCount(0);
 
@@ -20,7 +20,7 @@ test('a file share witness is offered only for disconnected operations', async (
 });
 
 test('the rack-aware choices follow the architecture', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Hardware and topology').click();
   await page.getByRole('radio', { name: 'Rack-aware (two rooms)' }).check();
   await expect(page.getByRole('radio', { name: 'Dedicated storage links' })).toBeVisible();
@@ -34,7 +34,7 @@ test('the rack-aware choices follow the architecture', async ({ page }) => {
   await expect(page.getByRole('radio', { name: 'Rack-aware (two rooms)' })).toHaveCount(0);
 });
 test('operations asks backup and disaster recovery follow-ups only when chosen', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await step(page, 'Operations').click();
   await expect(page.getByLabel('Backup solution')).toHaveCount(0);
   await page.getByLabel('Back up VMs').check();
@@ -45,7 +45,7 @@ test('operations asks backup and disaster recovery follow-ups only when chosen',
 });
 
 test('next and back move through the steps', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/project');
   await page.getByRole('link', { name: 'Next: Connectivity mode and architecture' }).click();
   await expect(page.getByRole('heading', { name: 'Connectivity mode and architecture' })).toBeVisible();
   await page.getByRole('link', { name: 'Back: Project' }).click();

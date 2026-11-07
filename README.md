@@ -21,7 +21,7 @@ A guided flow (hardware, storage, network design, intents and VLANs, management 
 You need Node.js 22.13 or later. The application uses React 19 and Tailwind CSS 4 with the dedicated `@tailwindcss/postcss` plugin; the JavaScript Tailwind configuration is loaded explicitly from the main stylesheet.
 
 ```powershell
-git clone https://github.com/Hybrid-Solutions-Cloud/azurelocal-trailwright.git
+git clone https://github.com/AzureLocal/azurelocal-trailwright.git
 cd azurelocal-trailwright
 npm install
 npm run dev            # http://localhost:5173

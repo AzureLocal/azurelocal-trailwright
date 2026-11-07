@@ -14,7 +14,7 @@ import type { Project } from '../model/schema';
 import { visibleSteps } from '../steps/steps';
 
 // The documentation lives in the repository; the Pages site publishes only the app.
-export const REPO_URL = 'https://github.com/Hybrid-Solutions-Cloud/azurelocal-trailwright';
+export const REPO_URL = 'https://github.com/AzureLocal/azurelocal-trailwright';
 const DOCS_URL = `${REPO_URL}/blob/main/docs`;
 const SURVEYOR_APP_URL = 'https://azurelocal.cloud/azurelocal-surveyor/';
 const SURVEYOR_REPO_URL = 'https://github.com/AzureLocal/azurelocal-surveyor';

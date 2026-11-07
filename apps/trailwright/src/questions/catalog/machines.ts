@@ -1,7 +1,7 @@
-// The machines and the hardware they share. Simplified provisioning adds the serial number, BMC and management MAC
-// of every machine; rack aware adds the zone; Storage Spaces Direct adds the drives.
+// The machines and the hardware they share. Simplified provisioning adds the serial number, BMC, management MAC and Arc
+// machine name of every machine; rack aware adds the zone; Storage Spaces Direct adds the drives.
 import type { Question } from '../types';
-import { isRackAware, isSimplified, learn, nodeCount, storageAutoIpOff, usesS2d } from '../when';
+import { arcMachineName, isRackAware, isSimplified, learn, nodeCount, storageAutoIpOff, usesS2d } from '../when';
 
 const step = 'machines' as const;
 const ipv4 = /^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
@@ -15,7 +15,7 @@ export const machineQuestions: Question[] = [
     step,
     group: 'Machines',
     label: 'Name',
-    help: 'Host name, up to 15 characters. Also the Arc machine name.',
+    help: 'Host name, up to 15 characters. Also the Arc machine name, unless simplified provisioning gives it another.',
     owner: 'datacenter',
     kind: 'text',
     check: (v, d, i) => {
@@ -31,7 +31,7 @@ export const machineQuestions: Question[] = [
     step,
     group: 'Machines',
     label: 'Management address',
-    help: 'Static, in the management subnet, outside the infrastructure pool.',
+    help: 'In the management subnet, outside the infrastructure pool. How it gets onto the machine is the management IP assignment on the Network step.',
     learnUrl: learn.decision8,
     owner: 'network',
     kind: 'ipv4',
@@ -42,12 +42,39 @@ export const machineQuestions: Question[] = [
     path: 'nodes[].management.mac_address',
     step,
     group: 'Machines',
-    label: 'Management adapter MAC',
-    help: 'Picks the management adapter on the machine. Simplified provisioning needs it; reserve the management address for this MAC in DHCP.',
+    label: 'Management port MAC',
+    help: 'The management port. Provisioning targets the port by this MAC: with a static IP assignment, simplified provisioning sets the management address on it, and node preparation finds the adapter by it. With DHCP, reserve the management address for this MAC. Simplified provisioning needs it in every IP assignment mode.',
+    learnUrl: learn.simplified,
     owner: 'datacenter',
     kind: 'mac',
     requiredWhen: isSimplified,
-    check: (v) => (typeof v === 'string' && !mac.test(v) ? 'AA:BB:CC:DD:EE:FF or AA-BB-CC-DD-EE-FF.' : undefined),
+    check: (v, d, i) => {
+      if (typeof v !== 'string') return undefined;
+      if (!mac.test(v)) return 'AA:BB:CC:DD:EE:FF or AA-BB-CC-DD-EE-FF.';
+      const norm = (m: unknown) => (typeof m === 'string' ? m.toUpperCase().replace(/-/g, ':') : undefined);
+      const others = (d.nodes ?? []).filter((_, j) => j !== i).map((n) => norm(n?.management?.mac_address));
+      return others.includes(norm(v)) ? `${v} is the management MAC of another machine.` : undefined;
+    },
+  },
+  {
+    id: 'nodes.arc_machine_name',
+    path: 'nodes[].arc_machine_name',
+    step,
+    group: 'Machines',
+    label: 'Arc machine name',
+    help: 'The name of the machine’s Arc resource. Leave it empty to use the host name. Simplified provisioning sets it when it claims the machine; without it the service names the machine ROE1-<id>, and an Arc machine can’t be renamed. 1-54 letters, digits, -, _ and ., not ending in a dot.',
+    learnUrl: learn.arcMachineName,
+    owner: 'azure',
+    kind: 'text',
+    appliesWhen: isSimplified,
+    requiredWhen: () => false,
+    suggest: (d, i) => (i === undefined ? undefined : d.nodes?.[i]?.name),
+    check: (v, d, i) => {
+      if (typeof v !== 'string') return undefined;
+      if (!/^[A-Za-z0-9_.-]{1,54}$/.test(v) || v.endsWith('.')) return '1-54 letters, digits, -, _ and ., not ending in a dot.';
+      const others = (d.nodes ?? []).map((_, j) => j).filter((j) => j !== i).map((j) => arcMachineName(d, j)?.toLowerCase());
+      return others.includes(v.toLowerCase()) ? `${v} is the Arc machine name of another machine.` : undefined;
+    },
   },
   { id: 'nodes.serial_number', path: 'nodes[].serial_number', step, group: 'Machines', label: 'Serial number', help: 'The serial number (Dell service tag). Simplified provisioning matches each ownership voucher to its machine by it.', learnUrl: learn.simplified, owner: 'datacenter', kind: 'text', requiredWhen: isSimplified },
   { id: 'nodes.bmc.ip_address', path: 'nodes[].bmc.ip_address', step, group: 'Machines', label: 'BMC address', help: 'iDRAC, iLO or XCC. Simplified provisioning mounts the provisioning image through it.', owner: 'datacenter', kind: 'ipv4', requiredWhen: isSimplified, check: checkIp },

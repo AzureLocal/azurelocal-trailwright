@@ -23,6 +23,14 @@ export const isArm = (d: Draft) => sc(d).deploy_method === 'arm';
 export const hasStorageNetwork = (d: Draft) => usesS2d(d) && nodeCount(d) > 1;
 export const storageAutoIpOff = (d: Draft) => hasStorageNetwork(d) && d.networking?.storage?.auto_ip === false;
 export const usesDhcp = (d: Draft) => d.networking?.management?.use_dhcp === true;
+// How each machine's management port gets its address before deployment: static (the schema default), dhcp or
+// preconfigured. Not use_dhcp, which is the deployment's ARM useDhcp.
+export const ipAssignment = (d: Draft) => d.networking?.management?.ip_assignment ?? 'static';
+// The Arc machine name of node i: arc_machine_name, else the deprecated arc_resource_name, else the host name.
+export const arcMachineName = (d: Draft, i: number): string | undefined => {
+  const n = d.nodes?.[i];
+  return n?.arc_machine_name || n?.arc_resource_name || n?.name || undefined;
+};
 export const witnessType = (d: Draft) => d.cluster?.witness?.type;
 export const monitoringOn = (d: Draft) => d.operations?.monitoring?.enabled === true;
 export const backupOn = (d: Draft) => d.operations?.backup?.enabled === true;
@@ -55,6 +63,7 @@ export const learn = {
   disaggregated: `${L}/plan/fiber-channel-no-backup-disaggregated-pattern`,
   disconnected: `${L}/manage/disconnected-operations-overview`,
   simplified: `${L}/deploy/simplified-machine-provisioning`,
+  arcMachineName: 'https://learn.microsoft.com/azure/templates/microsoft.hybridcompute/machines#property-values',
   installOs: `${L}/deploy/deployment-install-os`,
   arcGateway: `${L}/deploy/deployment-azure-arc-gateway-overview#supported-and-unsupported-scenarios`,
   privatePath: `${L}/deploy/deployment-with-azure-arc-gateway-private-path`,

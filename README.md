@@ -21,6 +21,18 @@ A guided flow (hardware, storage, network design, intents and VLANs, management 
 | Schedules (CSV, Excel), switch port plan, topology (draw.io), handoff (Markdown, PDF), project JSON | Teams and records |
 | As-built compare | Design versus what Ranger or your own script found ([format](docs/AS-BUILT.md)) |
 
+## Prerequisites
+
+| Need | Detail |
+|---|---|
+| Node.js | 22.13 or later, with npm. React 19 and Tailwind CSS 4 (@tailwindcss/postcss) come with 
+pm install. |
+| Browser | A current Edge, Chrome or Firefox. The app runs entirely in the browser; nothing is sent to a server and no secret is stored. |
+| Tests | 
+pm test needs no browser. 
+pm run test:browser uses Playwright, which downloads a browser the first time. |
+| Azure, PowerShell, credentials | None for Trailwright itself. To fill hardware values from the machines, run the toolkit's hardware discovery (Dell iDRAC only in this phase): PowerShell 7, the powershell-yaml module and TCP 443 to each BMC, with the BMC login as a Key Vault reference. See [docs/WHAT-TO-COLLECT.md](docs/WHAT-TO-COLLECT.md). |
+
 ## Quick start
 
 You need Node.js 22.13 or later. The application uses React 19 and Tailwind CSS 4 with the dedicated `@tailwindcss/postcss` plugin; the JavaScript Tailwind configuration is loaded explicitly from the main stylesheet.
@@ -45,6 +57,7 @@ npm run test:browser   # Playwright journeys (builds and previews the app)
 ## Documentation
 
 - [User guide](docs/USER-GUIDE.md)
+- [What an Azure Local deployment needs, what Trailwright asks, and what hardware discovery can fill in](docs/WHAT-TO-COLLECT.md)
 - [Validation rules](docs/RULES.md) (generated from the code)
 - [infrastructure.yml field reference](docs/INFRASTRUCTURE-YML.md)
 - [Environment file and Terraform variables](docs/ENVIRONMENT-FILE.md)

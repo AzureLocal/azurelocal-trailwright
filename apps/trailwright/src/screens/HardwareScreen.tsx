@@ -6,6 +6,7 @@ import { FindingsPanel } from '../components/FindingsPanel';
 import { NumberInput, TextInput } from '../components/Field';
 import { ChoiceCards } from '../components/ChoiceCards';
 import { zonesOf } from '../exports/createCluster';
+import { DiscoveryBanner, DiscoveryNote } from '../components/DiscoveryNote';
 
 const topologyOptions = [
   { value: 'standard', label: 'Single rack', description: 'All nodes and a pair of top-of-rack switches in one rack, up to 16 nodes.' },
@@ -61,11 +62,17 @@ export const HardwareScreen: FC = () => {
 
       <div>
         <h2 className="mb-3 text-lg font-medium text-gray-800">Nodes</h2>
+        <div className="mb-3">
+          <DiscoveryBanner />
+        </div>
         <ul className="space-y-3">
           {hardware.nodes.map((node, index) => (
             <li key={index} className="flex flex-wrap items-end gap-4 rounded-md border border-gray-200 p-3">
               <TextInput id={`node-${index}-name`} label={`Node ${index + 1} name`} value={node.name} onChange={(name) => updateNode(index, { name })} />
-              <TextInput id={`node-${index}-serial`} label={`Node ${index + 1} serial`} value={node.serial ?? ''} onChange={(serial) => updateNode(index, { serial })} />
+              <div className="flex flex-col gap-1">
+                <TextInput id={`node-${index}-serial`} label={`Node ${index + 1} serial`} value={node.serial ?? ''} onChange={(serial) => updateNode(index, { serial })} />
+                <DiscoveryNote what="The serial number (service tag)" />
+              </div>
               <NumberInput id={`node-${index}-cores`} label={`Node ${index + 1} cores`} value={node.cores} onChange={(cores) => updateNode(index, { cores })} />
               <NumberInput id={`node-${index}-memory`} label={`Node ${index + 1} memory (GiB)`} value={node.memoryGiB} onChange={(memoryGiB) => updateNode(index, { memoryGiB })} />
               {hardware.topology === 'rack-aware' && <TextInput id={`node-${index}-zone`} label={`Node ${index + 1} zone (rack)`} value={node.zone ?? ''} onChange={(zone) => updateNode(index, { zone })} hint={`Now: ${zonesOf(project).find((z) => z.nodes.includes(node.name))?.localAvailabilityZoneName ?? ''}. Empty: first half Zone1, second half Zone2.`} />}

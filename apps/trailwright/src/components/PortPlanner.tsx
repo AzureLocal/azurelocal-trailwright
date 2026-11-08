@@ -1,6 +1,7 @@
 import { useState, type FC } from 'react';
 import { useProjectStore } from '../model/store';
 import type { Project } from '../model/schema';
+import { DiscoveryBanner } from './DiscoveryNote';
 import { allPorts, assignedCount, intentsFromRoles, neededGroups, presetCards, proposeRoles, speeds, type Card, type Port } from '../network/ports';
 
 const rdmaOptions: Port['rdma'][] = ['none', 'iWARP', 'RoCE', 'RoCEv2'];
@@ -47,6 +48,7 @@ export const PortPlanner: FC = () => {
         <p className="text-sm text-gray-600">
           Describe the physical cards as the operating system names them. Use the same names on every node: the deployment template refers to adapters by name. Ports of one team must be identical (same make, model and speed).
         </p>
+        <DiscoveryBanner />
         <div className="flex flex-wrap gap-2">
           {[
             ['1 card, 2 ports', 1, 2],

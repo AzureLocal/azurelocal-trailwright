@@ -39,6 +39,7 @@ export const machineQuestions: Question[] = [
   },
   {
     id: 'nodes.management.mac_address',
+    discovery: true,
     path: 'nodes[].management.mac_address',
     step,
     group: 'Machines',
@@ -76,7 +77,7 @@ export const machineQuestions: Question[] = [
       return others.includes(v.toLowerCase()) ? `${v} is the Arc machine name of another machine.` : undefined;
     },
   },
-  { id: 'nodes.serial_number', path: 'nodes[].serial_number', step, group: 'Machines', label: 'Serial number', help: 'The serial number (Dell service tag). Simplified provisioning matches each ownership voucher to its machine by it.', learnUrl: learn.simplified, owner: 'datacenter', kind: 'text', requiredWhen: isSimplified },
+  { id: 'nodes.serial_number', discovery: true, path: 'nodes[].serial_number', step, group: 'Machines', label: 'Serial number', help: 'The serial number (Dell service tag). Simplified provisioning matches each ownership voucher to its machine by it.', learnUrl: learn.simplified, owner: 'datacenter', kind: 'text', requiredWhen: isSimplified },
   { id: 'nodes.bmc.ip_address', path: 'nodes[].bmc.ip_address', step, group: 'Machines', label: 'BMC address', help: 'iDRAC, iLO or XCC. Simplified provisioning mounts the provisioning image through it.', owner: 'datacenter', kind: 'ipv4', requiredWhen: isSimplified, check: checkIp },
   {
     id: 'nodes.zone',
@@ -97,21 +98,22 @@ export const machineQuestions: Question[] = [
 
   // The hardware every machine shares.
   { id: 'hardware.vendor', path: 'hardware.vendor', step, group: 'Hardware', label: 'Vendor', help: 'For example Dell, HPE, Lenovo or DataON. Picks the OEM extension (SBE) and, with simplified provisioning, the BMC handling.', owner: 'datacenter', kind: 'text' },
-  { id: 'hardware.model', path: 'hardware.model', step, group: 'Hardware', label: 'Model', help: 'For example AX-760. Must be in the Azure Local catalog; simplified provisioning supports a shorter list of validated hardware.', learnUrl: learn.simplified, owner: 'datacenter', kind: 'text' },
-  { id: 'hardware.cpu_cores', path: 'hardware.cpu_cores', step, group: 'Hardware', label: 'Physical cores per machine', owner: 'datacenter', kind: 'number', requiredWhen: () => false },
-  { id: 'hardware.memory_gib', path: 'hardware.memory_gib', step, group: 'Hardware', label: 'Memory per machine (GiB)', owner: 'datacenter', kind: 'number', requiredWhen: () => false },
+  { id: 'hardware.model', discovery: true, path: 'hardware.model', step, group: 'Hardware', label: 'Model', help: 'For example AX-760. Must be in the Azure Local catalog; simplified provisioning supports a shorter list of validated hardware.', learnUrl: learn.simplified, owner: 'datacenter', kind: 'text' },
+  { id: 'hardware.cpu_cores', discovery: true, path: 'hardware.cpu_cores', step, group: 'Hardware', label: 'Physical cores per machine', owner: 'datacenter', kind: 'number', requiredWhen: () => false },
+  { id: 'hardware.memory_gib', discovery: true, path: 'hardware.memory_gib', step, group: 'Hardware', label: 'Memory per machine (GiB)', owner: 'datacenter', kind: 'number', requiredWhen: () => false },
   ...(['capacity', 'cache'] as const).flatMap((tier): Question[] => {
     const applies = tier === 'capacity' ? usesS2d : (d: Parameters<typeof usesS2d>[0]) => usesS2d(d) && nodeCount(d) > 1;
     const what = tier === 'capacity' ? 'Capacity' : 'Cache';
     const help = tier === 'capacity' ? 'Every machine has the same drives; Storage Spaces Direct pools them.' : 'Optional: a faster tier in front of the capacity drives. Leave empty for all-flash with one drive type.';
     return [
-      { id: `hardware.drives.${tier}.media`, path: `hardware.drives.${tier}.media`, step, group: 'Drives', label: `${what} drive media`, help, owner: 'datacenter', kind: 'select', appliesWhen: applies, requiredWhen: () => false, options: [{ value: 'nvme', label: 'NVMe' }, { value: 'ssd', label: 'SSD' }, ...(tier === 'capacity' ? [{ value: 'hdd', label: 'HDD' }] : [])] },
-      { id: `hardware.drives.${tier}.count`, path: `hardware.drives.${tier}.count`, step, group: 'Drives', label: `${what} drives per machine`, owner: 'datacenter', kind: 'number', appliesWhen: applies, requiredWhen: () => false },
-      { id: `hardware.drives.${tier}.size_tb`, path: `hardware.drives.${tier}.size_tb`, step, group: 'Drives', label: `${what} drive size (TB)`, owner: 'datacenter', kind: 'number', appliesWhen: applies, requiredWhen: () => false },
+      { id: `hardware.drives.${tier}.media`, discovery: true, path: `hardware.drives.${tier}.media`, step, group: 'Drives', label: `${what} drive media`, help, owner: 'datacenter', kind: 'select', appliesWhen: applies, requiredWhen: () => false, options: [{ value: 'nvme', label: 'NVMe' }, { value: 'ssd', label: 'SSD' }, ...(tier === 'capacity' ? [{ value: 'hdd', label: 'HDD' }] : [])] },
+      { id: `hardware.drives.${tier}.count`, discovery: true, path: `hardware.drives.${tier}.count`, step, group: 'Drives', label: `${what} drives per machine`, owner: 'datacenter', kind: 'number', appliesWhen: applies, requiredWhen: () => false },
+      { id: `hardware.drives.${tier}.size_tb`, discovery: true, path: `hardware.drives.${tier}.size_tb`, step, group: 'Drives', label: `${what} drive size (TB)`, owner: 'datacenter', kind: 'number', appliesWhen: applies, requiredWhen: () => false },
     ];
   }),
   {
     id: 'hardware.network_cards',
+    discovery: true,
     path: 'hardware.network_cards',
     step,
     group: 'Network adapters',
@@ -129,6 +131,6 @@ export const machineQuestions: Question[] = [
   // What simplified provisioning needs from the hardware.
   { id: 'hardware.bmc.username', path: 'hardware.bmc.username', step, group: 'BMC login', label: 'BMC user name', help: 'The user name, or a keyvault:// reference to the secret holding it. Used for every machine.', owner: 'datacenter', kind: 'text', appliesWhen: isSimplified },
   { id: 'hardware.bmc.password', path: 'hardware.bmc.password', step, group: 'BMC login', label: 'BMC password secret', help: 'keyvault://<vault>/<secret>. Never the password itself.', owner: 'datacenter', kind: 'kvref', appliesWhen: isSimplified },
-  { id: 'hardware.sbe.bundle_path', path: 'hardware.sbe.bundle_path', step, group: 'OEM extension (SBE)', label: 'SBE folder', help: 'Folder on the management host with the OEM’s SBE files as downloaded. The machines are prepared with it before Validate.', owner: 'datacenter', kind: 'text', appliesWhen: isSimplified },
+  { id: 'hardware.sbe.bundle_path', path: 'hardware.sbe.bundle_path', step, group: 'OEM extension (SBE)', label: 'SBE folder', help: 'Optional, and never the default: only when a person wants an OEM Solution Builder Extension side-loaded. Folder on the management host with the OEM’s SBE files as downloaded. Without an SBE the machines keep the OEM drivers the OS already has.', owner: 'datacenter', kind: 'text', appliesWhen: isSimplified },
   { id: 'hardware.sbe.version', path: 'hardware.sbe.version', step, group: 'OEM extension (SBE)', label: 'SBE version', help: 'The OEM’s SBE version validated with the OS version you pin.', owner: 'datacenter', kind: 'text', requiredWhen: () => false },
 ];

@@ -83,6 +83,8 @@ export type Question = {
   // Why it's asked and what it changes.
   help?: string;
   learnUrl?: string;
+  // True when hardware discovery (the toolkit's Invoke-HardwareDiscovery.ps1, Dell iDRAC over Redfish) can read the value.
+  discovery?: boolean;
   owner: Owner;
   kind: Kind;
   options?: Option[];

@@ -45,6 +45,17 @@ export const exportProjects: Array<[string, () => Project]> = [
     p.storage = { ...p.storage, volumes: [{ name: 'nested', sizeGiB: 1024, resiliency: 'nested-two-way' }] };
     return p;
   }],
+  ['SBE not applicable', () => {
+    const p = createExampleProject();
+    p.hardware = { ...p.hardware, sbe: { ...p.hardware.sbe, requirement: 'not_applicable', notApplicableReason: 'No Solution Builder Extension exists for this hardware model.', sourcePath: '' } };
+    return p;
+  }],
+  ['SBE on a share with a reader account and a build-time side-load', () => {
+    const p = ad();
+    p.landingZone = { ...p.landingZone, keyVaultName: 'kv-example' };
+    p.hardware = { ...p.hardware, sbe: { requirement: 'required', notApplicableReason: '', sourcePath: '\\\\files.example.invalid\\sbe\\vendor', sourceUsername: 'EXAMPLE\\svc-sbe-read', sourcePasswordSecret: 'sbe-share-reader', delivery: 'winrm_copy' } };
+    return p;
+  }],
   ['empty design', () => {
     const p = createExampleProject();
     p.hardware = { ...p.hardware, nodes: [] };

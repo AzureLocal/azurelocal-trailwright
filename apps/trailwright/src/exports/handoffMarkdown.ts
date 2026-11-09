@@ -14,6 +14,17 @@ function table(head: string[], rows: (string | number | boolean | undefined)[][]
 
 const yes = (b: boolean): string => (b ? 'yes' : 'no');
 
+// The Solution Builder Extension (SBE) package: a requirement (it is needed to update the cluster; the automation reads it from a
+// share and checks it before the cluster is created). Installing it during the build is optional.
+function sbeLines(p: Project): string[] {
+  const s = p.hardware.sbe;
+  if (s.requirement === 'not_applicable') return [`- Solution Builder Extension package: not applicable. ${s.notApplicableReason || '(no reason given)'}`];
+  const out = [`- Solution Builder Extension package: required, available at ${s.sourcePath || '(location not given yet)'}`];
+  if (s.sourceUsername) out.push(`- Account that reads the package share: ${s.sourceUsername}, password from Key Vault secret ${s.sourcePasswordSecret || '(not given yet)'}`);
+  out.push(`- Install it during the build: ${s.delivery === 'skip' ? 'no (default)' : s.delivery}`);
+  return out;
+}
+
 // The design as a readable report that carries every answer, and the commands to deploy from the parameter files.
 // Secrets never appear: the model holds none, only names.
 export function buildHandoffMarkdown(p: Project): string {
@@ -31,7 +42,7 @@ export function buildHandoffMarkdown(p: Project): string {
 
   out.push('## Hardware and topology', '', `- Topology: ${p.hardware.topology}${p.hardware.topology === 'rack-aware' ? ` (${p.hardware.rackAwareUplink})` : ''}`, `- Witness: ${witnessTypeFor(p)}`);
   if (p.deployment.architecture === 'disaggregated') out.push(`- Racks: ${p.hardware.racks}`);
-  out.push('');
+  out.push(...sbeLines(p), '');
   out.push(...table(['Node', 'Management IP', 'Serial', 'Cores', 'Memory (GiB)', 'Drives'], p.hardware.nodes.map((n) => [n.name, n.ip, n.serial, n.cores, n.memoryGiB, n.drives])));
 
   out.push('## Identity', '', `- Mode: ${p.identity.mode}`, `- Local administrator user: ${p.identity.localAdminUsername}`);

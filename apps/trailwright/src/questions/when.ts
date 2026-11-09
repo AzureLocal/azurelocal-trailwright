@@ -63,6 +63,7 @@ export const learn = {
   disaggregated: `${L}/plan/fiber-channel-no-backup-disaggregated-pattern`,
   disconnected: `${L}/manage/disconnected-operations-overview`,
   simplified: `${L}/deploy/simplified-machine-provisioning`,
+  sbe: `${L}/update/solution-builder-extension`,
   arcMachineName: 'https://learn.microsoft.com/azure/templates/microsoft.hybridcompute/machines#property-values',
   installOs: `${L}/deploy/deployment-install-os`,
   arcGateway: `${L}/deploy/deployment-azure-arc-gateway-overview#supported-and-unsupported-scenarios`,

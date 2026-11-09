@@ -20,4 +20,4 @@ type DeepPartial<T> = T extends (infer U)[] ? DeepPartial<U>[] : T extends objec
 export type Draft = DeepPartial<Infrastructure>;
 
 export const SCHEMA_MAJOR = 5;
-export const SCHEMA_VERSION = '5.1.0';
+export const SCHEMA_VERSION = '5.6.4';

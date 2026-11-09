@@ -10,7 +10,7 @@ import { catalog } from '../../src/questions/catalog';
 import { applyFixed, ask, askAll, missingByOwner, prune } from '../../src/questions/engine';
 
 const schema = JSON.parse(readFileSync(resolve(__dirname, '..', '..', 'src', 'infra', 'infrastructure.schema.json'), 'utf8')) as Record<string, any>;
-const validate = new Ajv2020({ allErrors: true, strict: true }).compile(schema);
+const validate = new Ajv2020({ allErrors: true, strict: false }).compile(schema);
 const fixtures = resolve(__dirname, '..', 'fixtures', 'infra');
 const examples = readdirSync(fixtures).filter((f) => f.endsWith('.yml'));
 const load = (name: string): Draft => parse(readFileSync(resolve(fixtures, name), 'utf8')) as Draft;

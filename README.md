@@ -25,13 +25,11 @@ A guided flow (hardware, storage, network design, intents and VLANs, management 
 
 | Need | Detail |
 |---|---|
-| Node.js | 22.13 or later, with npm. React 19 and Tailwind CSS 4 (@tailwindcss/postcss) come with 
-pm install. |
+| Node.js | 22.13 or later, with npm. React 19 and Tailwind CSS 4 (@tailwindcss/postcss) come with `npm install`. |
 | Browser | A current Edge, Chrome or Firefox. The app runs entirely in the browser; nothing is sent to a server and no secret is stored. |
-| Tests | 
-pm test needs no browser. 
-pm run test:browser uses Playwright, which downloads a browser the first time. |
+| Tests | `npm test` needs no browser. `npm run test:browser` uses Playwright, which downloads a browser the first time. |
 | Azure, PowerShell, credentials | None for Trailwright itself. To fill hardware values from the machines, run the toolkit's hardware discovery (Dell iDRAC only in this phase): PowerShell 7, the powershell-yaml module and TCP 443 to each BMC, with the BMC login as a Key Vault reference. See [docs/WHAT-TO-COLLECT.md](docs/WHAT-TO-COLLECT.md). |
+| Solution Builder Extension (SBE) package | Download your hardware vendor's Solution Builder Extension package for your model and the Azure Local version you deploy. It is a requirement: you need it to update the cluster, and the automation reads it from a share and checks it before the cluster is created. Installing it during the build is optional (off by default). Trailwright asks where the package is (a share path), whether the requirement applies (required, or not applicable with a reason, for example hardware without an SBE) and whether to side-load it at build time (default no). The share credential is a Key Vault reference, never typed. Downloads differ by vendor and are not checked here; Dell AX and MC need a login-gated download. See [Solution Builder Extension updates for your Azure Local](https://learn.microsoft.com/azure/azure-local/update/solution-builder-extension). Hardware discovery does not read the package: it is not on the machines' BMC. |
 
 ## Quick start
 

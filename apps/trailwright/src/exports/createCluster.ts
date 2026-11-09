@@ -206,6 +206,9 @@ export function buildCreateClusterParams(p: Project, mode: 'Validate' | 'Deploy'
     storageConnectivitySwitchless: p.networking.storage === 'switchless',
     enableStorageAutoIp: p.networking.storageAutoIp,
     customLocation: lz.customLocation ?? '',
+    // The Solution Builder Extension package is a requirement, but the share it is read from is not an ARM parameter: it goes to
+    // infrastructure.yml as hardware.sbe.* (see buildSbe), where the toolkit checks it before the cluster is created. These stay empty
+    // because the build-time side-load is optional and off by default.
     sbeVersion: '',
     sbeFamily: '',
     sbePublisher: '',

@@ -7,6 +7,7 @@ import { NumberInput, TextInput } from '../components/Field';
 import { ChoiceCards } from '../components/ChoiceCards';
 import { zonesOf } from '../exports/createCluster';
 import { DiscoveryBanner, DiscoveryNote } from '../components/DiscoveryNote';
+import { SbeSection } from '../components/SbeSection';
 
 const topologyOptions = [
   { value: 'standard', label: 'Single rack', description: 'All nodes and a pair of top-of-rack switches in one rack, up to 16 nodes.' },
@@ -87,6 +88,8 @@ export const HardwareScreen: FC = () => {
           Add node
         </button>
       </div>
+
+      <SbeSection sbe={hardware.sbe} onChange={(patch) => update({ sbe: { ...hardware.sbe, ...patch } })} />
 
       <FindingsPanel prefixes={['hardware']} />
     </section>

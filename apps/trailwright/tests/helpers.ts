@@ -41,7 +41,7 @@ const compliant: DeepPartial<Project> = {
   },
   infrastructure: { useDhcp: false, subnetMask: '255.255.255.0', gateway: '192.0.2.1', startIp: '192.0.2.21', endIp: '192.0.2.27', dnsServers: ['192.0.2.10'], managementVlan: 0 },
   security: { backupKeyVaultName: 'kv-backup-example' },
-  hardware: { topology: 'standard', witness: 'cloud', nodes: makeNodes(2) },
+  hardware: { topology: 'standard', witness: 'cloud', nodes: makeNodes(2), sbe: { requirement: 'required', sourcePath: 'D:/sbe/vendor' } },
   operations: { updateMethod: 'portal' },
   storage: { driveLayout: { capacity: { media: 'nvme', count: 4, sizeTB: 3.84 }, cache: { media: 'nvme', count: 0, sizeTB: 0 } } },
   identity: { mode: 'active-directory', domain: 'example.com', ouPath: 'OU=azl01,DC=example,DC=com', lcmUsername: 'lcmuser01', localAdminUsername: 'azladmin' },

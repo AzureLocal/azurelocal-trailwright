@@ -36,6 +36,23 @@ const nodeSchema = z.object({
   storageIps: z.array(z.string()).optional(),
 });
 
+// The hardware vendor's Solution Builder Extension (SBE) package is a requirement: it is needed to update the cluster, and the
+// automation reads it from a share and checks it before the cluster is created. Installing it during the build is optional and off.
+const sbeSchema = z
+  .object({
+    requirement: z.enum(['required', 'not_applicable']).default('required'),
+    // Why no package is needed (not_applicable only), for example hardware without an SBE.
+    notApplicableReason: z.string().default(''),
+    // The share or folder where the downloaded package is available to the automation.
+    sourcePath: z.string().default(''),
+    // The account that reads the share, when the account running the automation cannot. Its password is a Key Vault secret name, never a value.
+    sourceUsername: z.string().default(''),
+    sourcePasswordSecret: z.string().default(''),
+    // Side-load at build time: skip (the default), winrm_copy or node_pull.
+    delivery: z.enum(['skip', 'winrm_copy', 'node_pull']).default('skip'),
+  })
+  .default({});
+
 const hardwareSchema = z.object({
   topology: z.enum(['standard', 'rack-aware']),
   // Rack-aware only: how storage and nodes are cabled between the two rooms (four documented options).
@@ -46,6 +63,7 @@ const hardwareSchema = z.object({
   witness: z.enum(['cloud', 'file-share', 'none']),
   // Disconnected operations: the UNC path of the file share witness.
   witnessPath: z.string().default(''),
+  sbe: sbeSchema,
 });
 
 const identitySchema = z.object({

@@ -1,5 +1,6 @@
 // The machines and the hardware they share. Simplified provisioning adds the serial number, BMC, management MAC and Arc
 // machine name of every machine; rack aware adds the zone; Storage Spaces Direct adds the drives.
+import type { Draft } from '../../infra/types';
 import type { Question } from '../types';
 import { arcMachineName, isRackAware, isSimplified, learn, nodeCount, storageAutoIpOff, usesS2d } from '../when';
 
@@ -7,6 +8,9 @@ const step = 'machines' as const;
 const ipv4 = /^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
 const mac = /^[0-9A-Fa-f]{2}([:-][0-9A-Fa-f]{2}){5}$/;
 const checkIp = (v: unknown) => (typeof v === 'string' && !ipv4.test(v) ? 'An IPv4 address, for example 192.0.2.11.' : undefined);
+// The Solution Builder Extension questions: all apply unless the requirement is declared not applicable.
+const sbeNotApplicable = (d: Draft) => d.hardware?.sbe?.requirement === 'not_applicable';
+const sbeApplies = (d: Draft) => !sbeNotApplicable(d);
 
 export const machineQuestions: Question[] = [
   {
@@ -131,6 +135,130 @@ export const machineQuestions: Question[] = [
   // What simplified provisioning needs from the hardware.
   { id: 'hardware.bmc.username', path: 'hardware.bmc.username', step, group: 'BMC login', label: 'BMC user name', help: 'The user name, or a keyvault:// reference to the secret holding it. Used for every machine.', owner: 'datacenter', kind: 'text', appliesWhen: isSimplified },
   { id: 'hardware.bmc.password', path: 'hardware.bmc.password', step, group: 'BMC login', label: 'BMC password secret', help: 'keyvault://<vault>/<secret>. Never the password itself.', owner: 'datacenter', kind: 'kvref', appliesWhen: isSimplified },
-  { id: 'hardware.sbe.bundle_path', path: 'hardware.sbe.bundle_path', step, group: 'OEM extension (SBE)', label: 'SBE folder', help: 'Optional, and never the default: only when a person wants an OEM Solution Builder Extension side-loaded. Folder on the management host with the OEM’s SBE files as downloaded. Without an SBE the machines keep the OEM drivers the OS already has.', owner: 'datacenter', kind: 'text', appliesWhen: isSimplified },
+  // The OEM Solution Builder Extension (SBE) package is a requirement: you need it to update the cluster, and the automation reads it
+  // from a share and checks it before the cluster is created. Key names are the toolkit master registry's hardware.sbe.*.
+  // Installing it during the build (delivery) is optional and off. Vendor downloads differ and are not checked here; Dell AX and MC need a
+  // login-gated download.
+  {
+    id: 'hardware.sbe.requirement',
+    path: 'hardware.sbe.requirement',
+    step,
+    group: 'OEM extension (SBE)',
+    label: 'Does the Solution Builder Extension requirement apply?',
+    help: 'Download your hardware vendor’s Solution Builder Extension package for your model and the Azure Local version you deploy. It is a requirement: you need it to update the cluster, and the automation reads it from a share and checks it before the cluster is created. Installing it during the build is optional (off by default). Dell AX and MC need a login-gated download from Dell support. Not applicable is for hardware without a Solution Builder Extension, or a cluster that downloads it with the vendor credential.',
+    learnUrl: learn.sbe,
+    owner: 'datacenter',
+    kind: 'select',
+    options: [
+      { value: 'required', label: 'Required: the package is on a share' },
+      { value: 'not_applicable', label: 'Not applicable (give the reason)' },
+    ],
+    // The registry leaves the key optional (the vendor catalog decides when it is absent), so an older file without it stays complete.
+    requiredWhen: () => false,
+  },
+  {
+    id: 'hardware.sbe.not_applicable_reason',
+    path: 'hardware.sbe.not_applicable_reason',
+    step,
+    group: 'OEM extension (SBE)',
+    label: 'Why the requirement does not apply',
+    help: 'One sentence, for example: no Solution Builder Extension exists for this hardware model.',
+    owner: 'datacenter',
+    kind: 'text',
+    appliesWhen: sbeNotApplicable,
+  },
+  {
+    id: 'hardware.sbe.source_path',
+    path: 'hardware.sbe.source_path',
+    step,
+    group: 'OEM extension (SBE)',
+    label: 'Where is the Solution Builder Extension package? (share or folder)',
+    help: 'A UNC share or folder, for example \\\\files.example.invalid\\sbe\\vendor, with the three files as the vendor delivers them (SBE_Discovery_<vendor>.xml, SBE_<vendor>_<family>_<version>.xml and the .zip). The automation reads it, read only, and checks it before the cluster is created. No credential, token or query string in the path.',
+    learnUrl: learn.sbe,
+    owner: 'datacenter',
+    kind: 'text',
+    appliesWhen: sbeApplies,
+    requiredWhen: (d) => d.hardware?.sbe?.requirement === 'required',
+    check: (v) => (typeof v === 'string' && /\?|:\/\/[^/]*@|(password|pwd|token|sig)=/i.test(v) ? 'No credential, token or query string in the path: the share or folder only.' : undefined),
+  },
+  {
+    id: 'hardware.sbe.source_username',
+    path: 'hardware.sbe.source_username',
+    step,
+    group: 'OEM extension (SBE)',
+    label: 'Account that reads the package share',
+    help: 'Only when the account running the automation cannot read it, for example DOMAIN\\svc-sbe-read. Read access only. Needs the password secret below.',
+    owner: 'datacenter',
+    kind: 'text',
+    appliesWhen: sbeApplies,
+    requiredWhen: () => false,
+  },
+  {
+    id: 'hardware.sbe.source_password',
+    path: 'hardware.sbe.source_password',
+    step,
+    group: 'OEM extension (SBE)',
+    label: 'Password secret of that account',
+    help: 'keyvault://<vault>/<secret>. Never the password itself.',
+    owner: 'datacenter',
+    kind: 'kvref',
+    appliesWhen: (d) => sbeApplies(d) && !!d.hardware?.sbe?.source_username,
+    requiredWhen: () => true,
+  },
+  {
+    id: 'hardware.sbe.package_sha256',
+    path: 'hardware.sbe.package_sha256',
+    step,
+    group: 'OEM extension (SBE)',
+    label: 'SHA-256 of the package .zip (optional)',
+    help: 'As the vendor publishes it, 64 hexadecimal characters. Without it the check uses the hash in the package’s own manifest.',
+    owner: 'datacenter',
+    kind: 'text',
+    appliesWhen: sbeApplies,
+    requiredWhen: () => false,
+    check: (v) => (typeof v === 'string' && v !== '' && !/^[A-Fa-f0-9]{64}$/.test(v) ? '64 hexadecimal characters.' : undefined),
+  },
+  {
+    id: 'hardware.sbe.package_size_bytes',
+    path: 'hardware.sbe.package_size_bytes',
+    step,
+    group: 'OEM extension (SBE)',
+    label: 'Size of the package .zip in bytes (optional)',
+    owner: 'datacenter',
+    kind: 'number',
+    appliesWhen: sbeApplies,
+    requiredWhen: () => false,
+  },
+  {
+    id: 'hardware.sbe.delivery',
+    path: 'hardware.sbe.delivery',
+    step,
+    group: 'OEM extension (SBE)',
+    label: 'Install it during the build (side-load)?',
+    help: 'Optional, and off by default. The package is checked before the cluster is created either way, and you still need it for the first update.',
+    learnUrl: learn.sbe,
+    owner: 'datacenter',
+    kind: 'select',
+    options: [
+      { value: 'skip', label: 'No (default)' },
+      { value: 'winrm_copy', label: 'Yes: copy it to the machines over WinRM' },
+      { value: 'node_pull', label: 'Yes: each machine pulls it from a read-only location' },
+    ],
+    appliesWhen: sbeApplies,
+    recommended: () => ({ value: 'skip', reason: 'Installing the package during the build is optional; the cluster can take it with the first update.' }),
+    requiredWhen: () => false,
+  },
+  {
+    id: 'hardware.sbe.node_pull_url',
+    path: 'hardware.sbe.node_pull_url',
+    step,
+    group: 'OEM extension (SBE)',
+    label: 'Folder the machines pull the package from',
+    help: 'An address the machines can reach: https://host/sbe/vendor or a UNC folder. Read only, and no credential in the address.',
+    owner: 'datacenter',
+    kind: 'text',
+    appliesWhen: (d) => sbeApplies(d) && d.hardware?.sbe?.delivery === 'node_pull',
+  },
+  { id: 'hardware.sbe.bundle_path', path: 'hardware.sbe.bundle_path', step, group: 'OEM extension (SBE)', label: 'SBE folder', help: 'Optional. Folder on the management host with the OEM’s Solution Builder Extension files as downloaded, used to prepare the machines before Validate. It means the same as the package location above, which is the one read when both are set. Without an SBE the machines keep the OEM drivers the OS already has.', owner: 'datacenter', kind: 'text', appliesWhen: isSimplified },
   { id: 'hardware.sbe.version', path: 'hardware.sbe.version', step, group: 'OEM extension (SBE)', label: 'SBE version', help: 'The OEM’s SBE version validated with the OS version you pin.', owner: 'datacenter', kind: 'text', requiredWhen: () => false },
 ];

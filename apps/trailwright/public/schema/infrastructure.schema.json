@@ -5,7 +5,7 @@
   "description": "The file written by the infrastructure.yml export (src/exports/infrastructureYml.ts). It is a design record in the shape of a subset of the Azure Local Toolkit registry (schema_version 4.0.0); it is not the full Toolkit registry. Secrets are never values: they are keyvault://<vault>/<secret> references. A test validates every export fixture against this schema, and the build fails when the exporter and the schema drift apart.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["_metadata", "site", "environment", "azure_platform", "provisioning", "identity", "connectivity", "infrastructure_network", "networking", "compute", "storage", "sdn", "security", "operations", "arm_parameters"],
+  "required": ["_metadata", "site", "environment", "azure_platform", "provisioning", "identity", "connectivity", "infrastructure_network", "networking", "hardware", "compute", "storage", "sdn", "security", "operations", "arm_parameters"],
   "$defs": {
     "textList": { "type": "array", "items": { "type": "string" } },
     "vlanId": { "type": "integer", "minimum": 1, "maximum": 4094 },
@@ -162,6 +162,30 @@
           }
         },
         "ip_plan": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["name", "cidr"], "properties": { "name": { "type": "string" }, "cidr": { "type": "string" } } } }
+      }
+    },
+    "hardware": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sbe"],
+      "properties": {
+        "sbe": {
+          "type": "object",
+          "description": "The hardware vendor's Solution Builder Extension (SBE) package is a requirement: it is needed to update the cluster, and the automation reads it from source_path and checks it before the cluster is created. Key names follow the toolkit master registry (hardware.sbe.*). delivery is the opt-in build-time side-load and is skip by default.",
+          "additionalProperties": false,
+          "required": ["requirement", "delivery"],
+          "properties": {
+            "requirement": { "enum": ["required", "not_applicable"] },
+            "not_applicable_reason": { "type": "string", "minLength": 1, "description": "Why no package is needed. Present only when requirement is not_applicable." },
+            "source_path": { "type": "string", "description": "The share or folder where the downloaded package is available to the automation. No credential in the path." },
+            "source_username": { "type": "string" },
+            "source_password": { "type": "string", "pattern": "^keyvault://[A-Za-z][A-Za-z0-9-]{1,22}[A-Za-z0-9]/[A-Za-z0-9-]{1,127}$", "description": "A Key Vault reference, never the password." },
+            "delivery": { "enum": ["skip", "winrm_copy", "node_pull"] }
+          },
+          "if": { "properties": { "requirement": { "const": "not_applicable" } } },
+          "then": { "required": ["not_applicable_reason"], "properties": { "delivery": { "const": "skip" } } },
+          "else": { "not": { "required": ["not_applicable_reason"] } }
+        }
       }
     },
     "compute": {

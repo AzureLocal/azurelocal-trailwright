@@ -6,6 +6,7 @@ const QUORUM_URL = 'https://learn.microsoft.com/windows-server/storage/storage-s
 const ARM_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-azure-resource-manager-template?view=azloc-2610#arm-template-parameters-reference';
 const RACK_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/rack-aware-cluster-requirements?view=azloc-2610#supported-node-configurations';
 const SYSREQ_URL = 'https://learn.microsoft.com/azure/azure-local/concepts/system-requirements-23h2?view=azloc-2610';
+const SBE_URL = 'https://learn.microsoft.com/azure/azure-local/update/solution-builder-extension?view=azloc-2610';
 
 const DISCONNECTED_URL = 'https://learn.microsoft.com/azure/azure-local/manage/disconnected-operations-deploy?view=azloc-2610#deploy-workload-clusters';
 const RACK_DEPLOY_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/rack-aware-cluster-deployment-via-template?view=azloc-2610#step-2-deploy-using-arm-template';
@@ -82,5 +83,48 @@ export const hardwareRules: Rule[] = [
       p.hardware.nodes.length === 0
         ? [{ id: 'HW-006', severity: 'error', field: 'hardware.nodes', message: 'At least one node is required for an Azure Local cluster.', learnUrl: SYSREQ_URL }]
         : [],
+  },
+  // The hardware vendor's Solution Builder Extension (SBE) package is a requirement: it is needed to update the cluster, and the
+  // automation reads it from a share and checks it before the cluster is created. Installing it during the build is optional (off).
+  {
+    id: 'SBE-001',
+    release: RELEASES,
+    learnUrl: SBE_URL,
+    check: (p) =>
+      p.hardware.sbe.requirement === 'required' && !p.hardware.sbe.sourcePath.trim()
+        ? [{ id: 'SBE-001', severity: 'warning', field: 'hardware.sbe.sourcePath', message: "Download your hardware vendor's Solution Builder Extension package for your model and the Azure Local version you deploy, and say where it is (a share or folder). It is a requirement: you need it to update the cluster, and the automation reads it from there and checks it before the cluster is created. If your hardware has no Solution Builder Extension, set the requirement to not applicable and give the reason.", learnUrl: SBE_URL }]
+        : [],
+  },
+  {
+    id: 'SBE-002',
+    release: RELEASES,
+    learnUrl: SBE_URL,
+    check: (p) =>
+      p.hardware.sbe.requirement === 'not_applicable' && !p.hardware.sbe.notApplicableReason.trim()
+        ? [{ id: 'SBE-002', severity: 'error', field: 'hardware.sbe.notApplicableReason', message: 'Say why no Solution Builder Extension package is needed, for example that the hardware has no Solution Builder Extension, or that the cluster downloads it with the vendor credential.', learnUrl: SBE_URL }]
+        : [],
+  },
+  {
+    id: 'SBE-003',
+    release: RELEASES,
+    learnUrl: SBE_URL,
+    check: (p) =>
+      p.hardware.sbe.requirement === 'required' && /\?|:\/\/[^/]*@|(password|pwd|token|sig)=/i.test(p.hardware.sbe.sourcePath)
+        ? [{ id: 'SBE-003', severity: 'error', field: 'hardware.sbe.sourcePath', message: 'The package location carries no credential, token or query string. Give the share or folder only; the account that reads it goes in the user name, and its password in Key Vault.', learnUrl: SBE_URL }]
+        : [],
+  },
+  {
+    id: 'SBE-004',
+    release: RELEASES,
+    learnUrl: SBE_URL,
+    check: (p) => {
+      const s = p.hardware.sbe;
+      if (s.requirement !== 'required' || !s.sourceUsername.trim()) return [];
+      const secret = s.sourcePasswordSecret.trim();
+      if (!secret) return [{ id: 'SBE-004', severity: 'warning', field: 'hardware.sbe.sourcePasswordSecret', message: 'The account that reads the package share needs a password: give the name of the Key Vault secret that holds it, never the password itself.', learnUrl: SBE_URL }];
+      if (!/^[A-Za-z0-9-]{1,127}$/.test(secret)) return [{ id: 'SBE-004', severity: 'error', field: 'hardware.sbe.sourcePasswordSecret', message: 'This is a Key Vault secret name (letters, numbers and hyphens), not a password. Store the password in Key Vault and give its name.', learnUrl: SBE_URL }];
+      if (!(p.landingZone.keyVaultName || p.identity.keyVaultName)) return [{ id: 'SBE-004', severity: 'warning', field: 'hardware.sbe.sourcePasswordSecret', message: 'The password reference needs a Key Vault name: set it under Azure resources or identity.', learnUrl: SBE_URL }];
+      return [];
+    },
   },
 ];

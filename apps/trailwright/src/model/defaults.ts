@@ -13,7 +13,7 @@ export function createEmptyProject(name: string): Project {
     provisioning: { osInstall: 'iso', hardwareSku: '', timeZone: '', timeServer: '', siteName: '', siteResourceGroup: '', proxyServer: '', adminKeyVaultName: '', osVersion: '', deployMethod: 'portal' },
     confirmed: [],
     project: { customer: '', owner: '', notes: '' },
-    hardware: { topology: 'standard', rackAwareUplink: 'dedicated-storage', racks: 1, nodes: [], witness: 'none' },
+    hardware: { topology: 'standard', rackAwareUplink: 'dedicated-storage', racks: 1, nodes: [], witness: 'none', sbe: { requirement: 'required', notApplicableReason: '', sourcePath: '', sourceUsername: '', sourcePasswordSecret: '', delivery: 'skip' } },
     identity: { mode: 'local-identity-key-vault' },
     networking: { storage: 'switched', torSwitches: 2, storageLayout: 'dedicated', switchlessLinks: 'dual', portsPerNode: 4, intentGrouping: 'mgmt-compute', backupNetwork: false, cards: [], fcHbaPorts: 2, storageAutoIp: true, storageSubnets: [], vlans: [], intents: [], ipPlan: [] },
     connectivity: { path: 'direct', arcGatewayName: '', privatePath: { transport: '', virtualNetwork: '', workloadSubnet: '', firewallSubnet: '', firewallPrivateIp: '', firewallPort: '', arcPrivateLinkScopeOnNetwork: false, proxyBypass: '' } },

@@ -4,6 +4,22 @@ import { buildCreateClusterParams, templateFor } from './createCluster';
 
 const SECRET_NAMES = ['local-admin-password', 'lcm-password'];
 
+// hardware.sbe (toolkit registry key names): the vendor's Solution Builder Extension package is a requirement. The automation
+// reads it from source_path and checks it before the cluster is created. The password of source_username is only ever a Key Vault
+// reference. delivery (the build-time side-load) is written as skip unless the design asks for it.
+export function buildSbe(p: Project, vault: string): Record<string, unknown> {
+  const s = p.hardware.sbe;
+  if (s.requirement === 'not_applicable') return { requirement: 'not_applicable', not_applicable_reason: s.notApplicableReason.trim(), delivery: 'skip' };
+  const sbe: Record<string, unknown> = { requirement: 'required' };
+  if (s.sourcePath.trim()) sbe.source_path = s.sourcePath.trim();
+  if (s.sourceUsername.trim()) {
+    sbe.source_username = s.sourceUsername.trim();
+    if (s.sourcePasswordSecret.trim() && vault) sbe.source_password = `keyvault://${vault}/${s.sourcePasswordSecret.trim()}`;
+  }
+  sbe.delivery = s.delivery;
+  return sbe;
+}
+
 // A subset of the Azure Local Toolkit registry shape (schema 4.0.0): the sections a design can fill.
 // Credentials are Key Vault references (keyvault://<vault>/<secret>), never values. The ARM parameter files carry the same values
 // in the form Microsoft's deployment template takes.
@@ -67,6 +83,7 @@ export function buildInfrastructureYml(p: Project): string {
       intents: p.networking.intents.map((i) => ({ name: i.name, traffic: i.traffic, adapters: i.adapters, override_qos: i.overrideQos ?? false, override_adapter: i.overrideAdapter ?? false })),
       ip_plan: p.networking.ipPlan.map((r) => ({ name: r.name, cidr: r.cidr })),
     },
+    hardware: { sbe: buildSbe(p, vault) },
     compute: {
       cluster: { topology: p.hardware.topology, witness_type: p.hardware.witness, node_count: p.hardware.nodes.length },
       nodes: p.hardware.nodes.map((n) => ({ name: n.name, ip: n.ip ?? '', serial: n.serial ?? '', cores: n.cores, memory_gib: n.memoryGiB, drives: n.drives })),

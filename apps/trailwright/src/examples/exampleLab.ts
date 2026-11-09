@@ -16,6 +16,7 @@ export function createExampleProject(): Project {
       rackAwareUplink: 'dedicated-storage',
       racks: 1,
       witness: 'cloud',
+      sbe: { requirement: 'required', sourcePath: '\\\\files.example.invalid\\sbe\\vendor' },
       nodes: [
         { name: 'node1', ip: '192.0.2.11', serial: 'EXAMPLE-0001', cores: 32, memoryGiB: 512, drives: 8 },
         { name: 'node2', ip: '192.0.2.12', serial: 'EXAMPLE-0002', cores: 32, memoryGiB: 512, drives: 8 },

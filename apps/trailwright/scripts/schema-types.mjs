@@ -1,5 +1,5 @@
 // Generates src/infra/schema.gen.ts from src/infra/infrastructure.schema.json (schema 5, vendored from
-// azurelocal-toolkit config/infrastructure). Run after updating the vendored schema: npm run schema:types
+// azurelocal-toolkit config/variables). Run after updating the vendored schema: npm run schema:types
 //
 // The types describe the shape only. Before generating, this drops what says "required when" rather than "what the
 // shape is": the conditional allOf/if/then rules, anyOf alternatives that only list required keys, and the `true`

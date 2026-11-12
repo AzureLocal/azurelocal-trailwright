@@ -1,5 +1,5 @@
 // The infrastructure.yml document, schema 5. The types come from the vendored schema (infrastructure.schema.json,
-// azurelocal-toolkit config/infrastructure) through npm run schema:types; nothing here restates the schema.
+// azurelocal-toolkit config/variables) through npm run schema:types; nothing here restates the schema.
 // Trailwright edits a Draft (every key optional) and exports an Infrastructure; tests validate every exported
 // document against the full schema, including the rules that make a section required.
 import type { AzureLocalInfrastructureYml, Intent as GenIntent, Node as GenNode, NetworkDevice as GenNetworkDevice } from './schema.gen';

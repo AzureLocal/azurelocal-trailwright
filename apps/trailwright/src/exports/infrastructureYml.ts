@@ -263,7 +263,6 @@ function operations(p: P): Draft['operations'] {
             // Insights creates the rule unless the design names an existing one; the endpoint is for agents on private links.
             data_collection_rule: o.useExistingDcr ? o.dcrName : undefined,
             data_collection_endpoint: o.agentPrivateLinks ? o.dceName : undefined,
-            health_alerts: o.healthAlerts,
             alert_email: o.alertEmail,
           }
         : {}),
@@ -345,10 +344,9 @@ export function buildInfrastructure(p: Project): Draft {
       bitlocker_boot_volume: p.security.bitlockerBootVolume,
       bitlocker_data_volumes: p.security.bitlockerDataVolumes,
       wdac: p.security.wdac,
-      backup_key_vault: p.security.backupKeyVaultName,
       telemetry: { streaming_data: p.security.streamingData, episodic_data_upload: p.security.episodicData, eu_location: p.security.euLocation },
     },
-    sdn: { enabled: p.sdn.enabled, ...(p.sdn.enabled ? { prefix: p.sdn.prefix, dns_records: p.sdn.dnsRecords, default_access_policy: p.sdn.defaultAccessPolicy } : {}) },
+    sdn: { enabled: p.sdn.enabled, ...(p.sdn.enabled ? { prefix: p.sdn.prefix, dns_records: p.sdn.dnsRecords } : {}) },
     operations: operations(p),
     provisioning: provisioning(p),
     ...(p.deployment.mode === 'disconnected' ? { disconnected: disconnected(p) } : {}),

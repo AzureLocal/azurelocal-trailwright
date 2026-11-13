@@ -1,6 +1,6 @@
 # infrastructure.yml field reference
 
-`infrastructure.yml` is the file the Azure Local Toolkit, azurelocal-ztp and the other Azure Local tools read. Trailwright writes it in the layout of the toolkit's schema 5, with `_metadata.schema_version: 5.6.10`. The key names and the nesting are the schema's; Trailwright adds none of its own.
+`infrastructure.yml` is the file the Azure Local Toolkit, azurelocal-ztp and the other Azure Local tools read. Trailwright writes it in the layout of the toolkit's schema 5, with `_metadata.schema_version: 5.6.16`. The key names and the nesting are the schema's; Trailwright adds none of its own.
 
 The contract is the toolkit's JSON Schema (2020-12) for the file, `config/variables/schema/infrastructure.schema.json` in azurelocal-toolkit. This repository holds a copy at [`apps/trailwright/src/infra/infrastructure.schema.json`](../apps/trailwright/src/infra/infrastructure.schema.json) (`SCHEMA_VERSION` in `src/infra/types.ts` names its version) and publishes the same file with the site at `/schema/infrastructure.schema.json` (from `public/schema`). The toolkit's `templates/infrastructure.master.yml` shows every key with a comment and an example value.
 
@@ -18,7 +18,7 @@ To deploy with the NIC deployment automation, use the **Environment file (deploy
 
 | Section | Keys Trailwright writes | Source in the design |
 |---|---|---|
-| `_metadata` | `schema_version` (`5.6.10`), `scope` (`full`), `file_version` (`1.0.0`), `generated_by` (`azurelocal-trailwright`) | Fixed |
+| `_metadata` | `schema_version` (`5.6.16`), `scope` (`full`), `file_version` (`1.0.0`), `generated_by` (`azurelocal-trailwright`) | Fixed |
 | `scenario` | `identity`, `storage_architecture`, `storage_connectivity`, `topology`, `connectivity`, `cloud`, `outbound_path`, `os_install`, `deploy_method` | Identity, architecture, network design, hardware, connectivity mode, outbound connectivity, provisioning. A SAN design and a single machine are `switched` |
 | `site` | `customer`, `owner`, `name`, `code`; `time_zone` with simplified provisioning | Project: customer, owner, site name, site code; the site time zone of simplified provisioning |
 | `environment` | `name`, `type` | The project name as lowercase letters, digits and hyphens (at most 41 characters); Project: environment type |
@@ -37,9 +37,9 @@ To deploy with the NIC deployment automation, use the **Environment file (deploy
 | `networking.outbound` | `proxy.url`; `arc_gateway.name`; `private_path.*` (`transport`, `virtual_network`, `workload_subnet`, `firewall_subnet`, `firewall_private_ip`, `firewall_port`, `arc_private_link_scope`, `proxy_bypass`) | Outbound connectivity, for the path chosen. The bypass text becomes a list |
 | `identity` | `local_admin.{username, password}`; `active_directory.{domain_fqdn, ou_path, lcm_user.{username, password}}` or `local_identity.{dns_server_config, dns_zone, dns_forwarders}` | Identity. Passwords are Key Vault references |
 | `storage` | `configuration_mode`, `volumes[]` (`name`, `size_gib`, `resiliency`) for Storage Spaces Direct; `san.{type, infra_volume_lun_id, performance_history_lun_id, luns[]}` for a SAN | Storage |
-| `security` | `level`, `drift_control`, `credential_guard`, `smb_signing`, `smb_cluster_encryption`, `bitlocker_boot_volume`, `bitlocker_data_volumes`, `wdac`, `backup_key_vault`, `telemetry.{streaming_data, episodic_data_upload, eu_location}` | Security |
-| `sdn` | `enabled`; when enabled `prefix`, `dns_records`, `default_access_policy` | Software defined networking |
-| `operations` | `update_method`, `backup.{enabled, approach, solution}`, `disaster_recovery.method`, `monitoring.{enabled, log_analytics_workspace, workspace_resource_group, data_collection_rule, data_collection_endpoint, health_alerts, alert_email}` | Operations. The limited-connectivity PowerShell update method is `powershell`. `data_collection_rule` only for an existing rule, `data_collection_endpoint` only with private links |
+| `security` | `level`, `drift_control`, `credential_guard`, `smb_signing`, `smb_cluster_encryption`, `bitlocker_boot_volume`, `bitlocker_data_volumes`, `wdac`, `telemetry.{streaming_data, episodic_data_upload, eu_location}` | Security |
+| `sdn` | `enabled`; when enabled `prefix`, `dns_records` | Software defined networking |
+| `operations` | `update_method`, `backup.{enabled, approach, solution}`, `disaster_recovery.method`, `monitoring.{enabled, log_analytics_workspace, workspace_resource_group, data_collection_rule, data_collection_endpoint, alert_email}` | Operations. The limited-connectivity PowerShell update method is `powershell`. `data_collection_rule` only for an existing rule, `data_collection_endpoint` only with private links |
 | `provisioning` | `os_version`; with simplified provisioning `simplified.{site_name, resource_group, maintenance_iso, admin.{username, password}, media_share.{name, host}, ntp.{configuration, server}}` | Provisioning: the software version (else the release build), the site, the provisioning image and the SMB share. `admin.username` is the local administrator of the Identity step, as in the provisioning manifest; its password is a reference into the Key Vault for administrator credentials. A time server gives `ntp.configuration: Manual` |
 | `disconnected` | `role`, `base_path`, `domain_suffix`, `ingress.*`, `management.*`, `dns_server`, `time_servers`, `identity.*`, `operator_subscription_name`, `resource_group`, `internal_ca` | Disconnected operations |
 | `landing_zone.subscriptions[]` | `name`, `id`, `role` (`azure_local`) | Azure resources: the subscription name |

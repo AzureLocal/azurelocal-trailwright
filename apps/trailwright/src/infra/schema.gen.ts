@@ -2,10 +2,6 @@
 
 export type Ipv4 = string;
 /**
- * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
- */
-export type KvRef = string;
-/**
  * A Fibre Channel World Wide Port Name: 16 hexadecimal digits, as 8 colon-separated pairs (50:00:09:72:08:12:34:56) or without colons.
  */
 export type Wwpn = string;
@@ -35,7 +31,7 @@ export interface AzureLocalInfrastructureYml {
    */
   _metadata: {
     /**
-     * The schema version this file follows. Major 5. A minor version adds optional keys only; a major version can rename or remove keys. Each key's description says which version added it ('since'). Version history, in order: 5.2 adds nodes[].network_adapters, BIOS settings, the site IP range and the maintenance environment's network. 5.3 adds the BIOS phases (bios_during_provisioning), networking.management.static_method and provisioning_dhcp_range, nodes[].maintenance_address, provisioning.simplified.maintenance_password, and the SAN details (storage.san.array, fibre_channel and iscsi, nodes[].san); it also adds _metadata.scope: ztp for a file that holds only what azurelocal-ztp reads. 5.4 puts every azurelocal-ztp setting in this schema, so no tool keeps a key of its own: the BIOS actions ZTP derives from the hardware inventory (provisioning.simplified.isolate_san_adapters and enable_embedded_nics, nodes[].san.hbas[].type), the Azure resource choices, timeouts, retries, the USB image and the maintenance environment of simplified provisioning, and hardware.bmc.rfs_write_attribute and verify_certificate. 5.4.1 adds provisioning.simplified.timeouts.adapters_minutes. 5.4.2 adds hardware.sbe.delivery and node_pull_url (how the SBE package reaches the nodes during OS configuration). 5.4.3 adds os_configuration.clear_storage, the switch that lets the OS configuration run wipe leftover local storage. 5.4.4 adds os_configuration.network (confirm_minutes, stable_seconds: the commit-confirmed window of a guarded network change) and os_configuration.remoting with transport, bootstrap_transport and allowed_source_cidrs. 5.5 puts the CI/CD infrastructure in devops (the project, its settings, the environments, the Azure sign-in, the runners with their network and roles) and adds the domain join (identity.active_directory.domain_join_account, join_options, local_admin_members). 5.6 adds the deployment block (the timeouts, polling, approval and resume of the toolkit's Validate and Deploy run) and the remote management security profile: scenario.environment_class, the profile keys of os_configuration.remoting (allow_any_source, trusted_hosts, use_https, isolation_confirmed, certificate; bootstrap_transport also takes smb and auto) and a purpose marker on networking.logical_networks[] and networking.cluster_networks[] (the values management and oob of networking.vlans[].purpose also count). A missing scenario.environment_class means production. 5.6.1 adds identity.active_directory.security_groups[].local_groups. 5.6.2 identifies the adapters of nodes[].network_adapters[] by hardware facts (mac_address is required; port_index, pci_location, vendor, os_name_override and allowed_vlans are optional). 5.6.3 adds enabled, ip_allocation_method and nsg_name to networking.logical_networks[]. A file written for 5.6.0 stays valid: a minor version adds optional keys only, except that 5.6.2 requires the MAC of every adapter. 5.6.4 adds the SBE package as a requirement: hardware.sbe.requirement and not_applicable_reason (whether the OEM package is required, or not applicable with a reason), source_path (the share or folder where the downloaded package is available to the automation), source_username and source_password (the read credential, a Key Vault reference), and the optional package_sha256 and package_size_bytes. The build-time side-load (delivery) is unchanged and stays off by default. 5.6.5 adds landing_zone.policy (required_tags, management_group): the tag names and the management group of the Tier 1 tag policy, which the Azure Policy task assigns in audit mode. 5.6.6 adds operations.monitoring.action_group: the name of the Azure Monitor action group that the alerting task creates. 5.6.7 adds security.defender_for_cloud: the free level of Microsoft Defender for Cloud that Azure Local needs. 5.6.8 adds security.defender_for_cloud.security_contact_email. 5.6.9 adds the storage keys the volume and storage path scripts read: storage.pool, storage.csv, storage.paths and, on storage.volumes, provisioning_type, file_system, parity_percent, media_type and deduplication. 5.6.10 adds what the SAN deployment needs: networking.cluster_network_properties and, for iSCSI, storage.san.iscsi.networks, jumbo_packet and chap.mutual. The current version is 5.6.10.
+     * The schema version this file follows. Major 5. A minor version adds optional keys only; a major version can rename or remove keys. Each key's description says which version added it ('since'). Version history, in order: 5.2 adds nodes[].network_adapters, BIOS settings, the site IP range and the maintenance environment's network. 5.3 adds the BIOS phases (bios_during_provisioning), networking.management.static_method and provisioning_dhcp_range, nodes[].maintenance_address, provisioning.simplified.maintenance_password, and the SAN details (storage.san.array, fibre_channel and iscsi, nodes[].san); it also adds _metadata.scope: ztp for a file that holds only what azurelocal-ztp reads. 5.4 puts every azurelocal-ztp setting in this schema, so no tool keeps a key of its own: the BIOS actions ZTP derives from the hardware inventory (provisioning.simplified.isolate_san_adapters and enable_embedded_nics, nodes[].san.hbas[].type), the Azure resource choices, timeouts, retries, the USB image and the maintenance environment of simplified provisioning, and hardware.bmc.rfs_write_attribute and verify_certificate. 5.4.1 adds provisioning.simplified.timeouts.adapters_minutes. 5.4.2 adds hardware.sbe.delivery and node_pull_url (how the SBE package reaches the nodes during OS configuration). 5.4.3 adds os_configuration.clear_storage, the switch that lets the OS configuration run wipe leftover local storage. 5.4.4 adds os_configuration.network (confirm_minutes, stable_seconds: the commit-confirmed window of a guarded network change) and os_configuration.remoting with transport, bootstrap_transport and allowed_source_cidrs. 5.5 puts the CI/CD infrastructure in devops (the project, its settings, the environments, the Azure sign-in, the runners with their network and roles) and adds the domain join (identity.active_directory.domain_join_account, join_options, local_admin_members). 5.6 adds the deployment block (the timeouts, polling, approval and resume of the toolkit's Validate and Deploy run) and the remote management security profile: scenario.environment_class, the profile keys of os_configuration.remoting (allow_any_source, trusted_hosts, use_https, isolation_confirmed, certificate; bootstrap_transport also takes smb and auto) and a purpose marker on networking.logical_networks[] and networking.cluster_networks[] (the values management and oob of networking.vlans[].purpose also count). A missing scenario.environment_class means production. 5.6.1 adds identity.active_directory.security_groups[].local_groups. 5.6.2 identifies the adapters of nodes[].network_adapters[] by hardware facts (mac_address is required; port_index, pci_location, vendor, os_name_override and allowed_vlans are optional). 5.6.3 adds enabled, ip_allocation_method and nsg_name to networking.logical_networks[]. A file written for 5.6.0 stays valid: a minor version adds optional keys only, except that 5.6.2 requires the MAC of every adapter. 5.6.4 adds the SBE package as a requirement: hardware.sbe.requirement and not_applicable_reason (whether the OEM package is required, or not applicable with a reason), source_path (the share or folder where the downloaded package is available to the automation), source_username and source_password (the read credential, a Key Vault reference), and the optional package_sha256 and package_size_bytes. The build-time side-load (delivery) is unchanged and stays off by default. 5.6.5 adds landing_zone.policy (required_tags, management_group): the tag names and the management group of the Tier 1 tag policy, which the Azure Policy task assigns in audit mode. 5.6.6 adds operations.monitoring.action_group: the name of the Azure Monitor action group that the alerting task creates. 5.6.7 adds security.defender_for_cloud: the free level of Microsoft Defender for Cloud that Azure Local needs. 5.6.8 adds security.defender_for_cloud.security_contact_email. 5.6.9 adds the storage keys the volume and storage path scripts read: storage.pool, storage.csv, storage.paths and, on storage.volumes, provisioning_type, file_system, parity_percent, media_type and deduplication. 5.6.10 adds what the SAN deployment needs: networking.cluster_network_properties and, for iSCSI, storage.san.iscsi.networks, jumbo_packet and chap.mutual. 5.6.11 adds what the logical network, network security group and VM image scripts read: networking.network_security_groups (name and rules with name, priority, direction, access, protocol, source and destination address prefixes and port ranges, description), networking.logical_networks[].vm_switch_name and storage.vm_images (name, os_type, publisher, offer, sku, version, storage_path). 5.6.12 adds operations.monitoring.retention_days and removes operations.notifications.teams_webhook and operations.monitoring.health_alerts. 5.6.13 adds the secrets section (provider, file directory, command) and lets a secret reference use the env://, file:// and command:// forms besides keyvault://. 5.6.14 adds hardware.inventory (output_directory, file_name_prefix, format, timeout_seconds), which Get-HardwareInventory.ps1 reads. 5.6.15 adds what Enable-ArcSdn.ps1 reads: sdn.acknowledge_maintenance_window and sdn.acknowledge_dns_record, the rules of sdn.prefix, and sdn.dns_records (read now); it removes sdn.default_access_policy. 5.6.16 adds storage.san.luns[].unique_id (how New-SanVolume.ps1 finds the disk of a LUN) and removes security.backup_key_vault. The current version is 5.6.16.
      */
     schema_version: string;
     /**
@@ -68,7 +64,7 @@ export interface AzureLocalInfrastructureYml {
      */
     identity?: 'active_directory' | 'local_identity';
     /**
-     * s2d: Storage Spaces Direct (hyperconverged). san: external SAN only (disaggregated; needs storage.san). hybrid: both (S2D plus a SAN). san and hybrid TELL THE SOLUTION THERE IS A SAN: the OS configuration then does the host-side SAN work itself (the Mpio step: MPIO, MSDSM hardware ID, the MPIO claim of the device (mpclaim -n -i -d), load balance policy, vendor MPIO settings; for iSCSI the initiator service, auto-claim, portals and sessions) and checks each LUN is seen once (SanVerify). storage.san.type says whether the SAN is fibre_channel or iscsi. On every node the OS configuration also looks, read only, for FC or iSCSI LUNs that are visible while the file declares no SAN, and reports them. https://learn.microsoft.com/azure/azure-local/deploy/enable-external-storage
+     * s2d: Storage Spaces Direct (hyperconverged). san: external SAN only (disaggregated; needs storage.san). hybrid: both (S2D plus a SAN). san and hybrid TELL THE SOLUTION THERE IS A SAN: the OS configuration then does the host-side SAN work itself (the Mpio step: MPIO, MSDSM hardware ID, the MPIO claim of the device (mpclaim -n -i -d), load balance policy, vendor MPIO settings; for iSCSI the initiator service, auto-claim, portals and sessions, except for a san design on Azure Local 2610 or later, where the deployment configures iSCSI and Microsoft Learn says not to enable it before) and checks each LUN is seen once (SanVerify). storage.san.type says whether the SAN is fibre_channel or iscsi. On every node the OS configuration also looks, read only, for FC or iSCSI LUNs that are visible while the file declares no SAN, and reports them. https://learn.microsoft.com/azure/azure-local/deploy/enable-external-storage
      */
     storage_architecture?: 's2d' | 'san' | 'hybrid';
     /**
@@ -242,6 +238,41 @@ export interface AzureLocalInfrastructureYml {
      */
     purpose?: string;
   }[];
+  /**
+   * Schema 5.6.13. Where the toolkit reads secrets from. Every secret in this file is a reference, never a value; a reference names its own provider in its scheme: keyvault://<vault>/<secret> (Azure Key Vault, the default), env://<VARIABLE_NAME>, file://<name> or command://<name>. One file can mix providers. A file or command reference holds a NAME only: the directory of the secret files and the command are set here, so a reference in a shared file cannot point a machine at an arbitrary path or run an arbitrary command. Optional; every key has a default. See docs/secret-references.md.
+   */
+  secrets?: {
+    /**
+     * Schema 5.6.13. The provider New-AzlSecretReference uses for a new reference when the caller does not name one. It does not change how an existing reference is read: that follows the reference's own scheme. Default keyvault.
+     */
+    provider?: 'keyvault' | 'env' | 'file' | 'command';
+    /**
+     * Schema 5.6.13. Settings of the file provider (file://<name>). Needed only when a reference uses it.
+     */
+    file?: {
+      /**
+       * Schema 5.6.13. The absolute path of the directory that holds the secret files. file://<name> reads the file <name> in it: one secret per file, UTF-8, the trailing line break removed. A name cannot hold a path, so no reference can leave this directory. Links are refused. A warning is written when Everyone, Users or Authenticated Users (Windows), or group or other (Linux, macOS), can read the file.
+       */
+      directory?: string;
+    };
+    /**
+     * Schema 5.6.13. Settings of the command provider (command://<name>). Needed only when a reference uses it. The toolkit starts the executable directly with the argument list, with no shell, closes its standard input and reads its standard output as the secret (the trailing line break removed). A command that exits with a code other than 0 fails, and its standard error is reported without the secret.
+     */
+    command?: {
+      /**
+       * Schema 5.6.13. The program to start: a command name found on the path, or an absolute path. Not a command line: the arguments are in command.arguments.
+       */
+      executable?: string;
+      /**
+       * Schema 5.6.13. The arguments, one list item each. The text {name} in an item is replaced by the name in the reference (command://<name>). At least one item must hold {name}. Each item is passed as one argument; nothing is split or quoted by a shell.
+       */
+      arguments?: string[];
+      /**
+       * Schema 5.6.13. How long the command may run before it is stopped and the read fails. Default 30.
+       */
+      timeout_seconds?: number;
+    };
+  };
   /**
    * The Azure Local instance (the cluster deployment).
    */
@@ -433,15 +464,15 @@ export interface AzureLocalInfrastructureYml {
      */
     model: string;
     /**
-     * Physical cores per machine.
+     * Physical cores per machine. Get-HardwareInventory.ps1 compares it with the cores the BMC reports (the sum over all processors).
      */
     cpu_cores?: number;
     /**
-     * Memory per machine, GiB. Not read by the tools yet: a documented placeholder.
+     * Memory per machine, GiB. Get-HardwareInventory.ps1 compares it with the memory the BMC reports.
      */
     memory_gib?: number;
     /**
-     * GPUs fitted in every machine. Leave out when there are none. Not read by the tools yet: a documented placeholder.
+     * GPUs fitted in every machine. Leave out when there are none. Get-HardwareInventory.ps1 compares these keys with the GPUs the BMC reports.
      */
     gpu?: {
       /**
@@ -453,11 +484,32 @@ export interface AzureLocalInfrastructureYml {
        */
       model?: string;
       /**
-       * Number of GPUs in each machine. Not read by the tools yet: a documented placeholder.
+       * Number of GPUs in each machine.
        */
       count_per_node?: number;
     };
     bmc?: BmcCredentials;
+    /**
+     * Schema 5.6.14. Where Get-HardwareInventory.ps1 writes the hardware inventory it reads from the BMCs, in which format, and how long it waits for a BMC. The script reads every BMC over the standard Redfish API (read only), for any maker, and writes one file per run. Leave the block out to use the defaults. The file holds serial numbers and MAC addresses: keep the folder out of git.
+     */
+    inventory?: {
+      /**
+       * Schema 5.6.14. The folder the inventory file is written to. It is created when it is missing. Default: hardware-inventory, relative to the folder the script runs from.
+       */
+      output_directory?: string;
+      /**
+       * Schema 5.6.14. The start of the file name. The file is named <prefix>-<UTC time>.<json or yml>, so every run writes a new file and keeps the old ones. 1 to 64 letters, digits, dots, underscores or hyphens, starting with a letter or digit. Default: hardware-inventory.
+       */
+      file_name_prefix?: string;
+      /**
+       * Schema 5.6.14. The format of the inventory file: json or yaml. Default: json.
+       */
+      format?: 'json' | 'yaml';
+      /**
+       * Schema 5.6.14. How long the script waits for one answer of a BMC, in seconds. A BMC is a small computer and can be slow. Default: 60.
+       */
+      timeout_seconds?: number;
+    };
     bios?: BiosSettings2;
     bios_during_provisioning?: BiosSettings3;
     /**
@@ -505,7 +557,7 @@ export interface AzureLocalInfrastructureYml {
        */
       source_username?: string;
       /**
-       * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+       * The Key Vault secret that holds the password of source_username, as a keyvault://<vault>/<secret> reference. It is read into memory for the run and never written or shown.
        */
       source_password?: string;
       /**
@@ -568,7 +620,7 @@ export interface AzureLocalInfrastructureYml {
       }[];
     }[];
     /**
-     * Drives per machine.
+     * Drives per machine. Get-HardwareInventory.ps1 compares them with the drives the BMC reports and the role (cache or capacity) it works out from the media types.
      */
     drives?: {
       capacity?: DriveGroup;
@@ -795,9 +847,125 @@ export interface AzureLocalInfrastructureYml {
       purpose?: string;
     }[];
     /**
-     * Arc VM logical networks created after deployment (task phase-06 task-08, Invoke-LogicalNetworks-Orchestrated.ps1: az stack-hci-vm network lnet create). Also read by the remote management security profile (purpose, address_prefix) and by the pre-cluster verification (name, vlan_id, address_prefix, purpose). The key names are the ones of this list: gateway and ip_pool. The older form networking.onprem.logical_networks[] (default_gateway, ip_pools) is deprecated.
+     * Arc VM logical networks created after deployment (task phase-06 task-08, New-LogicalNetwork.ps1: az stack-hci-vm network lnet create). Also read by the remote management security profile (purpose, address_prefix) and by the pre-cluster verification (name, vlan_id, address_prefix, purpose). The older form networking.onprem.logical_networks[] (default_gateway, ip_pools) is deprecated. A Static network needs address_prefix, gateway, dns_servers, vlan_id and ip_pool (Learn: DNS server, gateway and VLAN ID must be specified for a static logical network). Microsoft Learn: once a logical network exists you cannot change its gateway, IP pool, address space, VLAN ID or virtual switch name, so the script never changes an existing one.
      */
     logical_networks?: LogicalNetwork[];
+    /**
+     * Schema 5.6.11. Network security groups (NSG) for Azure Local virtual machines and logical networks, with their rules. New-NetworkSecurityGroup.ps1 (phase 06, task 07: az stack-hci-vm network nsg create and nsg rule create) creates each group and the rules it does not have yet. NSGs on Azure Local need SDN enabled by Azure Arc (sdn.enabled true); the script does not turn SDN on and refuses a file that lists a group while SDN is off. Run it before New-LogicalNetwork.ps1: a logical network is tied to its group when the logical network is created (networking.logical_networks[].nsg_name). Microsoft Learn: a group must have at least one rule, because an empty group denies all inbound traffic and a machine or logical network that uses it cannot be reached; the script refuses a group without rules. No Az PowerShell cmdlet creates these groups, so the script uses the Azure CLI with the stack-hci-vm extension.
+     */
+    network_security_groups?: {
+      /**
+       * Name of the network security group, 1 to 80 characters: letters, digits, underscore, period and hyphen; it starts with a letter or digit and ends with a letter, digit or underscore (Learn: naming rules for Microsoft.Network). It cannot be changed afterwards.
+       */
+      name: string;
+      /**
+       * The security rules of the group. At least one is needed. The script creates the rules that are missing; a rule that exists (same name) is left alone and, when it differs from the file, reported.
+       *
+       * @minItems 1
+       */
+      rules: [
+        {
+          /**
+           * Name of the rule, 1 to 80 characters, with the same characters as the group name. Unique inside the group.
+           */
+          name: string;
+          /**
+           * Priority of the rule, 100 to 4096. Unique inside the group. A lower number is evaluated first. Leave gaps between the numbers for rules you add later.
+           */
+          priority: number;
+          /**
+           * Whether the rule applies to incoming (Inbound) or outgoing (Outbound) traffic. To control both directions, write two rules.
+           */
+          direction: 'Inbound' | 'Outbound';
+          /**
+           * Allow or Deny the traffic the rule matches.
+           */
+          access: 'Allow' | 'Deny';
+          /**
+           * Protocol the rule matches: * (any, the default), Tcp, Udp or Icmp (az stack-hci-vm network nsg rule create --protocol). The script accepts any letter case.
+           */
+          protocol?: '*' | 'Tcp' | 'Udp' | 'Icmp';
+          /**
+           * Source addresses the rule matches: * (any, the default), an IPv4 address or an IPv4 range in CIDR form. A list. Service tags are not used on Azure Local.
+           *
+           * @minItems 1
+           */
+          source_address_prefixes?: [string, ...string[]];
+          /**
+           * Destination addresses the rule matches: * (any, the default), an IPv4 address or an IPv4 range in CIDR form. A list.
+           *
+           * @minItems 1
+           */
+          destination_address_prefixes?: [string, ...string[]];
+          /**
+           * Source ports the rule matches: * (any, the default), a port or a range such as 1024-2048, each from 0 to 65535. A list.
+           *
+           * @minItems 1
+           */
+          source_port_ranges?: [string, ...string[]];
+          /**
+           * Destination ports the rule matches: * (any), a port or a range such as 8000-8100, each from 0 to 65535. A list. Required: the Azure CLI default is port 80, which is not a default to rely on.
+           *
+           * @minItems 1
+           */
+          destination_port_ranges: [string, ...string[]];
+          /**
+           * Optional text for the rule, at most 140 characters. The characters & | < > ^ % and the double quote are not allowed: the Azure CLI is started through a command file on Windows, which treats them as commands.
+           */
+          description?: string;
+        },
+        ...{
+          /**
+           * Name of the rule, 1 to 80 characters, with the same characters as the group name. Unique inside the group.
+           */
+          name: string;
+          /**
+           * Priority of the rule, 100 to 4096. Unique inside the group. A lower number is evaluated first. Leave gaps between the numbers for rules you add later.
+           */
+          priority: number;
+          /**
+           * Whether the rule applies to incoming (Inbound) or outgoing (Outbound) traffic. To control both directions, write two rules.
+           */
+          direction: 'Inbound' | 'Outbound';
+          /**
+           * Allow or Deny the traffic the rule matches.
+           */
+          access: 'Allow' | 'Deny';
+          /**
+           * Protocol the rule matches: * (any, the default), Tcp, Udp or Icmp (az stack-hci-vm network nsg rule create --protocol). The script accepts any letter case.
+           */
+          protocol?: '*' | 'Tcp' | 'Udp' | 'Icmp';
+          /**
+           * Source addresses the rule matches: * (any, the default), an IPv4 address or an IPv4 range in CIDR form. A list. Service tags are not used on Azure Local.
+           *
+           * @minItems 1
+           */
+          source_address_prefixes?: [string, ...string[]];
+          /**
+           * Destination addresses the rule matches: * (any, the default), an IPv4 address or an IPv4 range in CIDR form. A list.
+           *
+           * @minItems 1
+           */
+          destination_address_prefixes?: [string, ...string[]];
+          /**
+           * Source ports the rule matches: * (any, the default), a port or a range such as 1024-2048, each from 0 to 65535. A list.
+           *
+           * @minItems 1
+           */
+          source_port_ranges?: [string, ...string[]];
+          /**
+           * Destination ports the rule matches: * (any), a port or a range such as 8000-8100, each from 0 to 65535. A list. Required: the Azure CLI default is port 80, which is not a default to rely on.
+           *
+           * @minItems 1
+           */
+          destination_port_ranges: [string, ...string[]];
+          /**
+           * Optional text for the rule, at most 140 characters. The characters & | < > ^ % and the double quote are not allowed: the Azure CLI is started through a command file on Windows, which treats them as commands.
+           */
+          description?: string;
+        }[]
+      ];
+    }[];
     /**
      * Details of scenario.outbound_path.
      */
@@ -880,11 +1048,11 @@ export interface AzureLocalInfrastructureYml {
        */
       username: string;
       /**
-       * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+       * Optional. The Key Vault secret that holds this user name, as a keyvault://<vault>/<secret> reference, for the tools that read the user name from the vault (azurelocal-ztp's Add-KeyVaultCredentials.ps1 stores it as local-admin-username next to the password). The pre-cluster verification (IDN-016) reads it and fails when it differs from username. Default: the secret local-admin-username in the vault of the password reference; a default secret that does not exist is a warning, a secret named here that does not exist is a failure. (since 5.6)
        */
       username_secret?: string;
       /**
-       * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+       * At least 14 characters with lowercase, uppercase, a digit and a special character.
        */
       password: string;
     };
@@ -957,7 +1125,7 @@ export interface AzureLocalInfrastructureYml {
          */
         username: string;
         /**
-         * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+         * At least 14 characters with lowercase, uppercase, a digit and a special character.
          */
         password: string;
       };
@@ -970,7 +1138,7 @@ export interface AzureLocalInfrastructureYml {
          */
         username: string;
         /**
-         * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+         * A Key Vault secret reference. The toolkit reads it on the machine that runs the OS configuration, passes it to the node as a secret and never writes it to disk, a log, the event feed or the report. (since 5.5)
          */
         password: string;
       };
@@ -1036,7 +1204,10 @@ export interface AzureLocalInfrastructureYml {
          * What the account is for, in words.
          */
         purpose?: string;
-        password?: KvRef;
+        /**
+         * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+         */
+        password?: string;
       }[];
     };
   };
@@ -1143,11 +1314,44 @@ export interface AzureLocalInfrastructureYml {
       path: string;
     }[];
     /**
+     * Schema 5.6.11. The Azure Marketplace images to download to the instance as Azure Local VM images (Learn: Create Azure Local VM image using Azure Marketplace images). New-VmImage.ps1 (phase 06, task 06) creates each image that does not exist yet in azure.resource_group, on azure.custom_location, in azure.location, with the file-level tags. An image that exists is left alone; a failed one is reported, never deleted. Needs the Microsoft.EdgeMarketplace resource provider registered in the subscription and the Azure Connected Machine Resource Manager role for the Microsoft.AzureStackHCI resource provider app on the resource group. Only Azure Marketplace images are supported: images from a local path, a storage account, an existing virtual machine or an Azure compute gallery are not (they need image preparation that this file does not describe). The list lives in storage because an image is kept on a storage path of the instance.
+     */
+    vm_images?: {
+      /**
+       * Name of the VM image resource, 1 to 80 characters: letters, digits, hyphen, period and underscore; it starts and ends with a letter or digit. It cannot be renamed. Learn: a newer Marketplace image is a new image with a new name (the portal increments the number), so pin the version in the name if you keep several.
+       */
+      name: string;
+      /**
+       * Operating system of the image, Windows or Linux (az stack-hci-vm image create --os-type). The images in Learn's Marketplace table are Windows images; for a Linux image Learn describes other procedures (Red Hat Enterprise Linux and Ubuntu: prepare the image, export the disk).
+       */
+      os_type: 'Windows' | 'Linux';
+      /**
+       * Publisher of the Marketplace image, as Learn's table gives it (lowercase).
+       */
+      publisher: string;
+      /**
+       * Offer of the Marketplace image.
+       */
+      offer: string;
+      /**
+       * SKU of the Marketplace image.
+       */
+      sku: string;
+      /**
+       * Version of the Marketplace image, for example 26100.4652.250808, or latest (the default: Azure picks the newest version when the image is created, and the script reports which). The script never writes the version it finds back to this file.
+       */
+      version?: string;
+      /**
+       * Name of the storage path the image is kept on, one of storage.paths[].name; create it first (New-StoragePath.ps1). Leave it out and Azure Local chooses a storage path itself (Learn: Choose automatically).
+       */
+      storage_path?: string;
+    }[];
+    /**
      * The external SAN of a disaggregated (san) or hybrid deployment. Its presence, and scenario.storage_architecture san or hybrid, tell the solution there is a SAN; type says fibre_channel or iscsi, and the OS configuration does the host-side MPIO and MSDSM work from that (type, array.vendor and array.model are all it needs). From 5.3 it also records the array, the Fibre Channel fabrics and target WWPNs or the iSCSI targets, which the SAN deployment and zoning work read; each machine's own HBAs or initiator are nodes[].san.
      */
     san?: {
       /**
-       * Whether the SAN is fibre_channel or iscsi. This selects the OS configuration's host-side steps: fibre_channel registers the array's MSDSM hardware ID (config/san/msdsm-vendors.json), CLAIMS it for MPIO (mpclaim -n -i -d with the vendor padded to 8 and the product padded to 16 characters, which puts it in MPIOSupportedDeviceList; the MSDSM registration alone is not enough, Azure Local already ships PURE FlashArray registered and the paths stayed separate), sets the load balance policy and the vendor MPIO settings, collects the WWPNs (Get-InitiatorPort) and restarts so MPIO claims the paths, then checks each LUN is seen once and listed by mpclaim -s -d; iscsi does the same and also starts the MSiSCSI service, enables MSDSM auto-claim for iSCSI and makes the target portals and sessions from storage.san.iscsi. Only type, and the array vendor and model (storage.san.array), are needed for the host-side work; the target WWPNs and the nodes' HBA WWPNs are needed later, for zoning and LUN masking (with fibre_channel, do not zone the HBA WWNs until after the Azure Local deployment).
+       * Whether the SAN is fibre_channel or iscsi. This selects the OS configuration's host-side steps: fibre_channel registers the array's MSDSM hardware ID (config/san/msdsm-vendors.json), CLAIMS it for MPIO (mpclaim -n -i -d with the vendor padded to 8 and the product padded to 16 characters, which puts it in MPIOSupportedDeviceList; the MSDSM registration alone is not enough, Azure Local already ships PURE FlashArray registered and the paths stayed separate), sets the load balance policy and the vendor MPIO settings, collects the WWPNs (Get-InitiatorPort) and restarts so MPIO claims the paths, then checks each LUN is seen once and listed by mpclaim -s -d; iscsi does the same and also starts the MSiSCSI service, enables MSDSM auto-claim for iSCSI and makes the target portals and sessions from storage.san.iscsi (not for scenario.storage_architecture san on Azure Local 2610 or later: the deployment configures iSCSI there and Microsoft Learn says not to enable it by hand before it; the release is deployment.solution_version, else the ZTP handoff). Only type, and the array vendor and model (storage.san.array), are needed for the host-side work; the target WWPNs and the nodes' HBA WWPNs are needed later, for zoning and LUN masking (with fibre_channel, do not zone the HBA WWNs until after the Azure Local deployment).
        */
       type: 'fibre_channel' | 'iscsi';
       /**
@@ -1155,7 +1359,7 @@ export interface AzureLocalInfrastructureYml {
        */
       array?: {
         /**
-         * The array's name, for example its hostname in the array manager.
+         * The array's name, for example its hostname in the array manager. Documentation only; not read by the tools.
          */
         name: string;
         /**
@@ -1167,7 +1371,7 @@ export interface AzureLocalInfrastructureYml {
          */
         model: string;
         /**
-         * The array's management address, when the SAN deployment drives it. Not read by the tools yet: a documented placeholder.
+         * The array's management address. Documentation only; not read by the tools: no tool signs in to the array.
          */
         management_address?: string;
       };
@@ -1184,11 +1388,11 @@ export interface AzureLocalInfrastructureYml {
            */
           name: string;
           /**
-           * The fabric's switch, for example a network_devices[].hostname.
+           * The fabric's switch, for example a network_devices[].hostname. Documentation only; not read by the tools: zoning is done on the switch.
            */
           switch?: string;
           /**
-           * The active zone set on this fabric. Not read by the tools yet: a documented placeholder.
+           * The active zone set on this fabric. Documentation only; not read by the tools: zoning is done on the switch.
            */
           zone_set?: string;
         }[];
@@ -1204,7 +1408,7 @@ export interface AzureLocalInfrastructureYml {
         }[];
       };
       /**
-       * Schema 5.3. Used when type is iscsi: the array's targets and CHAP. The OS configuration makes a target portal and a session (persistent, multipath) from every iscsi:a / iscsi:b port of every machine to every portal of every target (a target with a fabric A or B is reached only from the port with the matching role); with CHAP enabled it makes none and says so. Each machine's initiator IQN is nodes[].san.initiator_iqn; the addresses of its iSCSI ports are on nodes[].network_adapters with role iscsi:a and iscsi:b.
+       * Schema 5.3. Used when type is iscsi: the array's targets and CHAP. For a hybrid design, or a san design before Azure Local 2610, the OS configuration makes a target portal and a session (persistent, multipath) from every iscsi:a / iscsi:b port of every machine to every portal of every target (a target with a fabric A or B is reached only from the port with the matching role); with CHAP enabled it makes none and says so. Each machine's initiator IQN is nodes[].san.initiator_iqn; the addresses of its iSCSI ports are on nodes[].network_adapters with role iscsi:a and iscsi:b.
        */
       iscsi?: {
         /**
@@ -1236,7 +1440,7 @@ export interface AzureLocalInfrastructureYml {
            */
           username?: string;
           /**
-           * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+           * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults. Not read by the tools yet: a documented placeholder.
            */
           secret?: string;
           /**
@@ -1279,19 +1483,23 @@ export interface AzureLocalInfrastructureYml {
        */
       performance_history_lun_id?: string;
       /**
-       * The LUNs the array presents to the cluster. Documentation of the design; the tools read the disks from the machines. Not read by the tools yet: a documented placeholder.
+       * The LUNs the array presents to the cluster for workload volumes, after the deployment. New-SanVolume.ps1 (phase 06, task 05) prepares each one that is not a Cluster Shared Volume yet: it finds the disk by unique_id, brings it online, initializes it as GPT, creates one NTFS partition with 64 KB allocation units, adds it to the failover cluster as a disk named name and adds it to the CSVs. It never changes a disk that has a partition or data. Not the LUNs of the infrastructure and performance history volumes (infra_volume_lun_id, performance_history_lun_id): the deployment owns those.
        */
       luns?: {
         /**
-         * Name of the LUN as it is on the array. Not read by the tools yet: a documented placeholder.
+         * Name of the LUN. It becomes the name of the cluster disk and of the Cluster Shared Volume, so it is the name you see in Failover Cluster Manager and in Get-ClusterSharedVolume. Use the name the array shows, so the two match. 1 to 63 letters, digits, dot, underscore or hyphen, unique in the list; not UserStorage_<n> or Infrastructure_<n>. New-SanVolume.ps1 reads it.
          */
         name: string;
         /**
-         * Size of the LUN in GiB. Not read by the tools yet: a documented placeholder.
+         * Schema 5.6.16. The UniqueId of the disk this LUN shows on the machines, as Get-Disk reports it (Learn: Connect an external storage array to Azure Local, step 7: use UniqueId as the authoritative identifier; it is the same on every machine, disk numbers are not). Find it with Get-Disk | Select-Object Number, SerialNumber, UniqueId, or on the array (the LUN's NAA or WWN). New-SanVolume.ps1 finds the disk only by this value, never by size or disk number, and does nothing to a LUN that has none.
+         */
+        unique_id?: string;
+        /**
+         * Size of the LUN in GiB (binary units, as Windows counts). New-SanVolume.ps1 compares it with the size of the disk and refuses a disk that differs by more than 1 percent.
          */
         size_gib: number;
         /**
-         * The logical unit number the array presents the LUN as, for example 2. Not read by the tools yet: a documented placeholder.
+         * The logical unit number the array presents the LUN as, for example 2. New-SanVolume.ps1 compares it with the LUN number the disk shows (the Location of Get-Disk, when it shows one) and refuses a disk where they differ. It never picks a disk by it.
          */
         lun_id?: string;
       }[];
@@ -1334,10 +1542,6 @@ export interface AzureLocalInfrastructureYml {
      */
     wdac?: boolean;
     /**
-     * Name of the Key Vault that keeps the BitLocker recovery keys. Not read by the tools yet: a documented placeholder.
-     */
-    backup_key_vault?: string;
-    /**
      * The free level of Microsoft Defender for Cloud that Azure Local needs to show its security settings in the Azure portal. Enable-DefenderForCloud.ps1 reads it. No paid plan is turned on by any key of this file.
      */
     defender_for_cloud?: {
@@ -1373,25 +1577,29 @@ export interface AzureLocalInfrastructureYml {
     };
   };
   /**
-   * SDN enabled by Azure Arc.
+   * SDN enabled by Azure Arc (Network Controller as a Failover Cluster service; Azure Local 2506 or later, OS build 26100 or later). It supports logical networks, network interfaces of Azure Local VMs and network security groups, and nothing else: no virtual networks, no software load balancer, no gateways. The older SDN managed by on-premises tools (SDN Express, Windows Admin Center, Network Controller VMs) is not built. https://learn.microsoft.com/azure/azure-local/deploy/enable-sdn-integration
    */
   sdn?: {
     /**
-     * true when Software Defined Networking is turned on for the instance.
+     * true to turn SDN enabled by Azure Arc on, which CANNOT BE UNDONE. Enable-ArcSdn.ps1 (phase 06, task 01) runs Add-EceFeature -Name NC on a machine of the instance when it is true. Microsoft Learn says that once SDN is enabled you cannot roll back or disable it, and false does not turn it off. Never set it where Network Controller was deployed with on-premises tools. Enabling interrupts the network of running workloads for a short time. New-NetworkSecurityGroup.ps1 (task 07) and New-LogicalNetwork.ps1 (task 08, for a logical network with nsg_name) also read it: network security groups need SDN enabled by Azure Arc.
      */
     enabled: boolean;
     /**
-     * Prefix of the names of the SDN resources.
+     * The SDN prefix (Add-EceFeature -SDNPrefix). It names the Network Controller REST URL, https://<prefix>-NC.<domain>/, and tells the controllers of different instances apart. Microsoft Learn: not empty, eight characters or fewer, letters, digits and hyphens only, no two hyphens in a row, no hyphen at the end. The toolkit also refuses a hyphen at the start, which is not a valid DNS name. Required when sdn.enabled is true: Enable-ArcSdn.ps1 stops with exit 2 without it.
      */
     prefix?: string;
     /**
-     * How the SDN DNS records are created: dynamic or static. Not read by the tools yet: a documented placeholder.
+     * How the A record <prefix>-NC of the Network Controller REST URL comes about. dynamic: Active Directory integrated dynamic DNS creates it when SDN is enabled and you do nothing. static: you create it first; it must resolve to the fifth address of networking.management.infrastructure_pool (Microsoft Learn: the fifth IP address of the range you gave at deployment) and to nothing else. Required when sdn.enabled is true. Enable-ArcSdn.ps1 resolves the name on the machine before it enables SDN and stops when the answer is wrong.
      */
     dns_records?: 'dynamic' | 'static';
     /**
-     * true when the default network access policy of the SDN allows traffic that no rule denies. Not read by the tools yet: a documented placeholder.
+     * true when you accept that enabling SDN interrupts the network of running workloads for a short time and that a maintenance window is arranged on a production instance (Add-EceFeature -AcknowledgeMaintenanceWindow). Enable-ArcSdn.ps1 asks nothing at run time, so this is the answer: it enables SDN only when this is true.
      */
-    default_access_policy?: boolean;
+    acknowledge_maintenance_window?: boolean;
+    /**
+     * true when the static DNS record <prefix>-NC exists and points at the fifth address of networking.management.infrastructure_pool (Add-EceFeature -AcknowledgeDNSRecordCreation). Read only when sdn.dns_records is static: with dynamic DNS Microsoft Learn asks for no acknowledgement.
+     */
+    acknowledge_dns_record?: boolean;
   };
   /**
    * Day-2 choices: updates, backup, disaster recovery, notifications, licensing and monitoring. Only Azure Monitor (monitoring) and the notification addresses are read by the tools so far (the monitoring scripts of phase 02, operational foundations); the rest is not read yet. Sonar reads its own settings.
@@ -1476,17 +1684,13 @@ export interface AzureLocalInfrastructureYml {
       target_rpo_minutes?: number;
     };
     /**
-     * Who hears about alerts. A webhook URL is a secret.
+     * Who hears about alerts. Only email addresses: the action group of Azure Local alerting is an email group.
      */
     notifications?: {
       /**
        * Addresses (team mailboxes) that receive the notifications of the operations tools. Deploy-ActionGroup.ps1 makes each one an email receiver of the action group.
        */
       emails?: string[];
-      /**
-       * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
-       */
-      teams_webhook?: string;
     };
     /**
      * Licensing benefits the instance uses.
@@ -1510,19 +1714,23 @@ export interface AzureLocalInfrastructureYml {
      */
     monitoring?: {
       /**
-       * true when Azure Monitor is part of the design.
+       * true when Azure Monitor is part of the design. When it is false, every monitoring script of phase 02 (workspace, endpoint, Azure Monitor Agent, Insights association, action group) does nothing and exits 0.
        */
       enabled: boolean;
       /**
-       * Name of the Log Analytics workspace. Deploy-DataCollectionEndpoint.ps1 looks it up, and takes the region of the data collection endpoint from it.
+       * Name of the Log Analytics workspace. Deploy-LogAnalyticsWorkspace.ps1 creates it; Deploy-DataCollectionEndpoint.ps1 looks it up and takes the region of the endpoint from it. The Insights data collection rule sends to it.
        */
       log_analytics_workspace?: string;
       /**
-       * Resource group of the Log Analytics workspace. It is also the resource group of the data collection endpoint and of the action group that the monitoring scripts create.
+       * Resource group of the Log Analytics workspace. It is also the resource group of the data collection endpoint and of the action group that the monitoring scripts create and of the Insights data collection rule that Enable-HciInsights.ps1 looks up.
        */
       workspace_resource_group?: string;
       /**
-       * Name of the data collection rule. Not read by the tools yet: a documented placeholder.
+       * How many days the workspace keeps its data (the default retention). Deploy-LogAnalyticsWorkspace.ps1 passes it when it creates the workspace; a workspace that exists is never changed. 30 is the Azure default and costs nothing extra; Microsoft Learn says retention beyond 31 days is charged. The pricing tier is not a key: a new workspace is pay-as-you-go, the commitment tiers start at 100 GB a day and the legacy tiers are closed to new customers.
+       */
+      retention_days?: number;
+      /**
+       * Name of the existing data collection rule that Insights for Azure Local uses. Enable-HciInsights.ps1 (phase 02, task 03) looks it up in operations.monitoring.workspace_resource_group and associates it with the Arc machine of every node; it never creates or changes the rule. Microsoft Learn documents no template for the rule and says not to build your own, so create it once in the Azure portal (the instance, Capabilities, Insights, Get Started) and put its name here. Learn names the AzureStackHCI- prefix for the rule the portal creates.
        */
       data_collection_rule?: string;
       /**
@@ -1533,10 +1741,6 @@ export interface AzureLocalInfrastructureYml {
        * Name of the Azure Monitor action group that tells the operations team about alerts. Deploy-ActionGroup.ps1 creates it, with an email receiver for each address of operations.notifications.emails and operations.monitoring.alert_email. Letters, digits, space and . _ - ( ), starting with a letter or digit.
        */
       action_group?: string;
-      /**
-       * true when health alerts are created. Not read by the tools yet: a documented placeholder.
-       */
-      health_alerts?: boolean;
       /**
        * Address that receives the alerts (a team mailbox). Deploy-ActionGroup.ps1 makes it an email receiver of the action group, next to the addresses of operations.notifications.emails.
        */
@@ -1593,12 +1797,12 @@ export interface AzureLocalInfrastructureYml {
          */
         username: string;
         /**
-         * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+         * At least 12 characters with lowercase, uppercase, a digit and a special character. Create the secret before the run.
          */
         password: string;
       };
       /**
-       * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+       * Schema 5.3. The password of the maintenance environment's local user (edgeuser), which azurelocal-ztp's Device stage signs in with to reach the Configurator service before the machine is claimed. A Key Vault reference. Default: the maintenance environment's out-of-box password that Microsoft Learn documents (Configurator App article). Set a secret when the images carry another one.
        */
       maintenance_password?: string;
       /**
@@ -2121,7 +2325,10 @@ export interface AzureLocalInfrastructureYml {
            * BGP autonomous system number of the peer. Not read by the tools yet: a documented placeholder.
            */
           peer_asn?: number;
-          shared_key: KvRef;
+          /**
+           * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+           */
+          shared_key: string;
         }[];
         /**
          * Point-to-site VPN for individual users. Not read by the tools yet: a documented placeholder.
@@ -2225,7 +2432,10 @@ export interface AzureLocalInfrastructureYml {
        * Local administrator user name of the machine. The password is a Key Vault secret.
        */
       admin_username?: string;
-      admin_password?: KvRef;
+      /**
+       * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+       */
+      admin_password?: string;
     }[];
     /**
      * The Log Analytics workspace of the landing zone.
@@ -2287,7 +2497,7 @@ export interface AzureLocalInfrastructureYml {
      */
     project?: string;
     /**
-     * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+     * Schema 5.5. Key Vault reference to a token with administrator rights on the organization or project. The setup scripts (tasks 02 to 05) use it when the platform CLI is not already signed in. Without it they read GH_TOKEN, GITLAB_TOKEN or AZURE_DEVOPS_EXT_PAT from the environment.
      */
     api_token?: string;
     /**
@@ -2386,7 +2596,7 @@ export interface AzureLocalInfrastructureYml {
        */
       method?: 'oidc' | 'client_secret';
       /**
-       * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+       * Key Vault reference where task 01 stores the generated client secret (method client_secret).
        */
       client_secret?: string;
       /**
@@ -2435,7 +2645,7 @@ export interface AzureLocalInfrastructureYml {
        */
       labels?: string[];
       /**
-       * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+       * Key Vault reference to the secret the runner reads at boot: a PAT or App token (GitHub), the runner authentication token (GitLab), a PAT with Agent Pools read and manage (Azure DevOps). Only the reference is here.
        */
       registration_secret?: string;
       /**
@@ -2589,7 +2799,10 @@ export interface AzureLocalInfrastructureYml {
        * Runner tags or labels that jobs select.
        */
       labels?: string[];
-      registration_token?: KvRef;
+      /**
+       * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+       */
+      registration_token?: string;
     };
     /**
      * Where the Terraform state is kept.
@@ -2668,14 +2881,17 @@ export interface Node {
      */
     ip_address?: string;
     /**
-     * Kind of BMC: idrac (Dell), ilo (HPE), xcc (Lenovo) or other. Only Dell iDRAC is proven end to end in this phase; BMC kinds other than idrac are planned.
+     * Kind of BMC: idrac (Dell), ilo (HPE), xcc (Lenovo) or other. Only Dell iDRAC is proven end to end in this phase; BMC kinds other than idrac are planned. Hardware inventory (Get-HardwareInventory.ps1) compares it with the vendor it detects from the Redfish answers; other is not compared.
      */
     type?: 'idrac' | 'ilo' | 'xcc' | 'other';
     /**
      * BMC account name. The plain name, or a keyvault:// reference.
      */
     username?: string;
-    password?: KvRef;
+    /**
+     * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+     */
+    password?: string;
   };
   /**
    * Rack identifier, for the as-built record.
@@ -2966,7 +3182,10 @@ export interface BmcCredentials {
    * A reference to the secret holding the user name, or the user name itself.
    */
   username: string;
-  password: KvRef;
+  /**
+   * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+   */
+  password: string;
   /**
    * Schema 5.4. azurelocal-ztp, Boot stage: also set the iDRAC Remote File Share attribute RFS.<n>.WriteProtected to Read Write before it inserts the virtual media. iDRAC 7.30 rejects WriteProtected=false in InsertMedia, and the maintenance environment cannot write its voucher to a read-only drive. Default: true for Dell (azurelocal-ztp config/oem/dell.json, bmc.rfsWriteAttribute), false for the other vendors, whose BMCs have no such attribute. Set it when your BMC differs from its vendor's usual behaviour.
    */
@@ -3007,7 +3226,7 @@ export interface DriveGroup {
    */
   count?: number;
   /**
-   * Size of one capacity drive in TB. Not read by the tools yet: a documented placeholder.
+   * Size of one capacity drive in TB (decimal terabytes). Get-HardwareInventory.ps1 compares it with the size the BMC reports (within 5 percent).
    */
   size_tb?: number;
 }
@@ -3024,7 +3243,7 @@ export interface DriveGroup1 {
    */
   count?: number;
   /**
-   * Size of one cache drive in TB. Not read by the tools yet: a documented placeholder.
+   * Size of one cache drive in TB (decimal terabytes). Get-HardwareInventory.ps1 compares it with the size the BMC reports (within 5 percent).
    */
   size_tb?: number;
 }
@@ -3112,31 +3331,35 @@ export interface LogicalNetwork {
    */
   ip_allocation_method?: 'Static' | 'Dynamic';
   /**
-   * Name of the network security group to associate with the logical network. Used only when the creation task runs with -AssociateNsg; the group must exist (SDN). (Since 5.6.3.)
+   * Name of the network security group to associate with the logical network. The association is made when the logical network is created, so create the group first (networking.network_security_groups[], New-NetworkSecurityGroup.ps1): the name must be one of that list, and sdn.enabled must be true. Leave it out for a logical network without a group. The script does not associate a group with a logical network that exists. (Since 5.6.3.)
    */
   nsg_name?: string;
+  /**
+   * Name of the external virtual switch on the cluster that this logical network is created on (az stack-hci-vm: --vm-switch-name; it cannot be changed afterwards). Leave it out: the script reads the external virtual switches of the cluster with Get-VMSwitch -SwitchType External, the command Microsoft Learn gives, and uses the one it finds. Name it only when the cluster has more than one external switch (for example one for each compute intent); the name must be one the cluster reports. Network ATC names the switch after the intent, but the script does not build a name from the intent.
+   */
+  vm_switch_name?: string;
   /**
    * What the network is for (since 5.6). management and oob mark a network the machines' remote management may be reached from: the remote management security profile adds its subnet to the allowed sources of dev and production (a candidate, not a trust: prefer listing the controller addresses in os_configuration.remoting.allowed_source_cidrs). automation, compute, storage and other have no effect on remote management.
    */
   purpose?: 'management' | 'oob' | 'automation' | 'compute' | 'storage' | 'other';
   /**
-   * VLAN ID of the logical network; 0 for untagged.
+   * VLAN ID of the logical network; 0 for untagged. Needed when ip_allocation_method is Static (Learn: DNS server, gateway and VLAN ID must be specified for a static logical network). For a Dynamic network, leave it out for 0.
    */
   vlan_id?: number;
   /**
-   * Address prefix of the logical network in CIDR form.
+   * Address prefix of the logical network in CIDR form. Needed when ip_allocation_method is Static (az stack-hci-vm takes one prefix). Not used for a Dynamic network; it is still read by the remote management security profile and the pre-cluster verification.
    */
   address_prefix?: string;
   /**
-   * Default gateway of the logical network. When it is left out the network is created without a gateway (az stack-hci-vm: --no-gateway). The creation script of task-08 still reads this key as default_gateway: a task in config/variables/docs/variables-audit-tasks.md changes the script to this name.
+   * Default gateway of the logical network, inside address_prefix. Needed when ip_allocation_method is Static (Learn: gateway, DNS server and VLAN ID must be specified for a static logical network). Not used for a Dynamic network.
    */
   gateway?: string;
   /**
-   * DNS servers handed to machines on this logical network (ARM and az stack-hci-vm: dnsServers).
+   * DNS servers handed to machines on this logical network (az stack-hci-vm: --dns-servers). Needed when ip_allocation_method is Static; not used for a Dynamic network.
    */
   dns_servers?: Ipv4[];
   /**
-   * The one address range Azure Local hands to virtual machines on this logical network (first and last address, both inside address_prefix); az stack-hci-vm takes one pool per network. Needed when ip_allocation_method is Static. The creation script of task-08 still reads a list called ip_pools (and its type): a task in config/variables/docs/variables-audit-tasks.md changes the script to this name.
+   * The one address range Azure Local hands to virtual machines on this logical network (first and last address, both inside address_prefix), sent as --ip-pool-start and --ip-pool-end. Needed when ip_allocation_method is Static. The pool type is not a key: Learn's static examples give none. Not used for a Dynamic network.
    */
   ip_pool?: {
     /**
@@ -3237,7 +3460,10 @@ export interface NetworkDevice {
      * User name of the device login.
      */
     username: string;
-    password: KvRef;
+    /**
+     * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+     */
+    password: string;
   };
   /**
    * High availability of the device.

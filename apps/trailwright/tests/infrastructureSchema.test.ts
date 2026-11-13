@@ -33,7 +33,7 @@ describe(`infrastructure.yml follows the toolkit's schema ${SCHEMA_VERSION}`, ()
 
   it('writes the version of the vendored schema, for the whole instance', () => {
     const doc = exported(ad());
-    expect(SCHEMA_VERSION).toBe('5.6.10');
+    expect(SCHEMA_VERSION).toBe('5.6.16');
     expect(doc._metadata).toEqual({ schema_version: SCHEMA_VERSION, scope: 'full', file_version: '1.0.0', generated_by: 'azurelocal-trailwright' });
     expect(SCHEMA_VERSION).toMatch(new RegExp(schema.properties._metadata.properties.schema_version.pattern as string));
   });
@@ -159,7 +159,7 @@ describe('where a value of the design goes', () => {
     expect(doc.site.time_zone).toBe('UTC');
     // The validated model of the preview stands in when the design names no vendor and model.
     expect(doc.hardware).toMatchObject({ vendor: 'Dell', model: 'AX-750' });
-    expect(doc.sdn).toEqual({ enabled: true, prefix: 'sdn01', dns_records: 'dynamic', default_access_policy: false });
+    expect(doc.sdn).toEqual({ enabled: true, prefix: 'sdn01', dns_records: 'dynamic' });
     expect(doc.networking.logical_networks).toEqual([{ name: 'lnet-compute', vlan_id: 110, address_prefix: '192.0.2.128/25', gateway: '192.0.2.129', dns_servers: ['192.0.2.10'], ip_pool: { start: '192.0.2.140', end: '192.0.2.200' } }]);
   });
 

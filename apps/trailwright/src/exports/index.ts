@@ -23,7 +23,7 @@ const named = (suffix: string) => (p: Project) => `${slug(p.meta.name)}${suffix}
 export const exportKinds: ExportKind[] = [
   { id: 'handoff-md', label: 'Design handoff (Markdown)', filename: named('-handoff.md'), mime: 'text/markdown', build: buildHandoffMarkdown },
   { id: 'handoff-pdf', label: 'Design handoff (PDF)', filename: named('-handoff.pdf'), mime: 'application/pdf', build: buildHandoffPdf },
-  { id: 'infrastructure-yml', label: 'infrastructure.yml (Toolkit registry shape)', filename: () => 'infrastructure.yml', mime: 'application/yaml', build: buildInfrastructureYml },
+  { id: 'infrastructure-yml', label: 'infrastructure.yml (Azure Local Toolkit, schema 5)', filename: () => 'infrastructure.yml', mime: 'application/yaml', build: buildInfrastructureYml },
   { id: 'environment-yml', label: 'Environment file (deploy automation)', filename: () => 'environment.yml', mime: 'application/yaml', build: buildEnvironmentFile },
   { id: 'arm-validate', label: 'ARM parameters, validate (azuredeploy.parameters.json)', filename: named('-validate.parameters.json'), mime: 'application/json', build: (p) => buildArmParametersFile(p, 'Validate') },
   { id: 'arm-deploy', label: 'ARM parameters, deploy', filename: named('-deploy.parameters.json'), mime: 'application/json', build: (p) => buildArmParametersFile(p, 'Deploy') },

@@ -16,7 +16,7 @@ A guided flow (hardware, storage, network design, intents and VLANs, management 
 | Output | For |
 |---|---|
 | ARM parameters (validate, deploy) and Bicep parameters | Microsoft's eight quickstart templates, contract-tested |
-| `infrastructure.yml` (published [schema](apps/trailwright/public/schema/infrastructure.schema.json)) | The Azure Local Toolkit registry shape |
+| `infrastructure.yml` (published [schema](apps/trailwright/public/schema/infrastructure.schema.json)) | The Azure Local Toolkit and the tools that read its schema 5 file ([field reference](docs/INFRASTRUCTURE-YML.md)) |
 | Environment file and Terraform variables | The Azure Local deploy automation ([how it maps](docs/ENVIRONMENT-FILE.md)) |
 | Schedules (CSV, Excel), switch port plan, topology (draw.io), handoff (Markdown, PDF), project JSON | Teams and records |
 | As-built compare | Design versus what Ranger or your own script found ([format](docs/AS-BUILT.md)) |

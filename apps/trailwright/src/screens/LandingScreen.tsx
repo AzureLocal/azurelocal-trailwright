@@ -229,7 +229,7 @@ export const LandingScreen: FC = () => {
             <li aria-current="step" className="panel space-y-2 border-brand-500 ring-1 ring-brand-500">
               <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">This tool: design</p>
               <h3 className="font-semibold text-gray-900">Trailwright</h3>
-              <p className="text-sm text-gray-700">How is it built? Captures and checks the design, and writes infrastructure.yml in the Azure Local Toolkit registry shape plus the other exports.</p>
+              <p className="text-sm text-gray-700">How is it built? Captures and checks the design, and writes infrastructure.yml in the Azure Local Toolkit's schema 5 layout plus the other exports.</p>
             </li>
             <li className="panel space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">After: build</p>

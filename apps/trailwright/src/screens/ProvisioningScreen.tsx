@@ -70,6 +70,16 @@ export const ProvisioningScreen: FC = () => {
           </div>
 
           <div className="space-y-3">
+            <h3 className="font-medium text-gray-800">Automated provisioning (azurelocal-ztp)</h3>
+            <p className="text-xs text-gray-600">What infrastructure.yml needs so that azurelocal-ztp can run simplified machine provisioning: the provisioning image and the SMB share on the management host that the BMCs mount the images from. Each machine also needs its BMC address and the MAC of its management port, below.</p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <TextInput id="prov-maintenance-iso" label="Provisioning image" value={prov.maintenanceIso} placeholder="latest" hint="latest, a train such as 2610, a build such as 10.2610.0.3063, or a Microsoft download URL." onChange={(maintenanceIso) => set({ maintenanceIso })} />
+              <TextInput id="prov-media-share" label="SMB share for the provisioning images" value={prov.mediaShareName} placeholder="ztp-virtual-usb" hint="Letters, digits and hyphens. On the management host." onChange={(mediaShareName) => set({ mediaShareName })} />
+              <TextInput id="prov-media-host" label="Management host address, as the BMCs reach it" value={prov.mediaShareHost} placeholder="198.51.100.5" onChange={(mediaShareHost) => set({ mediaShareHost })} />
+            </div>
+          </div>
+
+          <div className="space-y-3">
             <h3 className="font-medium text-gray-800">Machines</h3>
             <p className="text-xs text-gray-600">
               For each machine you prepare a USB drive, boot the machine from it, and collect its ownership voucher: a small .pem file named after the machine&rsquo;s serial number (in \vouchers\&lt;serial number&gt;\ on the drive, or downloaded from the Configurator app, which connects to &lt;serial number&gt;.local). In the portal you add the vouchers, choose the software version, and set the local administrator credentials (a password of at least 12 characters with upper and lower case, a digit and a special character). The machine name becomes its Azure Arc resource name.
@@ -87,6 +97,8 @@ export const ProvisioningScreen: FC = () => {
                       <th className="py-2 pr-3">Arc resource name</th>
                       <th className="py-2 pr-3">Serial number</th>
                       <th className="py-2 pr-3">Static IP (Configurator app)</th>
+                      <th className="py-2 pr-3">BMC address</th>
+                      <th className="py-2 pr-3">Management port MAC</th>
                       <th className="py-2">Ownership voucher file</th>
                     </tr>
                   </thead>
@@ -96,6 +108,8 @@ export const ProvisioningScreen: FC = () => {
                         <td className="py-2 pr-3"><input aria-label={`Machine ${i + 1} name`} className="input" value={n.name} onChange={(e) => setNode(i, { name: e.target.value })} /></td>
                         <td className="py-2 pr-3"><input aria-label={`Machine ${i + 1} serial number`} className="input" value={n.serial ?? ''} onChange={(e) => setNode(i, { serial: e.target.value })} /></td>
                         <td className="py-2 pr-3"><input aria-label={`Machine ${i + 1} static IP`} className="input" value={n.ip} onChange={(e) => setNode(i, { ip: e.target.value })} /></td>
+                        <td className="py-2 pr-3"><input aria-label={`Machine ${i + 1} BMC address`} className="input" value={n.bmcIp ?? ''} onChange={(e) => setNode(i, { bmcIp: e.target.value })} /></td>
+                        <td className="py-2 pr-3"><input aria-label={`Machine ${i + 1} management port MAC`} className="input" value={n.managementMac ?? ''} onChange={(e) => setNode(i, { managementMac: e.target.value })} /></td>
                         <td className="py-2 font-mono text-xs text-gray-600">{n.serial ? `vouchers/${n.serial}/${n.serial}.pem` : 'needs the serial number'}</td>
                       </tr>
                     ))}

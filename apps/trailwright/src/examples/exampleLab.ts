@@ -10,8 +10,13 @@ export function createExampleProject(): Project {
       customer: 'Example Company',
       owner: 'Design owner',
       notes: 'Bundled example project. Replace every value with your own design.',
+      siteName: 'Example site',
+      siteCode: 'RAL',
+      environmentType: 'lab',
     },
     hardware: {
+      vendor: 'Dell',
+      model: 'AX-760',
       topology: 'standard',
       rackAwareUplink: 'dedicated-storage',
       racks: 1,

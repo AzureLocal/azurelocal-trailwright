@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { readXlsx } from './xlsxRead';
 import { parse } from 'yaml';
 import { exportKinds, buildArmParametersFile, buildBicepParamFile, buildInfrastructureYml, buildSchedulesCsv, buildSchedulesXlsx, buildTopologyDrawio, buildHandoffMarkdown, buildProjectJson } from '../src/exports';
+import { SCHEMA_VERSION } from '../src/infra/types';
 import { projectSchema } from '../src/model/schema';
 import { makeNodes, project } from './helpers';
 
@@ -65,8 +66,9 @@ describe('no secrets and no executable content', () => {
     expect(bicep).not.toMatch(/param\s+\w*password\w*\s*=\s*'/i);
   });
   it('infrastructure.yml references secrets as keyvault:// paths', () => {
-    const doc = parse(buildInfrastructureYml(p)) as { identity: { secrets: { name: string; value: string }[] } };
-    for (const s of doc.identity.secrets) expect(s.value).toBe(`keyvault://kv-example/${s.name}`);
+    const doc = parse(buildInfrastructureYml(p)) as { identity: { local_admin: { password: string } } };
+    expect(doc.identity.local_admin.password).toBe('keyvault://kv-example/local-admin-password');
+    expect(buildInfrastructureYml(p)).not.toMatch(/password: (?!keyvault:)/);
   });
 
   it('a spreadsheet cell that starts with a formula character is stored as text', () => {
@@ -103,9 +105,9 @@ describe('derived values', () => {
     expect((JSON.parse(buildArmParametersFile(p)) as { parameters: { witnessType: { value: string } } }).parameters.witnessType.value).toBe('Cloud');
   });
 
-  it('infrastructure.yml parses back with the registry schema version', () => {
+  it('infrastructure.yml parses back with the version of the toolkit schema it follows', () => {
     const doc = parse(buildInfrastructureYml(hostile())) as { _metadata: { schema_version: string } };
-    expect(doc._metadata.schema_version).toBe('4.0.0');
+    expect(doc._metadata.schema_version).toBe(SCHEMA_VERSION);
   });
 
   it('a PDF is produced', async () => {

@@ -48,7 +48,7 @@ const secretRef = (vault: string, secret: string): string => `keyvault://${vault
 const cap = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
 
 // The base address of the subnet that holds `ip` for a dotted mask, as a CIDR.
-function cidrOf(ip: string, mask: string): string | undefined {
+export function cidrOf(ip: string, mask: string): string | undefined {
   const bits = maskBits(mask);
   const n = toNum(ip);
   if (bits === undefined || n === undefined) return undefined;

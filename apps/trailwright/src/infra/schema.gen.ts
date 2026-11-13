@@ -35,7 +35,7 @@ export interface AzureLocalInfrastructureYml {
    */
   _metadata: {
     /**
-     * The schema version this file follows. Major 5. A minor version adds optional keys only; a major version can rename or remove keys. Each key's description says which version added it ('since'). Version history, in order: 5.2 adds nodes[].network_adapters, BIOS settings, the site IP range and the maintenance environment's network. 5.3 adds the BIOS phases (bios_during_provisioning), networking.management.static_method and provisioning_dhcp_range, nodes[].maintenance_address, provisioning.simplified.maintenance_password, and the SAN details (storage.san.array, fibre_channel and iscsi, nodes[].san); it also adds _metadata.scope: ztp for a file that holds only what azurelocal-ztp reads. 5.4 puts every azurelocal-ztp setting in this schema, so no tool keeps a key of its own: the BIOS actions ZTP derives from the hardware inventory (provisioning.simplified.isolate_san_adapters and enable_embedded_nics, nodes[].san.hbas[].type), the Azure resource choices, timeouts, retries, the USB image and the maintenance environment of simplified provisioning, and hardware.bmc.rfs_write_attribute and verify_certificate. 5.4.1 adds provisioning.simplified.timeouts.adapters_minutes. 5.4.2 adds hardware.sbe.delivery and node_pull_url (how the SBE package reaches the nodes during OS configuration). 5.4.3 adds os_configuration.clear_storage, the switch that lets the OS configuration run wipe leftover local storage. 5.4.4 adds os_configuration.network (confirm_minutes, stable_seconds: the commit-confirmed window of a guarded network change) and os_configuration.remoting with transport, bootstrap_transport and allowed_source_cidrs. 5.5 puts the CI/CD infrastructure in devops (the project, its settings, the environments, the Azure sign-in, the runners with their network and roles) and adds the domain join (identity.active_directory.domain_join_account, join_options, local_admin_members). 5.6 adds the deployment block (the timeouts, polling, approval and resume of the toolkit's Validate and Deploy run) and the remote management security profile: scenario.environment_class, the profile keys of os_configuration.remoting (allow_any_source, trusted_hosts, use_https, isolation_confirmed, certificate; bootstrap_transport also takes smb and auto) and a purpose marker on networking.logical_networks[] and networking.cluster_networks[] (the values management and oob of networking.vlans[].purpose also count). A missing scenario.environment_class means production. 5.6.1 adds identity.active_directory.security_groups[].local_groups. 5.6.2 identifies the adapters of nodes[].network_adapters[] by hardware facts (mac_address is required; port_index, pci_location, vendor, os_name_override and allowed_vlans are optional). 5.6.3 adds enabled, ip_allocation_method and nsg_name to networking.logical_networks[]. A file written for 5.6.0 stays valid: a minor version adds optional keys only, except that 5.6.2 requires the MAC of every adapter. 5.6.4 adds the SBE package as a requirement: hardware.sbe.requirement and not_applicable_reason (whether the OEM package is required, or not applicable with a reason), source_path (the share or folder where the downloaded package is available to the automation), source_username and source_password (the read credential, a Key Vault reference), and the optional package_sha256 and package_size_bytes. The build-time side-load (delivery) is unchanged and stays off by default. The current version is 5.6.4.
+     * The schema version this file follows. Major 5. A minor version adds optional keys only; a major version can rename or remove keys. Each key's description says which version added it ('since'). Version history, in order: 5.2 adds nodes[].network_adapters, BIOS settings, the site IP range and the maintenance environment's network. 5.3 adds the BIOS phases (bios_during_provisioning), networking.management.static_method and provisioning_dhcp_range, nodes[].maintenance_address, provisioning.simplified.maintenance_password, and the SAN details (storage.san.array, fibre_channel and iscsi, nodes[].san); it also adds _metadata.scope: ztp for a file that holds only what azurelocal-ztp reads. 5.4 puts every azurelocal-ztp setting in this schema, so no tool keeps a key of its own: the BIOS actions ZTP derives from the hardware inventory (provisioning.simplified.isolate_san_adapters and enable_embedded_nics, nodes[].san.hbas[].type), the Azure resource choices, timeouts, retries, the USB image and the maintenance environment of simplified provisioning, and hardware.bmc.rfs_write_attribute and verify_certificate. 5.4.1 adds provisioning.simplified.timeouts.adapters_minutes. 5.4.2 adds hardware.sbe.delivery and node_pull_url (how the SBE package reaches the nodes during OS configuration). 5.4.3 adds os_configuration.clear_storage, the switch that lets the OS configuration run wipe leftover local storage. 5.4.4 adds os_configuration.network (confirm_minutes, stable_seconds: the commit-confirmed window of a guarded network change) and os_configuration.remoting with transport, bootstrap_transport and allowed_source_cidrs. 5.5 puts the CI/CD infrastructure in devops (the project, its settings, the environments, the Azure sign-in, the runners with their network and roles) and adds the domain join (identity.active_directory.domain_join_account, join_options, local_admin_members). 5.6 adds the deployment block (the timeouts, polling, approval and resume of the toolkit's Validate and Deploy run) and the remote management security profile: scenario.environment_class, the profile keys of os_configuration.remoting (allow_any_source, trusted_hosts, use_https, isolation_confirmed, certificate; bootstrap_transport also takes smb and auto) and a purpose marker on networking.logical_networks[] and networking.cluster_networks[] (the values management and oob of networking.vlans[].purpose also count). A missing scenario.environment_class means production. 5.6.1 adds identity.active_directory.security_groups[].local_groups. 5.6.2 identifies the adapters of nodes[].network_adapters[] by hardware facts (mac_address is required; port_index, pci_location, vendor, os_name_override and allowed_vlans are optional). 5.6.3 adds enabled, ip_allocation_method and nsg_name to networking.logical_networks[]. A file written for 5.6.0 stays valid: a minor version adds optional keys only, except that 5.6.2 requires the MAC of every adapter. 5.6.4 adds the SBE package as a requirement: hardware.sbe.requirement and not_applicable_reason (whether the OEM package is required, or not applicable with a reason), source_path (the share or folder where the downloaded package is available to the automation), source_username and source_password (the read credential, a Key Vault reference), and the optional package_sha256 and package_size_bytes. The build-time side-load (delivery) is unchanged and stays off by default. 5.6.5 adds landing_zone.policy (required_tags, management_group): the tag names and the management group of the Tier 1 tag policy, which the Azure Policy task assigns in audit mode. 5.6.6 adds operations.monitoring.action_group: the name of the Azure Monitor action group that the alerting task creates. 5.6.7 adds security.defender_for_cloud: the free level of Microsoft Defender for Cloud that Azure Local needs. 5.6.8 adds security.defender_for_cloud.security_contact_email. 5.6.9 adds the storage keys the volume and storage path scripts read: storage.pool, storage.csv, storage.paths and, on storage.volumes, provisioning_type, file_system, parity_percent, media_type and deduplication. 5.6.10 adds what the SAN deployment needs: networking.cluster_network_properties and, for iSCSI, storage.san.iscsi.networks, jumbo_packet and chap.mutual. The current version is 5.6.10.
      */
     schema_version: string;
     /**
@@ -728,6 +728,27 @@ export interface AzureLocalInfrastructureYml {
       }[];
     };
     /**
+     * Schema 5.6.10. Disaggregated (SAN) only: the adapter properties of the cluster networks (ARM sanNetworkList.clusterNetworkConfig.adapterProperties). The defaults are the values of Microsoft's quickstart template.
+     */
+    cluster_network_properties?: {
+      /**
+       * Share of the bandwidth reserved for SMB traffic (CSV and live migration), 1 to 97 percent. ARM bandwidthPercentageSmb.
+       */
+      bandwidth_percentage_smb?: number;
+      /**
+       * Value of the JumboPacket property of the cluster network adapters, in bytes: 1514 (standard frame), 4088 or 9014 (jumbo). ARM jumboPacket.
+       */
+      jumbo_packet?: number;
+      /**
+       * 802.1p priority of the cluster heartbeat traffic, 0 to 7. ARM priorityValue8021ActionCluster.
+       */
+      priority_cluster?: number;
+      /**
+       * 802.1p priority of the SMB traffic, 0 to 7. ARM priorityValue8021ActionSmb.
+       */
+      priority_smb?: number;
+    };
+    /**
      * Disaggregated (SAN) only: the cluster networks on standalone ports, fabric A and B. ARM sanNetworkList.
      */
     cluster_networks?: {
@@ -889,7 +910,7 @@ export interface AzureLocalInfrastructureYml {
      */
     entra?: {
       /**
-       * Entra ID groups the instance expects. Not read by the tools yet.
+       * Entra ID groups the instance expects. New-EntraSecurityGroups.ps1 creates them and Set-EntraGroupRoleAssignments.ps1 assigns their roles.
        */
       groups?: {
         /**
@@ -1020,7 +1041,7 @@ export interface AzureLocalInfrastructureYml {
     };
   };
   /**
-   * Volumes and the SAN.
+   * Storage of the instance: the deployment's storage mode, the volumes, and the SAN of a disaggregated or hybrid deployment (the san block applies only when scenario.storage_architecture is san or hybrid).
    */
   storage?: {
     /**
@@ -1028,21 +1049,98 @@ export interface AzureLocalInfrastructureYml {
      */
     configuration_mode?: 'express' | 'infra_only' | 'keep_storage';
     /**
-     * The cluster shared volumes to create after deployment. Not read by the tools yet.
+     * Schema 5.6.9. The Storage Spaces Direct pool of the instance. Read by New-StorageVolume.ps1 (phase 06, task 05).
+     */
+    pool?: {
+      /**
+       * Name of the storage pool the volumes are created in. Leave it out: the script then uses the one Storage Spaces Direct pool the cluster has (an Azure Local deployment names it SU1_Pool). Needed only when the cluster has more than one pool.
+       */
+      name?: string;
+      /**
+       * Share of the pool, in percent, at which Azure Local raises the thin provisioning alert (Set-StoragePool -ThinProvisioningAlertThresholds). Microsoft's default is 70 and Microsoft recommends keeping it. Leave it out and the script does not touch the setting.
+       */
+      thin_provisioning_alert_threshold_percent?: number;
+    };
+    /**
+     * Schema 5.6.9. Cluster shared volume settings of the instance. Read by New-StorageVolume.ps1 (phase 06, task 05).
+     */
+    csv?: {
+      /**
+       * Memory per machine, in MiB, for the CSV in-memory read cache (the cluster property BlockCacheSize). Azure Local has it on with 1024 by default; 0 switches it off; up to 80 percent of the memory of a machine can be used. Leave it out and the script does not touch the setting. A change takes effect when the volumes next move or come online.
+       */
+      read_cache_size_mib?: number;
+    };
+    /**
+     * The Storage Spaces Direct volumes to create after deployment, in addition to what the deployment itself creates (storage.configuration_mode). New-StorageVolume.ps1 (phase 06, task 05) creates each one that does not exist yet with New-Volume and never changes or removes one that exists. Not used with scenario.storage_architecture san.
      */
     volumes?: {
       /**
-       * Name of the volume, for example vol-workloads-01.
+       * Name of the volume, for example vol-workloads-01. It becomes the folder C:\ClusterStorage\<name>. Not a name the deployment manages (UserStorage_<n>, Infrastructure_<n>).
        */
       name: string;
       /**
-       * Size of the volume in GiB. Not read by the tools yet: a documented placeholder.
+       * Size of the volume in GiB (binary units, as Windows counts).
        */
       size_gib: number;
       /**
-       * Resiliency of the volume: two_way, three_way, four_way, parity or nested_two_way.
+       * Resiliency of the volume. two_way, three_way and parity (dual parity, 4 or more machines) are the usual ones; four_way is for a rack aware cluster; nested_two_way and nested_mirror_accelerated_parity are for a cluster of two machines; mirror_accelerated_parity needs 4 or more machines and ReFS (the two accelerated-parity values are new in 5.6.9). Leave it out and Storage Spaces Direct chooses: two-way mirror with one or two machines, three-way mirror with three or more.
        */
-      resiliency?: 'two_way' | 'three_way' | 'four_way' | 'parity' | 'nested_two_way';
+      resiliency?: 'two_way' | 'three_way' | 'four_way' | 'parity' | 'nested_two_way' | 'mirror_accelerated_parity' | 'nested_mirror_accelerated_parity';
+      /**
+       * Schema 5.6.9. thin (space is taken from the pool as data is written) or fixed (all space is taken when the volume is created). Leave it out and the default of the pool applies. For a volume made of storage tiers (nested or accelerated parity) the script sets this on the tier templates of the pool for the creation, as Microsoft Learn describes, and puts the templates back afterwards.
+       */
+      provisioning_type?: 'thin' | 'fixed';
+      /**
+       * Schema 5.6.9. refs (the default; Microsoft recommends it for all volumes, and mirror-accelerated parity and ReFS deduplication need it) or ntfs.
+       */
+      file_system?: 'refs' | 'ntfs';
+      /**
+       * Schema 5.6.9. Only for mirror_accelerated_parity and nested_mirror_accelerated_parity: the share of the volume, in percent, that is parity; the rest is mirror. The default is 80, the ratio Microsoft recommends for most workloads.
+       */
+      parity_percent?: number;
+      /**
+       * Schema 5.6.9. ssd or hdd: the capacity drives the volume goes on, when the machines have both kinds. NVMe counts as ssd. Leave it out on machines with one kind of capacity drive; for a volume made of storage tiers the script then takes it from hardware.drives.capacity.media.
+       */
+      media_type?: 'ssd' | 'hdd';
+      /**
+       * Schema 5.6.9. ReFS deduplication and compression of the volume. Off unless type says otherwise.
+       */
+      deduplication?: {
+        /**
+         * none (the default: the script does not touch deduplication), dedup, compress or dedup_and_compress (Enable-ReFSDedup -Type). Needs file_system refs. The script turns it on for a volume that has it off and never changes or turns off what is already set.
+         */
+        type?: 'none' | 'dedup' | 'compress' | 'dedup_and_compress';
+        /**
+         * When the deduplication job runs (Set-ReFSDedupSchedule). Give all three keys or leave the block out; without a schedule a job runs only when someone starts one.
+         */
+        schedule?: {
+          /**
+           * Time of day the job starts, as HH:mm in the time of the machines, for example 22:00.
+           */
+          start_time?: string;
+          /**
+           * The days the job runs: Sunday to Saturday, or EveryDay.
+           */
+          days?: ('Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'EveryDay')[];
+          /**
+           * The longest one run may take, in hours.
+           */
+          duration_hours?: number;
+        };
+      };
+    }[];
+    /**
+     * Schema 5.6.9. The Azure Local storage paths to create after deployment: the Azure resources that say where on a cluster shared volume the virtual machine files, images and disks go. New-StoragePath.ps1 (phase 06, task 05) creates each one that does not exist yet in azure.resource_group, on azure.custom_location, with the file-level tags. The storage paths the deployment makes in Express mode are not listed here.
+     */
+    paths?: {
+      /**
+       * Name of the storage path resource: 3 to 64 letters, digits or hyphens. It cannot be renamed later.
+       */
+      name: string;
+      /**
+       * The folder on a cluster shared volume, for example C:\ClusterStorage\vol-workloads-01\vms for a volume of storage.volumes, or the folder of the cluster shared volume of a SAN LUN. Never on the infrastructure volume. It cannot be changed later.
+       */
+      path: string;
     }[];
     /**
      * The external SAN of a disaggregated (san) or hybrid deployment. Its presence, and scenario.storage_architecture san or hybrid, tell the solution there is a SAN; type says fibre_channel or iscsi, and the OS configuration does the host-side MPIO and MSDSM work from that (type, array.vendor and array.model are all it needs). From 5.3 it also records the array, the Fibre Channel fabrics and target WWPNs or the iSCSI targets, which the SAN deployment and zoning work read; each machine's own HBAs or initiator are nodes[].san.
@@ -1134,14 +1232,43 @@ export interface AzureLocalInfrastructureYml {
            */
           enabled: boolean;
           /**
-           * CHAP user name for the iSCSI targets. Not read by the tools yet: a documented placeholder.
+           * CHAP user name for the iSCSI targets. ARM chapUsername of the iSCSI deployment.
            */
           username?: string;
           /**
            * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
            */
           secret?: string;
+          /**
+           * Schema 5.6.10. true: the initiators also authenticate the targets (ARM chapType Mutual); false: one-way CHAP (OneWay). With enabled false the deployment gets chapType None. Microsoft's template uses the one CHAP credential for both directions.
+           */
+          mutual?: boolean;
         };
+        /**
+         * Schema 5.6.10. Value of the JumboPacket property of the iSCSI ports, in bytes: 1514 (standard frame), 4088 or 9014 (jumbo). Use the same frame size on the whole iSCSI path. ARM iScsiNetworkConfig.adapterProperties.jumboPacket.
+         */
+        jumbo_packet?: number;
+        /**
+         * Schema 5.6.10. The iSCSI networks, one per path. The iSCSI ports are dedicated physical ports outside the network intents; a port belongs to a path by its role iscsi:a or iscsi:b (nodes[].network_adapters[].roles). The iSCSI deployment reads this (ARM iScsiNetworkConfig.adapterIPConfig).
+         */
+        networks?: {
+          /**
+           * The path: A for the ports with the role iscsi:a, B for iscsi:b.
+           */
+          fabric: 'A' | 'B';
+          /**
+           * VLAN of this iSCSI network, 0 to 4094. 0 means untagged (the switch port is an access port).
+           */
+          vlan_id?: number;
+          /**
+           * Subnet of this iSCSI network in CIDR form.
+           */
+          subnet: string;
+          /**
+           * Only when the target portals of this path are in another subnet: the router address on this network. The deployment then reaches each portal of the path through it. Leave it out when the portals are in the subnet: each portal is then sent as its own next hop, as in the template of Microsoft. The iSCSI ports never get a default gateway.
+           */
+          next_hop?: string;
+        }[];
       };
       /**
        * LUN of the infrastructure volume (250 GB minimum). ARM infraVolLunId.
@@ -1211,6 +1338,23 @@ export interface AzureLocalInfrastructureYml {
      */
     backup_key_vault?: string;
     /**
+     * The free level of Microsoft Defender for Cloud that Azure Local needs to show its security settings in the Azure portal. Enable-DefenderForCloud.ps1 reads it. No paid plan is turned on by any key of this file.
+     */
+    defender_for_cloud?: {
+      /**
+       * true (default) registers the Microsoft.Security resource provider on the subscription of the cluster, which turns on Foundational CSPM, the free plan. false leaves Defender for Cloud alone.
+       */
+      enabled?: boolean;
+      /**
+       * true (default) assigns the Microsoft cloud security benchmark initiative to the subscription of the cluster when it is not assigned yet. Free. Without it the security settings of Azure Local do not show in the portal.
+       */
+      apply_cloud_security_benchmark?: boolean;
+      /**
+       * Address that Microsoft Defender for Cloud sends its security notifications to (a team mailbox; several addresses are separated by semicolons). Free. Empty or absent sets no contact. Enable-DefenderForCloud.ps1 sets it when the subscription has no security contact yet, and never replaces one that exists.
+       */
+      security_contact_email?: string;
+    };
+    /**
      * What the cluster sends to Microsoft as telemetry. Not read by the tools yet.
      */
     telemetry?: {
@@ -1250,7 +1394,7 @@ export interface AzureLocalInfrastructureYml {
     default_access_policy?: boolean;
   };
   /**
-   * Day-2 choices: updates, backup, disaster recovery, notifications, licensing and monitoring. Not read by the tools yet; Sonar reads its own settings.
+   * Day-2 choices: updates, backup, disaster recovery, notifications, licensing and monitoring. Only Azure Monitor (monitoring) and the notification addresses are read by the tools so far (the monitoring scripts of phase 02, operational foundations); the rest is not read yet. Sonar reads its own settings.
    */
   operations?: {
     /**
@@ -1336,7 +1480,7 @@ export interface AzureLocalInfrastructureYml {
      */
     notifications?: {
       /**
-       * Addresses (team mailboxes) that receive the notifications of the operations tools.
+       * Addresses (team mailboxes) that receive the notifications of the operations tools. Deploy-ActionGroup.ps1 makes each one an email receiver of the action group.
        */
       emails?: string[];
       /**
@@ -1362,7 +1506,7 @@ export interface AzureLocalInfrastructureYml {
       azure_verification_for_vms?: boolean;
     };
     /**
-     * Azure Monitor for the instance. Not read by the tools yet; Sonar reads its own settings.
+     * Azure Monitor for the instance. Only Azure Monitor (monitoring) and the notification addresses are read by the tools so far (the monitoring scripts of phase 02, operational foundations); the rest is not read yet. Sonar reads its own settings.
      */
     monitoring?: {
       /**
@@ -1370,11 +1514,11 @@ export interface AzureLocalInfrastructureYml {
        */
       enabled: boolean;
       /**
-       * Name of the Log Analytics workspace. Not read by the tools yet: a documented placeholder.
+       * Name of the Log Analytics workspace. Deploy-DataCollectionEndpoint.ps1 looks it up, and takes the region of the data collection endpoint from it.
        */
       log_analytics_workspace?: string;
       /**
-       * Resource group of the Log Analytics workspace. Not read by the tools yet: a documented placeholder.
+       * Resource group of the Log Analytics workspace. It is also the resource group of the data collection endpoint and of the action group that the monitoring scripts create.
        */
       workspace_resource_group?: string;
       /**
@@ -1382,15 +1526,19 @@ export interface AzureLocalInfrastructureYml {
        */
       data_collection_rule?: string;
       /**
-       * Name of the data collection endpoint. Not read by the tools yet: a documented placeholder.
+       * Name of the data collection endpoint that Deploy-DataCollectionEndpoint.ps1 creates, in the region of the workspace.
        */
       data_collection_endpoint?: string;
+      /**
+       * Name of the Azure Monitor action group that tells the operations team about alerts. Deploy-ActionGroup.ps1 creates it, with an email receiver for each address of operations.notifications.emails and operations.monitoring.alert_email. Letters, digits, space and . _ - ( ), starting with a letter or digit.
+       */
+      action_group?: string;
       /**
        * true when health alerts are created. Not read by the tools yet: a documented placeholder.
        */
       health_alerts?: boolean;
       /**
-       * Address that receives the alerts (a team mailbox). Not read by the tools yet: a documented placeholder.
+       * Address that receives the alerts (a team mailbox). Deploy-ActionGroup.ps1 makes it an email receiver of the action group, next to the addresses of operations.notifications.emails.
        */
       alert_email?: string;
     };
@@ -1842,6 +1990,21 @@ export interface AzureLocalInfrastructureYml {
      * Resource provider namespaces to register, for example Microsoft.AzureStackHCI. Not read by the tools yet: a documented placeholder.
      */
     resource_providers?: string[];
+    /**
+     * Azure Policy of the landing zone. Tier 1 is the tag policy: the built-in policy 'Require a tag on resources' assigned in audit mode (enforcement mode DoNotEnforce, so non-compliance is reported and nothing is denied) at one management group, once for each required tag. Optional.
+     */
+    policy?: {
+      /**
+       * Tag names that every resource should carry, one audit assignment of the built-in policy 'Require a tag on resources' for each. The names follow your tagging standard; the tools assume none. Tag names are case-insensitive in Azure, must not contain < > % &  ? / and are at most 80 characters here.
+       *
+       * @minItems 1
+       */
+      required_tags?: [string, ...string[]];
+      /**
+       * Name (id) of the management group the tag policy is assigned at; the assignment cascades to everything under it. Empty or absent: the tenant root management group, whose id is azure.tenant_id. A management group id has 1 to 90 letters, digits, hyphens, underscores, periods and parentheses, starts with a letter or digit and does not end with a period.
+       */
+      management_group?: string;
+    };
     /**
      * Azure virtual networks.
      */
@@ -2965,7 +3128,7 @@ export interface LogicalNetwork {
    */
   address_prefix?: string;
   /**
-   * Default gateway of the logical network. When it is left out the network is created without a gateway (az stack-hci-vm: --no-gateway). The creation script of task-08 still reads this key as default_gateway: a task in docs/design/variables-audit-tasks.md changes the script to this name.
+   * Default gateway of the logical network. When it is left out the network is created without a gateway (az stack-hci-vm: --no-gateway). The creation script of task-08 still reads this key as default_gateway: a task in config/variables/docs/variables-audit-tasks.md changes the script to this name.
    */
   gateway?: string;
   /**
@@ -2973,7 +3136,7 @@ export interface LogicalNetwork {
    */
   dns_servers?: Ipv4[];
   /**
-   * The one address range Azure Local hands to virtual machines on this logical network (first and last address, both inside address_prefix); az stack-hci-vm takes one pool per network. Needed when ip_allocation_method is Static. The creation script of task-08 still reads a list called ip_pools (and its type): a task in docs/design/variables-audit-tasks.md changes the script to this name.
+   * The one address range Azure Local hands to virtual machines on this logical network (first and last address, both inside address_prefix); az stack-hci-vm takes one pool per network. Needed when ip_allocation_method is Static. The creation script of task-08 still reads a list called ip_pools (and its type): a task in config/variables/docs/variables-audit-tasks.md changes the script to this name.
    */
   ip_pool?: {
     /**

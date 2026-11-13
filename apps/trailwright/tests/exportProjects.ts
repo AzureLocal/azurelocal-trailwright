@@ -11,7 +11,17 @@ const ad = (): Project => {
 const san = (base: Project): Project => {
   base.deployment = { ...base.deployment, architecture: 'disaggregated', sanType: 'iscsi' };
   base.storage = { ...base.storage, architecture: 'san', infraVolLunId: 'LUN-INFRA-0001', infraPerfLunId: 'LUN-PERF-0002' };
-  base.networking = { ...base.networking, clusterSubnets: ['10.10.100.0/24', '10.10.101.0/24'] };
+  // The ports of a disaggregated machine: two for management and compute, and the two standalone cluster ports.
+  const port = (osName: string, role: string) => ({ osName, speedGbps: 25, rdma: 'none' as const, role });
+  base.networking = {
+    ...base.networking,
+    clusterSubnets: ['198.51.100.0/25', '198.51.100.128/25'],
+    intents: base.networking.intents.filter((i) => !i.traffic.includes('storage')),
+    cards: [
+      { label: 'NIC 1', make: '', model: '', ports: [port('pNIC01', 'intent:Management_Compute'), port('pNIC03', 'cluster:1')] },
+      { label: 'NIC 2', make: '', model: '', ports: [port('pNIC02', 'intent:Management_Compute'), port('pNIC04', 'cluster:2')] },
+    ],
+  };
   return base;
 };
 
@@ -35,7 +45,8 @@ export const exportProjects: Array<[string, () => Project]> = [
     const p = createExampleProject();
     p.connectivity = { ...p.connectivity, path: 'private-path', privatePath: { ...p.connectivity.privatePath, transport: 'expressroute', virtualNetwork: 'vnet-example', workloadSubnet: 'snet-workload', firewallSubnet: 'AzureFirewallSubnet', firewallPrivateIp: '192.0.2.4', firewallPort: '8443', proxyBypass: 'localhost' } };
     p.sdn = { ...p.sdn, enabled: true, prefix: 'sdn01', dnsRecords: 'dynamic', defaultAccessPolicy: false, logicalNetworks: [{ name: 'lnet-compute', vlan: 110, addressPrefix: '192.0.2.128/25', gateway: '192.0.2.129', dnsServers: ['192.0.2.10'], poolStart: '192.0.2.140', poolEnd: '192.0.2.200' }] };
-    p.provisioning = { ...p.provisioning, osInstall: 'simplified', hardwareSku: 'dell-ax-750', timeZone: 'UTC', timeServer: 'time.example.com' };
+    p.provisioning = { ...p.provisioning, osInstall: 'simplified', hardwareSku: 'dell-ax-750', timeZone: 'UTC', timeServer: 'time.example.com', siteName: 'iic-site-01', siteResourceGroup: 'rg-iic-azl-01', adminKeyVaultName: 'kv-iic-mgmt-01', osVersion: '12.2610.1004.50', maintenanceIso: 'latest', mediaShareName: 'ztp-virtual-usb', mediaShareHost: '198.51.100.5' };
+    p.hardware = { ...p.hardware, vendor: '', model: '', nodes: p.hardware.nodes.map((n, i) => ({ ...n, bmcIp: `198.51.100.${11 + i}`, managementMac: `00:00:5E:00:53:${11 + i}` })) };
     p.operations = { ...p.operations, monitoring: false };
     return p;
   }],

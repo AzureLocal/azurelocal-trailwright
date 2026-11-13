@@ -61,6 +61,11 @@ export const HardwareScreen: FC = () => {
         <TextInput id="witness-path" label="File share witness path" value={hardware.witnessPath} onChange={(witnessPath) => update({ witnessPath })} hint="A local UNC path on a Windows server in the same Active Directory forest, for example \\fs01\witness." />
       )}
 
+      <div className="grid gap-4 md:grid-cols-2">
+        <TextInput id="hardware-vendor" label="Vendor" value={hardware.vendor} placeholder="Dell" hint="The OEM of the machines, for example Dell, HPE, Lenovo or DataON. infrastructure.yml needs it." onChange={(vendor) => update({ vendor })} />
+        <TextInput id="hardware-model" label="Model" value={hardware.model} placeholder="AX-760" hint="The model of the machines. infrastructure.yml needs it." onChange={(model) => update({ model })} />
+      </div>
+
       <div>
         <h2 className="mb-3 text-lg font-medium text-gray-800">Nodes</h2>
         <div className="mb-3">

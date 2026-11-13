@@ -1,12 +1,23 @@
 import { useState, type FC } from 'react';
 import { useProjectStore } from '../model/store';
-import { Field, TextInput } from '../components/Field';
+import { Field, SelectInput, TextInput } from '../components/Field';
+import type { Project } from '../model/schema';
 import { CURRENT_RELEASE } from '../model/release';
 import { createExampleProject } from '../examples/exampleLab';
 import { createEmptyProject } from '../model/defaults';
 import { ImportPanel } from '../components/ImportPanel';
 
-
+// environment.type of infrastructure.yml.
+const environmentTypes = [
+  { value: '', label: 'Choose the environment type' },
+  { value: 'lab', label: 'Lab' },
+  { value: 'demo', label: 'Demo' },
+  { value: 'poc', label: 'Proof of concept' },
+  { value: 'dev', label: 'Development' },
+  { value: 'test', label: 'Test' },
+  { value: 'stg', label: 'Staging' },
+  { value: 'prd', label: 'Production' },
+];
 
 export const ProjectScreen: FC = () => {
   const { project, setSection, replaceProject } = useProjectStore();
@@ -20,6 +31,9 @@ export const ProjectScreen: FC = () => {
         <TextInput id="project-name" label="Project name" value={project.meta.name} onChange={(name) => setSection('meta', { ...project.meta, name })} />
         <TextInput id="customer" label="Customer" value={project.project.customer} onChange={(customer) => setSection('project', { ...project.project, customer })} />
         <TextInput id="owner" label="Owner" value={project.project.owner} onChange={(owner) => setSection('project', { ...project.project, owner })} />
+        <TextInput id="project-site-name" label="Site name" value={project.project.siteName} hint="The display name of the site the machines are in. infrastructure.yml needs it." onChange={(siteName) => setSection('project', { ...project.project, siteName })} />
+        <TextInput id="project-site-code" label="Site code" value={project.project.siteCode} placeholder="RAL" hint="2 to 8 uppercase letters or digits. infrastructure.yml needs it." onChange={(siteCode) => setSection('project', { ...project.project, siteCode: siteCode.toUpperCase() })} />
+        <SelectInput id="environment-type" label="Environment type" value={project.project.environmentType} options={environmentTypes} hint="infrastructure.yml needs it." onChange={(v) => setSection('project', { ...project.project, environmentType: v as Project['project']['environmentType'] })} />
         <TextInput id="release-build" label="Release build (optional)" value={project.release.build} placeholder={`12.${CURRENT_RELEASE}.x.y`} hint={`The full build of the release you will deploy, if you know it. Exports carry it as written; Trailwright never guesses it.`} onChange={(build) => setSection('release', { ...project.release, build })} />
         <div className="md:col-span-2">
           <Field label="Notes" htmlFor="notes" hint="Notes are written to the project JSON and the handoff document. Do not type passwords, keys or other secrets here.">

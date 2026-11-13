@@ -20,4 +20,5 @@ type DeepPartial<T> = T extends (infer U)[] ? DeepPartial<U>[] : T extends objec
 export type Draft = DeepPartial<Infrastructure>;
 
 export const SCHEMA_MAJOR = 5;
-export const SCHEMA_VERSION = '5.6.4';
+// The version of the vendored schema. The infrastructure.yml export writes it as _metadata.schema_version.
+export const SCHEMA_VERSION = '5.6.10';

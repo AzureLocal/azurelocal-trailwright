@@ -20,6 +20,11 @@ const projectDetailsSchema = z.object({
   customer: z.string(),
   owner: z.string(),
   notes: z.string(),
+  // The site the machines are in (infrastructure.yml site.name and site.code) and the kind of environment (environment.type).
+  // Empty means not given: the infrastructure.yml export leaves the key out.
+  siteName: z.string().default(''),
+  siteCode: z.string().default(''),
+  environmentType: z.enum(['', 'lab', 'demo', 'poc', 'dev', 'test', 'stg', 'prd']).default(''),
 });
 
 const nodeSchema = z.object({
@@ -34,6 +39,9 @@ const nodeSchema = z.object({
   zone: z.string().optional(),
   // Storage Auto IP off: this machine's address on each storage network, in storage-network order.
   storageIps: z.array(z.string()).optional(),
+  // Simplified machine provisioning: the address of the machine's BMC and the MAC of its management port.
+  bmcIp: z.string().optional(),
+  managementMac: z.string().optional(),
 });
 
 // The hardware vendor's Solution Builder Extension (SBE) package is a requirement: it is needed to update the cluster, and the
@@ -54,6 +62,9 @@ const sbeSchema = z
   .default({});
 
 const hardwareSchema = z.object({
+  // The OEM and the model of the machines (infrastructure.yml hardware.vendor and hardware.model).
+  vendor: z.string().default(''),
+  model: z.string().default(''),
   topology: z.enum(['standard', 'rack-aware']),
   // Rack-aware only: how storage and nodes are cabled between the two rooms (four documented options).
   rackAwareUplink: z.enum(['dedicated-storage', 'aggregated-storage', 'per-room', 'cross-room']).default('dedicated-storage'),
@@ -278,6 +289,11 @@ const provisioningSchema = z
     adminKeyVaultName: z.string().default(''),
     // The operating system software version chosen for the machines when they are provisioned.
     osVersion: z.string().default(''),
+    // Simplified machine provisioning as azurelocal-ztp runs it: the maintenance environment ISO and the SMB share the BMCs
+    // mount the images from (its name, and the management host's address as the BMCs reach it).
+    maintenanceIso: z.string().default(''),
+    mediaShareName: z.string().default(''),
+    mediaShareHost: z.string().default(''),
     // Step 6A (Azure portal) or 6B (ARM template).
     deployMethod: z.enum(['portal', 'arm']).default('portal'),
   })

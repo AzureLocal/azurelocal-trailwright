@@ -33,12 +33,14 @@ export function templateFor(p: Project): TemplateName {
 // The name of the LCM password parameter: Microsoft's US Government template spells it with three s.
 export const lcmPasswordParam = (p: Project): string => (templateFor(p) === 'create-cluster-for-usgov' ? 'AzureStackLCMAdminPasssword' : 'AzureStackLCMAdminPassword');
 
-// Rack-aware: the machines of each rack. A machine without a zone goes to Zone1 in the first half and Zone2 in the second.
+// Rack-aware: the zone of the machine at index i. A machine without a zone goes to Zone1 in the first half and Zone2 in the second.
+export const zoneNameOf = (p: Project, i: number): string => p.hardware.nodes[i]?.zone?.trim() || (i < p.hardware.nodes.length / 2 ? 'Zone1' : 'Zone2');
+
+// Rack-aware: the machines of each rack.
 export function zonesOf(p: Project): { localAvailabilityZoneName: string; nodes: string[] }[] {
-  const n = p.hardware.nodes.length;
   const zones: { localAvailabilityZoneName: string; nodes: string[] }[] = [];
   p.hardware.nodes.forEach((node, i) => {
-    const name = node.zone?.trim() || (i < n / 2 ? 'Zone1' : 'Zone2');
+    const name = zoneNameOf(p, i);
     const found = zones.find((z) => z.localAvailabilityZoneName === name);
     if (found) found.nodes.push(node.name);
     else zones.push({ localAvailabilityZoneName: name, nodes: [node.name] });

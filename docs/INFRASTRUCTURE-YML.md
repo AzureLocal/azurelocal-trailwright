@@ -1,6 +1,6 @@
 # infrastructure.yml field reference
 
-`infrastructure.yml` is the file the Azure Local Toolkit, azurelocal-ztp and the other Azure Local tools read. Trailwright writes it in the layout of the toolkit's schema 5, with `_metadata.schema_version: 5.6.26`. The key names and the nesting are the schema's; Trailwright adds none of its own.
+`infrastructure.yml` is the file the Azure Local Toolkit, azurelocal-ztp and the other Azure Local tools read. Trailwright writes it in the layout of the toolkit's schema 5, with `_metadata.schema_version: 5.6.27`. The key names and the nesting are the schema's; Trailwright adds none of its own.
 
 The contract is the toolkit's JSON Schema (2020-12) for the file, `config/variables/schema/infrastructure.schema.json` in azurelocal-toolkit. This repository holds a copy at [`apps/trailwright/src/infra/infrastructure.schema.json`](../apps/trailwright/src/infra/infrastructure.schema.json) (`SCHEMA_VERSION` in `src/infra/types.ts` names its version) and publishes the same file with the site at `/schema/infrastructure.schema.json` (from `public/schema`). The toolkit's `templates/infrastructure.master.yml` shows every key with a comment and an example value.
 
@@ -18,7 +18,7 @@ To deploy with the NIC deployment automation, use the **Environment file (deploy
 
 | Section | Keys Trailwright writes | Source in the design |
 |---|---|---|
-| `_metadata` | `schema_version` (`5.6.26`), `scope` (`full`), `file_version` (`1.0.0`), `generated_by` (`azurelocal-trailwright`) | Fixed |
+| `_metadata` | `schema_version` (`5.6.27`), `scope` (`full`), `file_version` (`1.0.0`), `generated_by` (`azurelocal-trailwright`) | Fixed |
 | `scenario` | `identity`, `storage_architecture`, `storage_connectivity`, `topology`, `connectivity`, `cloud`, `outbound_path`, `os_install`, `deploy_method` | Identity, architecture, network design, hardware, connectivity mode, outbound connectivity, provisioning. A SAN design and a single machine are `switched` |
 | `site` | `customer`, `owner`, `name`, `code`; `time_zone` with simplified provisioning | Project: customer, owner, site name, site code; the site time zone of simplified provisioning |
 | `environment` | `name`, `type` | The project name as lowercase letters, digits and hyphens (at most 41 characters); Project: environment type |
@@ -66,7 +66,7 @@ The schema needs these and the design does not hold them. Add them to the file b
 
 Not required, and not asked: every other key of the schema, for example `site.location`, `networking.oob`, `networking.ntp_servers`, `nodes[].network_adapters`, `nodes[].san`, `storage.san.array`, `deployment.*` run settings, `os_configuration`, `network_devices`, `devops` and the rest of `landing_zone`. See [WHAT-TO-COLLECT.md](WHAT-TO-COLLECT.md).
 
-The optional keys schema 5.6.17 to 5.6.26 added are not written either: the design has no field for them, and the toolkit's Trailwright template (`config/variables/templates/tools/trailwright.yml`) does not list them as keys Trailwright writes. They are `azure.automation_identity.object_id`, `landing_zone.management_groups[].role`, `landing_zone.subscriptions[].billing_scope` and `workload`, `landing_zone.connectivity.bastion.network`, `nat_gateway.*` and `vpn_gateway.point_to_site.{protocols, root_certificate_name, root_certificate}`, `landing_zone.network_security_groups[]`, `landing_zone.networks[].{allow_forwarded_traffic, allow_gateway_transit, use_remote_gateways}`, `provisioning.iso.image_uri`, `operations.updates.{install_after_deployment, target_version}`, `security.baseline_settings[]`, `identity.active_directory.precreate_computer_objects`, `hardware.sbe.{partner_properties[], partner_credentials[]}` and `devops.pipelines.{runner_label, environments.*}` (5.6.25). 5.6.26 added no key. Add them to the file by hand when the deployment needs them.
+The optional keys schema 5.6.17 to 5.6.27 added are not written either: the design has no field for them, and the toolkit's Trailwright template (`config/variables/templates/tools/trailwright.yml`) does not list them as keys Trailwright writes. They are `azure.automation_identity.object_id`, `landing_zone.management_groups[].role`, `landing_zone.subscriptions[].billing_scope` and `workload`, `landing_zone.connectivity.bastion.network`, `nat_gateway.*` and `vpn_gateway.point_to_site.{protocols, root_certificate_name, root_certificate}`, `landing_zone.network_security_groups[]`, `landing_zone.networks[].{allow_forwarded_traffic, allow_gateway_transit, use_remote_gateways}`, `provisioning.iso.image_uri`, `operations.updates.{install_after_deployment, target_version}`, `security.baseline_settings[]`, `identity.active_directory.precreate_computer_objects`, `hardware.sbe.{partner_properties[], partner_credentials[]}`, `devops.pipelines.{runner_label, environments.*}` (5.6.25) and `devops.pipelines.{service_connection, variable_group}` (5.6.27, Azure DevOps only). 5.6.26 added no key. Add them to the file by hand when the deployment needs them.
 
 ## Keys the toolkit removed
 

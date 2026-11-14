@@ -21,4 +21,4 @@ export type Draft = DeepPartial<Infrastructure>;
 
 export const SCHEMA_MAJOR = 5;
 // The version of the vendored schema. The infrastructure.yml export writes it as _metadata.schema_version.
-export const SCHEMA_VERSION = '5.6.26';
+export const SCHEMA_VERSION = '5.6.27';

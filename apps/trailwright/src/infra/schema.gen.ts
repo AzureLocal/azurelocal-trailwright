@@ -31,11 +31,11 @@ export interface AzureLocalInfrastructureYml {
    */
   _metadata: {
     /**
-     * The schema version this file follows. Major 5. A minor version adds optional keys only; a major version can rename or remove keys. Each key's description says which version added it ('since'). Version history, in order: 5.2 adds nodes[].network_adapters, BIOS settings, the site IP range and the maintenance environment's network. 5.3 adds the BIOS phases (bios_during_provisioning), networking.management.static_method and provisioning_dhcp_range, nodes[].maintenance_address, provisioning.simplified.maintenance_password, and the SAN details (storage.san.array, fibre_channel and iscsi, nodes[].san); it also adds _metadata.scope: ztp for a file that holds only what azurelocal-ztp reads. 5.4 puts every azurelocal-ztp setting in this schema, so no tool keeps a key of its own: the BIOS actions ZTP derives from the hardware inventory (provisioning.simplified.isolate_san_adapters and enable_embedded_nics, nodes[].san.hbas[].type), the Azure resource choices, timeouts, retries, the USB image and the maintenance environment of simplified provisioning, and hardware.bmc.rfs_write_attribute and verify_certificate. 5.4.1 adds provisioning.simplified.timeouts.adapters_minutes. 5.4.2 adds hardware.sbe.delivery and node_pull_url (how the SBE package reaches the nodes during OS configuration). 5.4.3 adds os_configuration.clear_storage, the switch that lets the OS configuration run wipe leftover local storage. 5.4.4 adds os_configuration.network (confirm_minutes, stable_seconds: the commit-confirmed window of a guarded network change) and os_configuration.remoting with transport, bootstrap_transport and allowed_source_cidrs. 5.5 puts the CI/CD infrastructure in devops (the project, its settings, the environments, the Azure sign-in, the runners with their network and roles) and adds the domain join (identity.active_directory.domain_join_account, join_options, local_admin_members). 5.6 adds the deployment block (the timeouts, polling, approval and resume of the toolkit's Validate and Deploy run) and the remote management security profile: scenario.environment_class, the profile keys of os_configuration.remoting (allow_any_source, trusted_hosts, use_https, isolation_confirmed, certificate; bootstrap_transport also takes smb and auto) and a purpose marker on networking.logical_networks[] and networking.cluster_networks[] (the values management and oob of networking.vlans[].purpose also count). A missing scenario.environment_class means production. 5.6.1 adds identity.active_directory.security_groups[].local_groups. 5.6.2 identifies the adapters of nodes[].network_adapters[] by hardware facts (mac_address is required; port_index, pci_location, vendor, os_name_override and allowed_vlans are optional). 5.6.3 adds enabled, ip_allocation_method and nsg_name to networking.logical_networks[]. A file written for 5.6.0 stays valid: a minor version adds optional keys only, except that 5.6.2 requires the MAC of every adapter. 5.6.4 adds the SBE package as a requirement: hardware.sbe.requirement and not_applicable_reason (whether the OEM package is required, or not applicable with a reason), source_path (the share or folder where the downloaded package is available to the automation), source_username and source_password (the read credential, a Key Vault reference), and the optional package_sha256 and package_size_bytes. The build-time side-load (delivery) is unchanged and stays off by default. 5.6.5 adds landing_zone.policy (required_tags, management_group): the tag names and the management group of the Tier 1 tag policy, which the Azure Policy task assigns in audit mode. 5.6.6 adds operations.monitoring.action_group: the name of the Azure Monitor action group that the alerting task creates. 5.6.7 adds security.defender_for_cloud: the free level of Microsoft Defender for Cloud that Azure Local needs. 5.6.8 adds security.defender_for_cloud.security_contact_email. 5.6.9 adds the storage keys the volume and storage path scripts read: storage.pool, storage.csv, storage.paths and, on storage.volumes, provisioning_type, file_system, parity_percent, media_type and deduplication. 5.6.10 adds what the SAN deployment needs: networking.cluster_network_properties and, for iSCSI, storage.san.iscsi.networks, jumbo_packet and chap.mutual. 5.6.11 adds what the logical network, network security group and VM image scripts read: networking.network_security_groups (name and rules with name, priority, direction, access, protocol, source and destination address prefixes and port ranges, description), networking.logical_networks[].vm_switch_name and storage.vm_images (name, os_type, publisher, offer, sku, version, storage_path). 5.6.12 adds operations.monitoring.retention_days and removes operations.notifications.teams_webhook and operations.monitoring.health_alerts. 5.6.13 adds the secrets section (provider, file directory, command) and lets a secret reference use the env://, file:// and command:// forms besides keyvault://. 5.6.14 adds hardware.inventory (output_directory, file_name_prefix, format, timeout_seconds), which Get-HardwareInventory.ps1 reads. 5.6.15 adds what Enable-ArcSdn.ps1 reads: sdn.acknowledge_maintenance_window and sdn.acknowledge_dns_record, the rules of sdn.prefix, and sdn.dns_records (read now); it removes sdn.default_access_policy. 5.6.16 adds storage.san.luns[].unique_id (how New-SanVolume.ps1 finds the disk of a LUN) and removes security.backup_key_vault. 5.6.17 adds landing_zone.management_groups[].role and azure.automation_identity.object_id (the two keys the Terraform landing zone and identity modules need) and makes the Terraform and Ansible code readers of the file (New-IacVariableFiles.ps1). 5.6.19 adds provisioning.iso.image_uri (the address Invoke-MountGoldImageISO.ps1 gives the BMC virtual media), landing_zone.subscriptions[].billing_scope and workload, point_to_site.protocols, root_certificate_name and root_certificate, bastion.network and the nat_gateway object of landing_zone.connectivity, and a list of values for landing_zone.virtual_machines[].os. 5.6.20 adds operations.updates.install_after_deployment and operations.updates.target_version (read by Start-SolutionUpdateAfterDeployment.ps1) and removes keys that no tool read (see MIGRATION, To 5.6.20). 5.6.21 adds landing_zone.network_security_groups[] (the network security groups of the Azure landing zone networks: name and rules, created by New-LandingZoneNsg.ps1) and security.baseline_settings[] (type, name, value and acknowledge_weaker_security of the security baseline settings that Set-SecurityBaselines.ps1 changes with Set-AzsSecurity). 5.6.23 adds landing_zone.networks[].allow_forwarded_traffic, allow_gateway_transit and use_remote_gateways (the options of the virtual network peerings Deploy-VirtualNetworks.ps1 makes) and identity.active_directory.precreate_computer_objects (Set-ADConfiguration.ps1 pre-creates the computer objects of the machines and the cluster). 5.6.24 adds hardware.sbe.partner_properties[] (name and value pairs that the hardware vendor's SBE asks for; ARM partnerProperties) and hardware.sbe.partner_credentials[] (secret_name and secret: the secret that the SBE needs, which the deployment template writes into the cluster Key Vault under secret_name; secret is a reference, never the value; ARM partnerCredentiallist). 5.6.25 adds devops.pipelines.runner_label and devops.pipelines.environments.* (the runner label and the approval environment of each of the toolkit's pipelines; task 05 sets them as pipeline variables). 5.6.26 removes registry entries that only the old variables.yml layout had (environment.env_name, env_type, env_owner and env_description, site.env_name and identity.active_directory.security_groups_by_role); a file never accepted them, so a file of any 5.6 version stays valid. The current version is 5.6.26.
+     * The schema version this file follows. Major 5. A minor version adds optional keys only; a major version can rename or remove keys. Each key's description says which version added it ('since'). Version history, in order: 5.2 adds nodes[].network_adapters, BIOS settings, the site IP range and the maintenance environment's network. 5.3 adds the BIOS phases (bios_during_provisioning), networking.management.static_method and provisioning_dhcp_range, nodes[].maintenance_address, provisioning.simplified.maintenance_password, and the SAN details (storage.san.array, fibre_channel and iscsi, nodes[].san); it also adds _metadata.scope: ztp for a file that holds only what azurelocal-ztp reads. 5.4 puts every azurelocal-ztp setting in this schema, so no tool keeps a key of its own: the BIOS actions ZTP derives from the hardware inventory (provisioning.simplified.isolate_san_adapters and enable_embedded_nics, nodes[].san.hbas[].type), the Azure resource choices, timeouts, retries, the USB image and the maintenance environment of simplified provisioning, and hardware.bmc.rfs_write_attribute and verify_certificate. 5.4.1 adds provisioning.simplified.timeouts.adapters_minutes. 5.4.2 adds hardware.sbe.delivery and node_pull_url (how the SBE package reaches the nodes during OS configuration). 5.4.3 adds os_configuration.clear_storage, the switch that lets the OS configuration run wipe leftover local storage. 5.4.4 adds os_configuration.network (confirm_minutes, stable_seconds: the commit-confirmed window of a guarded network change) and os_configuration.remoting with transport, bootstrap_transport and allowed_source_cidrs. 5.5 puts the CI/CD infrastructure in devops (the project, its settings, the environments, the Azure sign-in, the runners with their network and roles) and adds the domain join (identity.active_directory.domain_join_account, join_options, local_admin_members). 5.6 adds the deployment block (the timeouts, polling, approval and resume of the toolkit's Validate and Deploy run) and the remote management security profile: scenario.environment_class, the profile keys of os_configuration.remoting (allow_any_source, trusted_hosts, use_https, isolation_confirmed, certificate; bootstrap_transport also takes smb and auto) and a purpose marker on networking.logical_networks[] and networking.cluster_networks[] (the values management and oob of networking.vlans[].purpose also count). A missing scenario.environment_class means production. 5.6.1 adds identity.active_directory.security_groups[].local_groups. 5.6.2 identifies the adapters of nodes[].network_adapters[] by hardware facts (mac_address is required; port_index, pci_location, vendor, os_name_override and allowed_vlans are optional). 5.6.3 adds enabled, ip_allocation_method and nsg_name to networking.logical_networks[]. A file written for 5.6.0 stays valid: a minor version adds optional keys only, except that 5.6.2 requires the MAC of every adapter. 5.6.4 adds the SBE package as a requirement: hardware.sbe.requirement and not_applicable_reason (whether the OEM package is required, or not applicable with a reason), source_path (the share or folder where the downloaded package is available to the automation), source_username and source_password (the read credential, a Key Vault reference), and the optional package_sha256 and package_size_bytes. The build-time side-load (delivery) is unchanged and stays off by default. 5.6.5 adds landing_zone.policy (required_tags, management_group): the tag names and the management group of the Tier 1 tag policy, which the Azure Policy task assigns in audit mode. 5.6.6 adds operations.monitoring.action_group: the name of the Azure Monitor action group that the alerting task creates. 5.6.7 adds security.defender_for_cloud: the free level of Microsoft Defender for Cloud that Azure Local needs. 5.6.8 adds security.defender_for_cloud.security_contact_email. 5.6.9 adds the storage keys the volume and storage path scripts read: storage.pool, storage.csv, storage.paths and, on storage.volumes, provisioning_type, file_system, parity_percent, media_type and deduplication. 5.6.10 adds what the SAN deployment needs: networking.cluster_network_properties and, for iSCSI, storage.san.iscsi.networks, jumbo_packet and chap.mutual. 5.6.11 adds what the logical network, network security group and VM image scripts read: networking.network_security_groups (name and rules with name, priority, direction, access, protocol, source and destination address prefixes and port ranges, description), networking.logical_networks[].vm_switch_name and storage.vm_images (name, os_type, publisher, offer, sku, version, storage_path). 5.6.12 adds operations.monitoring.retention_days and removes operations.notifications.teams_webhook and operations.monitoring.health_alerts. 5.6.13 adds the secrets section (provider, file directory, command) and lets a secret reference use the env://, file:// and command:// forms besides keyvault://. 5.6.14 adds hardware.inventory (output_directory, file_name_prefix, format, timeout_seconds), which Get-HardwareInventory.ps1 reads. 5.6.15 adds what Enable-ArcSdn.ps1 reads: sdn.acknowledge_maintenance_window and sdn.acknowledge_dns_record, the rules of sdn.prefix, and sdn.dns_records (read now); it removes sdn.default_access_policy. 5.6.16 adds storage.san.luns[].unique_id (how New-SanVolume.ps1 finds the disk of a LUN) and removes security.backup_key_vault. 5.6.17 adds landing_zone.management_groups[].role and azure.automation_identity.object_id (the two keys the Terraform landing zone and identity modules need) and makes the Terraform and Ansible code readers of the file (New-IacVariableFiles.ps1). 5.6.19 adds provisioning.iso.image_uri (the address Invoke-MountGoldImageISO.ps1 gives the BMC virtual media), landing_zone.subscriptions[].billing_scope and workload, point_to_site.protocols, root_certificate_name and root_certificate, bastion.network and the nat_gateway object of landing_zone.connectivity, and a list of values for landing_zone.virtual_machines[].os. 5.6.20 adds operations.updates.install_after_deployment and operations.updates.target_version (read by Start-SolutionUpdateAfterDeployment.ps1) and removes keys that no tool read (see MIGRATION, To 5.6.20). 5.6.21 adds landing_zone.network_security_groups[] (the network security groups of the Azure landing zone networks: name and rules, created by New-LandingZoneNsg.ps1) and security.baseline_settings[] (type, name, value and acknowledge_weaker_security of the security baseline settings that Set-SecurityBaselines.ps1 changes with Set-AzsSecurity). 5.6.23 adds landing_zone.networks[].allow_forwarded_traffic, allow_gateway_transit and use_remote_gateways (the options of the virtual network peerings Deploy-VirtualNetworks.ps1 makes) and identity.active_directory.precreate_computer_objects (Set-ADConfiguration.ps1 pre-creates the computer objects of the machines and the cluster). 5.6.24 adds hardware.sbe.partner_properties[] (name and value pairs that the hardware vendor's SBE asks for; ARM partnerProperties) and hardware.sbe.partner_credentials[] (secret_name and secret: the secret that the SBE needs, which the deployment template writes into the cluster Key Vault under secret_name; secret is a reference, never the value; ARM partnerCredentiallist). 5.6.25 adds devops.pipelines.runner_label and devops.pipelines.environments.* (the runner label and the approval environment of each of the toolkit's pipelines; task 05 sets them as pipeline variables). 5.6.26 removes registry entries that only the old variables.yml layout had (environment.env_name, env_type, env_owner and env_description, site.env_name and identity.active_directory.security_groups_by_role); a file never accepted them, so a file of any 5.6 version stays valid. 5.6.27 adds devops.pipelines.service_connection and devops.pipelines.variable_group (Azure DevOps: the names of the service connection and the variable group task 05 creates and the pipelines take as run parameters); a file without them stays valid. The current version is 5.6.27.
      */
     schema_version: string;
     /**
-     * Schema 5.3. full (default): the whole instance, so every design section is required (scenario, environment, cluster, networking.intents, identity and the sections a scenario choice makes required). ztp: a file for azurelocal-ztp on its own, with no automation after it. It holds only what ZTP reads, so the cluster deployment's sections (cluster, intents, storage, identity beyond local_admin) are not required. Use infrastructure.ztp.example.yml to start one. To grow it into the full file, add the rest and set scope to full (or remove the key).
+     * Schema 5.3. full (default): the whole instance, so every design section is required (scenario, environment, cluster, networking.intents, identity and the sections a scenario choice makes required). ztp: a file for azurelocal-ztp on its own, with no automation after it. It holds only what ZTP reads, so the cluster deployment's sections (cluster, intents, storage, identity) are not required. Use infrastructure.ztp.example.yml to start one. To grow it into the full file, add the rest and set scope to full (or remove the key).
      */
     scope?: 'full' | 'ztp';
     /**
@@ -96,7 +96,7 @@ export interface AzureLocalInfrastructureYml {
      */
     deploy_method?: 'portal' | 'arm';
     /**
-     * What kind of environment this is. It picks the remote management security profile of the OS configuration run (WinRM, RDP and ICMP scope on the nodes, HTTP or HTTPS, the TrustedHosts policy of the machine running the automation, the one-time Arc bootstrap): see docs/os-configuration-and-arm-deployment.md and config/remoting-profiles.json. lab and test are relaxed with the wildcard (TrustedHosts '*', sources Any, HTTP 5985 allowed) and a warning says so; dev, production and dmz are strict. Optional. Missing means production (fail closed); another value is rejected. (since 5.6)
+     * What kind of environment this is. It picks the remote management security profile of the OS configuration run (WinRM, RDP and ICMP scope on the nodes, HTTP or HTTPS, the TrustedHosts policy of the machine running the automation, the one-time Arc bootstrap): see docs/os-configuration-and-arm-deployment.md and config/remoting-profiles.json. lab and test are relaxed with the wildcard (TrustedHosts '*', sources Any, HTTP 5985 allowed) and a warning says so; dev, production and dmz are strict. It also decides purge protection of the Key Vaults that Deploy-KeyVaults.ps1 and the Terraform identity module create: off in lab, test and dev (a vault there has to be removable), on in every other class. Optional. Missing means production (fail closed); another value is rejected. (since 5.6)
      */
     environment_class?: 'lab' | 'test' | 'dev' | 'production' | 'dmz';
   };
@@ -323,7 +323,7 @@ export interface AzureLocalInfrastructureYml {
        */
       create_new?: boolean;
       /**
-       * Days a deleted secret or vault stays recoverable, 7 to 90.
+       * Days a deleted secret or vault stays recoverable, 7 to 90 (ARM softDeleteRetentionDays). The Terraform identity module gives the cluster vault the same retention.
        */
       soft_delete_retention_days?: number;
     };
@@ -366,9 +366,9 @@ export interface AzureLocalInfrastructureYml {
      */
     poll_max_seconds?: number;
     /**
-     * Mode ValidateAndDeploy: what happens between a good Validate and the Deploy. stop (default): the run ends in state AwaitingApproval and a later run with Mode Deploy continues. prompt: asks on the console, and stops without a console. none: continues at once (a lab). Pipelines run Validate and Deploy as two jobs with the platform's approval between them and do not use this. (since 5.6)
+     * Mode ValidateAndDeploy: what happens between a good Validate and the Deploy. stop (default): the run ends in state AwaitingApproval and a later run with Mode Deploy continues. none: continues at once (a lab). No script asks on the console (the value prompt is gone since registry 5.0.61). Pipelines run Validate and Deploy as two jobs with the platform's approval between them and do not use this. (since 5.6)
      */
-    approval?: 'stop' | 'prompt' | 'none';
+    approval?: 'stop' | 'none';
     /**
      * Allow the run to resubmit a failed Deploy (and attach to a running one). Without it a failed Deploy is refused. Microsoft's portal has Resume deployment for a failed instance; for the ARM route this resubmits the same parameters in Deploy mode. Default false. (since 5.6)
      */
@@ -460,7 +460,7 @@ export interface AzureLocalInfrastructureYml {
    */
   hardware?: {
     /**
-     * OEM, for example Dell, HPE, Lenovo or DataON. ZTP picks config/oem/<vendor>.json from it.
+     * OEM, for example Dell, HPE, Lenovo or DataON. azurelocal-ztp picks config/oem/<vendor>.json from it (the BMC log services and signals of its Bootstrap watch, the BIOS slot mapping and the one-time USB boot of its Boot stage): it has no built-in vendor, so its Boot and Bootstrap stages stop without it (azurelocal-ztp 091ebb3).
      */
     vendor: string;
     /**
@@ -1078,7 +1078,7 @@ export interface AzureLocalInfrastructureYml {
        */
       username: string;
       /**
-       * Optional. The Key Vault secret that holds this user name, as a keyvault://<vault>/<secret> reference, for the tools that read the user name from the vault (azurelocal-ztp's Add-KeyVaultCredentials.ps1 stores it as local-admin-username next to the password). The pre-cluster verification (IDN-016) reads it and fails when it differs from username. Default: the secret local-admin-username in the vault of the password reference; a default secret that does not exist is a warning, a secret named here that does not exist is a failure. (since 5.6)
+       * Optional. The Key Vault secret that holds this user name, as a keyvault://<vault>/<secret> reference, for the tools that read the user name from the vault. The pre-cluster verification (IDN-016) reads it and fails when it differs from username. Default: the secret local-admin-username in the vault of the password reference; a default secret that does not exist is a warning, a secret named here that does not exist is a failure. (since 5.6)
        */
       username_secret?: string;
       /**
@@ -1823,7 +1823,7 @@ export interface AzureLocalInfrastructureYml {
        */
       site_name: string;
       /**
-       * Subscription of the site and edge machines, when it isn't azure.subscription_id.
+       * Subscription of the site and edge machines, when it isn't azure.subscription_id. Set-AzlDeploymentPolicyExemption.ps1 exempts the site's resource groups there.
        */
       subscription_id?: string;
       /**
@@ -1835,7 +1835,7 @@ export interface AzureLocalInfrastructureYml {
        */
       maintenance_iso: string;
       /**
-       * The local administrator that the provisioned OS gets. Prepare signs in as <node>\<username>.
+       * The local administrator that the provisioned OS gets (Learn: simplified machine provisioning, step 3, provision machines from Azure).
        */
       admin: {
         /**
@@ -1843,12 +1843,12 @@ export interface AzureLocalInfrastructureYml {
          */
         username: string;
         /**
-         * At least 12 characters with lowercase, uppercase, a digit and a special character. Create the secret before the run.
+         * At least 12 characters with lowercase, uppercase, a digit and a special character. Create the secret before the run. azurelocal-ztp needs a keyvault://<vault>/<secret> reference here: Azure reads this secret from the vault itself when it provisions the machines (the template passes the vault and the secret name, never a value).
          */
         password: string;
       };
       /**
-       * Schema 5.3. The password of the maintenance environment's local user (edgeuser), which azurelocal-ztp's Device stage signs in with to reach the Configurator service before the machine is claimed. A Key Vault reference. Default: the maintenance environment's out-of-box password that Microsoft Learn documents (Configurator App article). Set a secret when the images carry another one.
+       * Schema 5.3. The password of the maintenance environment's local user (edgeuser), which azurelocal-ztp's Device stage signs in with to reach the Configurator service before the machine is claimed. A secret reference (keyvault://, env://, file:// or command://), read through the toolkit's resolver (scripts/common/secrets/AzlSecret.psm1) only when the run makes changes. Default: the maintenance environment's out-of-box password that Microsoft Learn documents (Configurator App article). Set a secret when the images carry another one.
        */
       maintenance_password?: string;
       /**
@@ -2781,6 +2781,14 @@ export interface AzureLocalInfrastructureYml {
          */
         terraform_deployment?: string;
       };
+      /**
+       * Schema 5.6.27. Azure DevOps only. The name of the Azure Resource Manager service connection (workload identity federation) that task 05 creates and that the Azure DevOps pipelines sign in through; task 01 puts the same name in the subject of the federated credential. The pipelines (pipelines/azure-devops/*.yml) take it as a run parameter with no default, and task 05 lists the value to enter. Required when devops.platform is azure_devops; GitHub and GitLab ignore it.
+       */
+      service_connection?: string;
+      /**
+       * Schema 5.6.27. Azure DevOps only. The name of the variable group (Pipelines > Library) task 05 writes the sign-in values (ARM_*) and the state settings (TF_BACKEND_*) to. With entries in devops.environments[] there is one group per environment, named <variable_group>-<environment>. The Azure DevOps pipelines that link a group (azure-local-deploy.yml, os-configuration.yml) take its name as a run parameter with no default, and task 05 lists the value to enter. Required when devops.platform is azure_devops; GitHub and GitLab ignore it.
+       */
+      variable_group?: string;
     };
     /**
      * Schema 5.5. How the pipelines sign in to Azure (tasks 01 and 05). The app registration is azure.automation_identity.name.
@@ -3016,7 +3024,7 @@ export interface AzureLocalInfrastructureYml {
        */
       storage_account?: string;
       /**
-       * Blob container that holds the state.
+       * Blob container that holds the state. Default tfstate (task 05 sets TF_BACKEND_CONTAINER for the pipelines, task 06 and New-IacVariableFiles.ps1 write it to the backend settings).
        */
       container?: string;
       /**
@@ -3080,11 +3088,11 @@ export interface Node {
      */
     type?: 'idrac' | 'ilo' | 'xcc' | 'other';
     /**
-     * BMC account name. The plain name, or a keyvault:// reference.
+     * BMC account name of this machine: a secret reference (keyvault://, env://, file:// or command://) or the plain name. azurelocal-ztp uses one login for every machine (hardware.bmc) and stops when a node sets another.
      */
     username?: string;
     /**
-     * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+     * A secret reference: keyvault://<vault>/<secret> (the vault listed in key_vaults), env://, file:// or command://, read through the toolkit's resolver (scripts/common/secrets/AzlSecret.psm1), never the password itself. azurelocal-ztp uses one login for every machine (hardware.bmc) and stops when a node sets another.
      */
     password?: string;
   };
@@ -3374,11 +3382,11 @@ export interface NodeSan {
  */
 export interface BmcCredentials {
   /**
-   * A reference to the secret holding the user name, or the user name itself.
+   * The BMC user name of every machine: a secret reference (keyvault://, env://, file:// or command://) or the user name itself. azurelocal-ztp and hardware discovery read a reference through the toolkit's resolver (scripts/common/secrets/AzlSecret.psm1).
    */
   username: string;
   /**
-   * A Key Vault secret reference: keyvault://<vault>/<secret>. The vault must be listed in key_vaults.
+   * The BMC password of every machine: a secret reference, keyvault://<vault>/<secret> (the vault listed in key_vaults), env://<VARIABLE>, file://<name> or command://<name>, never the password itself. azurelocal-ztp (since 5b75c9a) and hardware discovery read it through the toolkit's resolver (scripts/common/secrets/AzlSecret.psm1).
    */
   password: string;
   /**
@@ -3468,15 +3476,15 @@ export interface Intent {
      */
     qos?: {
       /**
-       * 802.1p priority value of the cluster heartbeat traffic, 0 to 7 (ARM priorityValue8021Action_Cluster). Network ATC default 7. The physical switches must carry the same value.
+       * 802.1p priority value of the cluster heartbeat traffic, 0 to 7 (ARM priorityValue8021Action_Cluster). Network ATC default 7 (Learn: Deploy host networking with Network ATC, Default Data Center Bridging (DCB) configuration). The physical switches must carry the same value.
        */
       cluster_priority?: number;
       /**
-       * 802.1p priority value of the SMB Direct (RDMA storage) traffic, 0 to 7 (ARM priorityValue8021Action_SMB). Network ATC default 3. The physical switches must carry the same value.
+       * 802.1p priority value of the SMB Direct (RDMA storage) traffic, 0 to 7 (ARM priorityValue8021Action_SMB). Network ATC default 3 (Learn: Deploy host networking with Network ATC, Default Data Center Bridging (DCB) configuration). The physical switches must carry the same value.
        */
       smb_priority?: number;
       /**
-       * Share of the link reserved for SMB Direct storage traffic, 1 to 100 percent (ARM bandwidthPercentage_SMB). Network ATC default 50.
+       * Share of the link reserved for SMB Direct storage traffic, 1 to 100 percent (ARM bandwidthPercentage_SMB). Network ATC default 50 (Learn: Deploy host networking with Network ATC, Default Data Center Bridging (DCB) configuration).
        */
       smb_bandwidth_percent?: number;
     };
@@ -3493,7 +3501,7 @@ export interface Intent {
        */
       network_direct?: boolean;
       /**
-       * RDMA technology of the adapters: iwarp, roce_v2 (RoCEv2) or roce (RoCE, version 1). Sent to ARM as networkDirectTechnology 'iWARP', 'RoCEv2' or 'RoCE'; Learn's network considerations name RoCEv2 and iWARP, the ARM model also accepts RoCE. Used only when network_direct is on; leave out for RoCEv2. Set the technology your adapter vendor and switches are configured for.
+       * RDMA technology of the adapters: iwarp, roce_v2 (RoCEv2) or roce (RoCE, version 1). Sent to ARM as networkDirectTechnology 'iWARP', 'RoCEv2' or 'RoCE'; Learn's network considerations name RoCEv2 and iWARP, the ARM model also accepts RoCE. Used only when network_direct is on; leave out for RoCEv2, the value of Microsoft's quickstart parameters file. Set the technology your adapter vendor and switches are configured for.
        */
       network_direct_technology?: 'iwarp' | 'roce' | 'roce_v2';
     };

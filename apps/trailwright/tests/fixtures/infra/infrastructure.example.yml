@@ -104,6 +104,7 @@ azure:
   automation_identity:
     type: managed_identity # managed_identity | service_principal
     name: "id-iic-cicd-01"
+    object_id: "00000000-0000-0000-0000-000000000000" # the principal the Terraform identity module assigns roles to
     subscription_id: "00000000-0000-0000-0000-000000000000"
     resource_group: "rg-iic-devops-01"
 
@@ -208,6 +209,16 @@ hardware:
     delivery: node_pull
     node_pull_url: 'https://sbe.iic.example/sbe/dell' # or a UNC folder, \\files.iic.example\sbe\dell
     allow_unvalidated: false # test only
+    # Schema 5.6.24. OPTIONAL, and only when the hardware vendor's SBE documentation names them (sent only with a version above): properties as
+    # name and value pairs, and the names of Key Vault secrets (in cluster.key_vault) that the SBE needs while the deployment runs.
+    # partner_properties:
+    #   - name: iic-example-property
+    #     value: iic-example-value
+    #   - name: iic-example-second-property
+    #     value: iic-example-second-value
+    # partner_credentials:
+    #   - secret_name: iic-sbe-download-login
+    #   - secret_name: iic-sbe-second-login
   # BIOS: from 5.4 azurelocal-ztp derives the SAN-adapter slots (nodes[].san.hbas[].slot) and the embedded NICs
   # (a port with slot Embedded) itself, per vendor; the raw maps are explicit overrides that win over the derived values.
   bios: # optional; the FINAL state, set by azurelocal-ztp at its Boot stage. Vendor attribute names (Dell here).
@@ -306,19 +317,16 @@ identity:
     # right to create and delete computer objects in the dedicated OU). To use another account, set domain_join_account (same rights on ou_path):
     # domain_join_account: { username: "svc-azl-join", password: "keyvault://kv-iic-mgmt-01/domain-join-password" }
     join_options: # optional
-      rename_after_join: false # fixed: the machine gets its final name first (Hostname step) and is never renamed after the join
       allow_ou_move: false # true: BEFORE the deployment, move a machine that is in this domain but in another OU into ou_path. Never after (not supported).
     # Added to the local Administrators group of every machine after the join. Default: the security group below that administers the instance, and the LCM user.
     # local_admin_members: ["sg-iic-azl-01-admins", "lcm-iic-azl-01"]
     domain_controllers: ["192.0.2.4", "192.0.2.5"]
+    precreate_computer_objects: false # true: Set-ADConfiguration.ps1 creates the computer objects of the machines and the cluster in ou_path before the deployment
     security_groups:
-      - { name: "sg-iic-azl-01-admins", purpose: "Administrators of the instance" }
-    service_accounts:
-      - { name: "svc-iic-azl-backup", purpose: "Backup agent", password: "keyvault://kv-iic-mgmt-01/svc-backup-password" }
+      - { name: "sg-iic-azl-01-admins", purpose: "Administrators of the instance", local_groups: ["Administrators"] }
   entra:
     groups:
       - { name: "grp-iic-azl-operators", purpose: "Operate the instance", roles: ["Azure Stack HCI Administrator"], scope: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-iic-azl-01" }
-    break_glass_accounts: ["breakglass01@improbability.cloud"]
 
 storage:
   configuration_mode: express # express | infra_only | keep_storage
@@ -452,8 +460,14 @@ network_devices:
 # -----------------------------------------------------------------------------
 landing_zone:
   management_groups:
-    - { name: "mg-iic", display_name: "IIC" }
-    - { name: "mg-iic-platform", parent: "mg-iic" }
+    # role (5.6.17) names the group of the fixed hierarchy the Terraform landing zone module builds: it is read by New-IacVariableFiles.ps1 only.
+    - { name: "mg-iic", display_name: "IIC", role: root }
+    - { name: "mg-iic-platform", display_name: "IIC Platform", parent: "mg-iic", role: platform }
+    - { name: "mg-iic-identity", parent: "mg-iic-platform", role: identity }
+    - { name: "mg-iic-connectivity", parent: "mg-iic-platform", role: connectivity }
+    - { name: "mg-iic-management", parent: "mg-iic-platform", role: management }
+    - { name: "mg-iic-security", parent: "mg-iic-platform", role: security }
+    - { name: "mg-iic-landing-zones", display_name: "IIC Landing Zones", parent: "mg-iic", role: landing_zones }
   subscriptions:
     - { name: "sub-iic-connectivity", id: "00000000-0000-0000-0000-000000000000", role: connectivity, management_group: "mg-iic-platform" }
     - { name: "sub-iic-identity", id: "00000000-0000-0000-0000-000000000000", role: identity, management_group: "mg-iic-platform" }
@@ -465,17 +479,18 @@ landing_zone:
     - { name: "rg-iic-mgmt-01", subscription: "sub-iic-management", location: "eastus", purpose: "management" }
     - { name: "rg-iic-runners-01", subscription: "sub-iic-devops", location: "eastus", purpose: "CI/CD runners" }
     - { name: "rg-iic-azl-01", subscription: "sub-iic-azure-local", location: "eastus", purpose: "Azure Local instance" }
-  resource_providers: ["Microsoft.AzureStackHCI", "Microsoft.HybridCompute", "Microsoft.Edge", "Microsoft.KeyVault"]
   networks:
     - name: "vnet-iic-hub-01"
       subscription: "sub-iic-connectivity"
       resource_group: "rg-iic-conn-01"
       location: "eastus"
       role: hub
+      allow_gateway_transit: true # the spokes that peer with this network may use its VPN gateway (peering option, default false)
       address_space: ["10.20.0.0/22"]
       subnets:
         - { name: "GatewaySubnet", prefix: "10.20.0.0/27" }
         - { name: "AzureBastionSubnet", prefix: "10.20.0.64/26" }
+        - { name: "snet-iic-hub-mgmt-01", prefix: "10.20.0.128/26" }
     - name: "vnet-iic-mgmt-01"
       subscription: "sub-iic-management"
       resource_group: "rg-iic-mgmt-01"
@@ -486,6 +501,8 @@ landing_zone:
       subnets:
         - { name: "snet-iic-mgmt-01", prefix: "10.20.4.0/26" }
       peer_with: ["vnet-iic-hub-01"]
+      allow_forwarded_traffic: true # peering option, default true
+      use_remote_gateways: true # use the VPN gateway of the hub (the hub sets allow_gateway_transit; default false)
   connectivity:
     vpn_gateway:
       name: "vpng-iic-hub-01"
@@ -507,13 +524,14 @@ landing_zone:
       deploy_target: azure
       subscription: "sub-iic-management"
       resource_group: "rg-iic-mgmt-01"
-      network: "vnet-iic-mgmt-01"
-      subnet: "snet-iic-mgmt-01"
-      private_ip: "10.20.4.10"
+      network: "vnet-iic-hub-01"
+      subnet: "snet-iic-hub-mgmt-01"
+      private_ip: "10.20.0.134"
       size: "Standard_D2s_v5"
+      os: "windows_server_2025"
       admin_username: "iic-vmadmin"
       admin_password: "keyvault://kv-iic-mgmt-01/vm-admin-password"
-  log_analytics: { name: "log-iic-azl-01", resource_group: "rg-iic-mgmt-01", retention_days: 90 }
+  log_analytics: { name: "log-iic-azl-01" }
   storage_accounts:
     - { name: "stiicazl01wit", resource_group: "rg-iic-azl-01", sku: "Standard_LRS", purpose: "cloud witness" }
 

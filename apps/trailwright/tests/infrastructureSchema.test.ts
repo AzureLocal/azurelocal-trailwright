@@ -33,7 +33,7 @@ describe(`infrastructure.yml follows the toolkit's schema ${SCHEMA_VERSION}`, ()
 
   it('writes the version of the vendored schema, for the whole instance', () => {
     const doc = exported(ad());
-    expect(SCHEMA_VERSION).toBe('5.6.16');
+    expect(SCHEMA_VERSION).toBe('5.6.24');
     expect(doc._metadata).toEqual({ schema_version: SCHEMA_VERSION, scope: 'full', file_version: '1.0.0', generated_by: 'azurelocal-trailwright' });
     expect(SCHEMA_VERSION).toMatch(new RegExp(schema.properties._metadata.properties.schema_version.pattern as string));
   });
@@ -66,6 +66,61 @@ describe(`infrastructure.yml follows the toolkit's schema ${SCHEMA_VERSION}`, ()
     const doc = exported(p);
     expect(doc.site).toEqual({ customer: 'Example Company', owner: 'Design owner' });
     expect(problems(doc).sort()).toEqual(["/environment must have required property 'type'", "/hardware must have required property 'model'", "/hardware must have required property 'vendor'", "/site must have required property 'code'", "/site must have required property 'name'"]);
+  });
+});
+
+// The keys the toolkit removed from schema 5 (azurelocal-toolkit config/variables/docs/MIGRATION.md): 5.6.12, 5.6.15 and 5.6.16
+// removed one each, and 5.6.20 removed the keys that no tool read. landing_zone.management_groups[].parent was kept.
+const REMOVED_KEYS = [
+  'operations.notifications.teams_webhook',
+  'operations.monitoring.health_alerts',
+  'sdn.default_access_policy',
+  'security.backup_key_vault',
+  'landing_zone.resource_providers',
+  'identity.entra.break_glass_accounts',
+  'identity.break_glass_account_ids',
+  'identity.managed_identities',
+  'landing_zone.log_analytics.resource_group',
+  'landing_zone.log_analytics.retention_days',
+  'identity.active_directory.service_accounts',
+  'identity.accounts',
+  'provisioning.iso.image_version',
+  'identity.active_directory.join_options.rename_after_join',
+];
+
+// Every key path of a document, with [] for the items of a list: nodes[].management.ip_address.
+function keyPaths(value: unknown, prefix = ''): string[] {
+  if (Array.isArray(value)) return value.flatMap((v) => keyPaths(v, `${prefix}[]`));
+  if (!value || typeof value !== 'object') return [];
+  return Object.entries(value).flatMap(([k, v]) => {
+    const path = prefix ? `${prefix}.${k}` : k;
+    return [path, ...keyPaths(v, path)];
+  });
+}
+
+// Walks the schema along a key path, through $ref and the items of a list. Undefined when the schema has no such key.
+function schemaAt(path: string): unknown {
+  const deref = (n: any) => (n && n.$ref ? schema.$defs[n.$ref.split('/').pop()] : n);
+  let node: any = schema;
+  for (const raw of path.split('.')) {
+    node = deref(node)?.properties?.[raw.replace(/\[\]$/, '')];
+    if (raw.endsWith('[]')) node = deref(node)?.items;
+    if (!node) return undefined;
+  }
+  return deref(node);
+}
+
+describe(`infrastructure.yml writes no key that schema ${SCHEMA_VERSION} removed`, () => {
+  it('the vendored schema has none of the removed keys', () => {
+    expect(REMOVED_KEYS.filter((k) => schemaAt(k) !== undefined)).toEqual([]);
+    // Kept by 5.6.20, so it is not in the list.
+    expect(schemaAt('landing_zone.management_groups[].parent')).toBeDefined();
+  });
+
+  it.each(exportProjects.map(([label, make]) => [label, make] as const))('the export of %s writes only keys the schema has, and none it removed', (_label, make) => {
+    const paths = keyPaths(exported(make()));
+    expect(paths.filter((k) => REMOVED_KEYS.some((r) => k === r || k.startsWith(`${r}.`) || k.startsWith(`${r}[]`)))).toEqual([]);
+    expect(paths.filter((k) => schemaAt(k) === undefined)).toEqual([]);
   });
 });
 

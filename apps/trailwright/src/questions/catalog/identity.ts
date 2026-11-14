@@ -66,22 +66,6 @@ export const identityQuestions: Question[] = [
       { key: 'purpose', label: 'Purpose', kind: 'text' },
     ],
   },
-  {
-    id: 'identity.active_directory.service_accounts',
-    path: 'identity.active_directory.service_accounts',
-    step: 'identity',
-    group: 'Active Directory',
-    label: 'Service accounts',
-    owner: 'identity',
-    kind: 'table',
-    appliesWhen: isAd,
-    requiredWhen: () => false,
-    columns: [
-      { key: 'name', label: 'Name', kind: 'text', required: true },
-      { key: 'purpose', label: 'Purpose', kind: 'text' },
-      { key: 'password', label: 'Password secret', kind: 'kvref' },
-    ],
-  },
 
   // Local identity
   {

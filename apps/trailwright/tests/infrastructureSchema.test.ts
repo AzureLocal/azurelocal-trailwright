@@ -33,7 +33,7 @@ describe(`infrastructure.yml follows the toolkit's schema ${SCHEMA_VERSION}`, ()
 
   it('writes the version of the vendored schema, for the whole instance', () => {
     const doc = exported(ad());
-    expect(SCHEMA_VERSION).toBe('5.6.24');
+    expect(SCHEMA_VERSION).toBe('5.6.26');
     expect(doc._metadata).toEqual({ schema_version: SCHEMA_VERSION, scope: 'full', file_version: '1.0.0', generated_by: 'azurelocal-trailwright' });
     expect(SCHEMA_VERSION).toMatch(new RegExp(schema.properties._metadata.properties.schema_version.pattern as string));
   });

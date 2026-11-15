@@ -448,6 +448,14 @@ network_devices:
     credentials:
       username: "admin"
       password: "keyvault://kv-iic-mgmt-01/switch-admin-password"
+    # Schema 5.6.28. What New-SwitchConfiguration.ps1 needs to write the switch's configuration from the vendor template.
+    mtu: 9216
+    ports:
+      uplinks: ["ethernet1/1/1"]
+      node_ports: ["ethernet1/1/2", "ethernet1/1/3"]
+      peer_link: ["ethernet1/1/13", "ethernet1/1/14"]
+      native_vlan_id: 2201 # the switch VLAN of the untagged management traffic (networking.management.vlan_id is 0)
+    ha: { domain_id: 1, peer_address: "198.51.100.7", priority: 100, system_mac: "00-00-5E-00-53-01" }
   - hostname: "sw02-iic"
     type: switch
     role: secondary
@@ -457,6 +465,13 @@ network_devices:
     credentials:
       username: "admin"
       password: "keyvault://kv-iic-mgmt-01/switch-admin-password"
+    mtu: 9216
+    ports:
+      uplinks: ["ethernet1/1/1"]
+      node_ports: ["ethernet1/1/2", "ethernet1/1/3"]
+      peer_link: ["ethernet1/1/13", "ethernet1/1/14"]
+      native_vlan_id: 2201
+    ha: { domain_id: 1, peer_address: "198.51.100.6", priority: 200, system_mac: "00-00-5E-00-53-01" }
 
 # -----------------------------------------------------------------------------
 # Part 2 of the implementation steps: the Azure foundation. Leave out when it
@@ -513,6 +528,7 @@ landing_zone:
       resource_group: "rg-iic-conn-01"
       network: "vnet-iic-hub-01"
       sku: "VpnGw1AZ"
+      public_ip_name: "pip-iic-vpng-hub-01" # 5.6.28
       bgp_asn: 65515
       site_to_site:
         - connection_name: "cn-iic-dal-01"
@@ -520,7 +536,7 @@ landing_zone:
           peer_public_ip: "203.0.113.1"
           peer_address_prefixes: ["192.0.2.0/24", "198.51.100.0/24"]
           shared_key: "keyvault://kv-iic-mgmt-01/vpn-shared-key"
-    bastion: { name: "bas-iic-hub-01", resource_group: "rg-iic-conn-01", sku: "Standard" }
+    bastion: { name: "bas-iic-hub-01", resource_group: "rg-iic-conn-01", sku: "Standard", public_ip_name: "pip-iic-bas-hub-01" }
   virtual_machines:
     - name: "vm-iic-dc-01"
       hostname: "iic-dc01"
@@ -535,6 +551,10 @@ landing_zone:
       os: "windows_server_2025"
       admin_username: "iic-vmadmin"
       admin_password: "keyvault://kv-iic-mgmt-01/vm-admin-password"
+      # Schema 5.6.28, domain controllers only: the Ansible domain controller role creates the forest (new_forest) or joins it (replica),
+      # with the DSRM password from this Key Vault secret (never generated).
+      dc_promotion: new_forest
+      dsrm_password: "keyvault://kv-iic-mgmt-01/dsrm-password"
   log_analytics: { name: "log-iic-azl-01" }
   storage_accounts:
     - { name: "stiicazl01wit", resource_group: "rg-iic-azl-01", sku: "Standard_LRS", purpose: "cloud witness" }
@@ -588,10 +608,22 @@ devops:
     # with these names; the Azure DevOps pipelines take them as run parameters. GitHub and GitLab ignore both.
     service_connection: "iic-azure-local"
     variable_group: "iic-azure-credentials"
+    # 5.6.28: the infrastructure file and the ZTP handoff path the pipelines pass to the scripts, and the tool versions every pipeline
+    # installs. Task 05 sets them as AZL_* variables (Azure DevOps: the paths are run parameters, the versions go to the variable group).
+    infrastructure_file: "config/infrastructure.yml"
+    handoff_path: "ztp-state"
+    tool_versions:
+      terraform: "1.16.3"
+      python: "3.12"
+      ansible_core: "2.21.5"
+      ansible_lint: "26.10.1"
+      az_powershell: "16.3.0"
+      powershell_yaml: "0.4.12"
+      az_keyvault: "6.6.1"
 
   # Tasks 01 and 05. The app registration is azure.automation_identity.name.
   authentication:
-    method: oidc # oidc | client_secret
+    method: oidc # oidc | client_secret; every pipeline follows it (AZL_AUTH_METHOD)
     roles: ["Contributor", "User Access Administrator"]
     grant_graph_role_management: false
     register_encryption_at_host: true
@@ -602,11 +634,14 @@ devops:
       os_type: linux
       purpose: general
       count: 1
+      admin_username: "runneradmin" # 5.6.28: the VM admin (Terraform) and the account Ansible connects as
       size: "Standard_D2s_v5"
       labels: ["azure-local"] # added to the defaults; devops.pipelines.runner_label is one of them
       registration_secret: "keyvault://kv-iic-mgmt-01/github-runner-token"
       subnet: { name: "snet-iic-runner-lnx-01", prefix: "10.20.10.0/26" }
       private_ips: ["10.20.10.4"]
+      nsg_name: "nsg-iic-runner-lnx-01" # 5.6.28: the NSG and the managed identity task 06 creates
+      managed_identity_name: "id-iic-runner-lnx-01"
     - name: "vm-iic-runner-ztp"
       os_type: windows
       purpose: ztp
@@ -616,10 +651,12 @@ devops:
       subnet: { name: "snet-iic-runner-ztp-01", prefix: "10.20.10.64/26" }
       private_ips: ["10.20.10.68"]
       data_disk_gb: 512
+      nsg_name: "nsg-iic-runner-ztp-01"
+      managed_identity_name: "id-iic-runner-ztp-01"
   runner_network:
     vnet_name: "vnet-iic-devops-01"
     address_space: ["10.20.10.0/24"]
-    hub_peering: { enabled: true, hub_network: "vnet-iic-hub-01", use_remote_gateways: true, create_hub_side: true }
+    hub_peering: { enabled: true, hub_network: "vnet-iic-hub-01", use_remote_gateways: true, create_hub_side: true, spoke_name: "peer-vnet-iic-devops-01-to-hub", hub_name: "peer-hub-to-vnet-iic-devops-01" }
     reachable_cidrs: ["192.0.2.0/24", "198.51.100.0/24"] # the lab: management and storage
     bmc_cidrs: ["198.51.100.0/24"] # the ztp runner accepts inbound TCP 445 from these only
     admin_source_cidrs: []
@@ -629,7 +666,7 @@ devops:
     arc_run_command: true
     key_vaults: ["kv-iic-mgmt-01"] # default: every vault in key_vaults
 
-  state: { storage_account: "stiictfstate01", container: "tfstate", resource_group: "rg-iic-mgmt-01", key: "cicd-infra.tfstate" }
+  state: { storage_account: "stiictfstate01", container: "tfstate", resource_group: "rg-iic-mgmt-01", key: "cicd-infra.tfstate", azure_local_key: "azure-local.tfstate" }
 
 # Anything this schema doesn't define, under its own key. Tools ignore keys they don't own.
 # Schema 5.4.3. The OS configuration run (Invoke-AzureLocalOsConfiguration.ps1). Optional.

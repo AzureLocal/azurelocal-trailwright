@@ -21,6 +21,24 @@ A guided flow (hardware, storage, network design, intents and VLANs, management 
 | Schedules (CSV, Excel), switch port plan, topology (draw.io), handoff (Markdown, PDF), project JSON | Teams and records |
 | As-built compare | Design versus what Ranger or your own script found ([format](docs/AS-BUILT.md)) |
 
+## Where Trailwright fits in the Azure Local tool chain
+
+Trailwright is the **author of `infrastructure.yml`**: the one tool that writes it from a design. Every other tool reads it (the toolkit's hardware discovery adds serial numbers and MAC addresses to it later).
+
+```text
+Surveyor (sizing handoff) -> Trailwright (infrastructure.yml) -> Draftsman / hardware discovery -> Beacon -> ZTP -> toolkit OS configuration, gate, ARM deploy -> Ranger / Sonar
+```
+
+| Direction | What | Name |
+|---|---|---|
+| In (sizing) | The sized cluster from Surveyor | `azure-local-sizing-handoff-*.json`, schema 1.0 or 1.1 (Review and export, **Import**): machines, drive layout, volumes with `provisioning_type`, and the sizing results as notes. What the import leaves out is in the [user guide](docs/USER-GUIDE.md#importing-a-surveyor-plan) |
+| In (design) | A saved design | The Trailwright project JSON |
+| Out | The environment file | `infrastructure.yml`, schema 5 (`_metadata.schema_version` 5.6.31, `_metadata.scope: trailwright`: a planning scope, so the port MACs may be missing until discovery fills them) |
+| Out | Deployment inputs | ARM and Bicep parameters, Terraform variables; the older environment file (`environment/azure-local/environment.yml`) is **deprecated** and removed in the next release |
+| Out | Records | Schedules (CSV, Excel), switch port plan, topology (draw.io), handoff (Markdown, PDF) |
+
+Check the file with the toolkit's `Test-InfrastructureFile.ps1` before you pass it on. The schema is the toolkit's; Trailwright holds a copy and `npm run schema:sync` (with `AZL_TOOLKIT_ROOT` set) refreshes it ([how](docs/INFRASTRUCTURE-YML.md)).
+
 ## Prerequisites
 
 | Need | Detail |

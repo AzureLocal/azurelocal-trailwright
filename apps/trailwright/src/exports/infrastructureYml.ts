@@ -5,6 +5,7 @@ import { usesS2d, usesSan } from '../rules/types';
 import { cidrOf } from './clusterFacts';
 import { sanNetworkList, storageNetworkList, witnessTypeFor, zoneNameOf } from './createCluster';
 import { slug } from './types';
+import { withAnswers } from '../questions/answers';
 
 // infrastructure.yml in the layout of the Azure Local Toolkit's schema 5 (azurelocal-toolkit config/variables, vendored at
 // src/infra/infrastructure.schema.json; SCHEMA_VERSION is the version of that copy). The key names and the nesting are the
@@ -74,11 +75,12 @@ const environmentNameOf = (p: P): string | undefined => (text(p.meta.name) ? slu
 
 // hardware.sbe: the vendor's Solution Builder Extension package is a requirement. The automation reads it from source_path and
 // checks it before the cluster is created. The password of source_username is only ever a Key Vault reference. delivery (the
-// build-time side-load) is written as skip unless the design asks for it.
+// build-time side-load) is written as skip unless the design asks for it. requirement is the design's answer: vendor (the default:
+// the toolkit's vendor catalog decides from hardware.vendor), required or not_applicable.
 export function buildSbe(p: Project, vault: string): Record<string, unknown> {
   const s = p.hardware.sbe;
   if (s.requirement === 'not_applicable') return { requirement: 'not_applicable', not_applicable_reason: s.notApplicableReason.trim(), delivery: 'skip' };
-  const sbe: Record<string, unknown> = { requirement: 'required' };
+  const sbe: Record<string, unknown> = { requirement: s.requirement };
   if (s.sourcePath.trim()) sbe.source_path = s.sourcePath.trim();
   if (s.sourceUsername.trim()) {
     sbe.source_username = s.sourceUsername.trim();
@@ -353,7 +355,8 @@ export function buildInfrastructure(p: Project): Draft {
     // The subscription of the instance, by name.
     ...(text(lz.subscriptionName) ? { landing_zone: { subscriptions: [{ name: text(lz.subscriptionName), id: lz.subscriptionId, role: 'azure_local' as const }] } } : {}),
   };
-  return known(doc) ?? {};
+  // The answers to the questions the screens do not ask fill in what the screens leave out (src/questions/answers.ts).
+  return known(withAnswers(known(doc) ?? {}, p.answers as Draft)) ?? {};
 }
 
 export function buildInfrastructureYml(p: Project): string {

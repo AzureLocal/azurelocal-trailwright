@@ -5,6 +5,7 @@ import { lcmPasswordParam, templateFor, witnessTypeFor } from './createCluster';
 import { slug } from './types';
 import { switchPortRows } from './switchPorts';
 import { ncAddress } from '../rules/sdn';
+import { describeSbeDecision, sbeDecision } from '../model/sbe';
 
 const cell = (value: string | number | boolean | undefined): string => String(value ?? '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
 
@@ -19,7 +20,7 @@ const yes = (b: boolean): string => (b ? 'yes' : 'no');
 function sbeLines(p: Project): string[] {
   const s = p.hardware.sbe;
   if (s.requirement === 'not_applicable') return [`- Solution Builder Extension package: not applicable. ${s.notApplicableReason || '(no reason given)'}`];
-  const out = [`- Solution Builder Extension package: required, available at ${s.sourcePath || '(location not given yet)'}`];
+  const out = [`- Solution Builder Extension package: ${describeSbeDecision(sbeDecision(p))}; available at ${s.sourcePath || '(location not given yet)'}`];
   if (s.sourceUsername) out.push(`- Account that reads the package share: ${s.sourceUsername}, password from Key Vault secret ${s.sourcePasswordSecret || '(not given yet)'}`);
   out.push(`- Install it during the build: ${s.delivery === 'skip' ? 'no (default)' : s.delivery}`);
   return out;

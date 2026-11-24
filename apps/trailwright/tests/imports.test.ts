@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { applyPatch, parseSurveyorPlan, previewConflicts } from '../src/imports/surveyor';
 import { parseProjectFile } from '../src/imports/projectFile';
+import { buildInfrastructure } from '../src/exports/infrastructureYml';
 import { createEmptyProject } from '../src/model/defaults';
 import { projectSchema } from '../src/model/schema';
 import { project } from './helpers';
@@ -122,5 +123,67 @@ describe('a real Surveyor 2.8.0 project file', () => {
     const result = parseSurveyorPlan(JSON.stringify({ kind: 'something-else', schemaVersion: 1, inputs: {} }));
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toContain('azurelocal-surveyor-project');
+  });
+});
+// tests/fixtures/surveyor-sizing-handoff.json is a copy of Surveyor's docs/reference/sizing-handoff.example.json, which a
+// Surveyor unit test keeps equal to what Surveyor writes.
+describe('the Surveyor sizing handoff', () => {
+  const text = readFileSync(resolve(__dirname, 'fixtures', 'surveyor-sizing-handoff.json'), 'utf8');
+
+  it('brings in the sized cluster: machines, cores, memory, drives, volumes and the plan name', () => {
+    const result = parseSurveyorPlan(text);
+    if (!result.ok) throw new Error(result.error);
+    expect(result.patch.nodes).toHaveLength(4);
+    expect(result.patch.nodes[0]).toMatchObject({ name: 'node1', ip: '', cores: 32, memoryGiB: 256, drives: 6 });
+    expect(result.patch.driveLayout).toEqual({ capacity: { media: 'nvme', count: 6, sizeTB: 3.84 }, cache: { media: 'nvme', count: 0, sizeTB: 0 } });
+    expect(result.patch.volumes).toEqual([
+      { name: 'Volume1', sizeGiB: 4546, resiliency: 'two-way' },
+      { name: 'Volume2', sizeGiB: 2048, resiliency: 'two-way' },
+    ]);
+    expect(result.patch.topology).toBe('standard');
+    expect(result.patch.name).toBe('Example plan');
+    expect(result.patch.notes).toContain('sized against Azure Local 12.2611');
+    expect(result.patch.notes).toContain('effective usable capacity 25.04 TB');
+    expect(result.patch.notes).toContain('the sizing health check passed');
+  });
+
+  it('a rack-aware handoff with a four-way mirror and a cache tier', () => {
+    const doc = JSON.parse(text) as Record<string, any>;
+    doc.cluster = { node_count: 4, topology: 'rack_aware' };
+    doc.hardware.drives.cache = { media: 'ssd', count: 2, size_tb: 1.6 };
+    doc.storage.volumes = [{ name: 'Zoned', size_gib: 1024, resiliency: 'four_way', provisioning: 'fixed' }];
+    const result = parseSurveyorPlan(JSON.stringify(doc));
+    if (!result.ok) throw new Error(result.error);
+    expect(result.patch.topology).toBe('rack-aware');
+    expect(result.patch.volumes).toEqual([{ name: 'Zoned', sizeGiB: 1024, resiliency: 'four-way' }]);
+    expect(result.patch.driveLayout?.cache).toEqual({ media: 'ssd', count: 2, sizeTB: 1.6 });
+    expect(result.patch.nodes[0].drives).toBe(8);
+  });
+
+  it('applies to a clean design and the export writes it in infrastructure.yml', () => {
+    const result = parseSurveyorPlan(text);
+    if (!result.ok) throw new Error(result.error);
+    const applied = applyPatch(createEmptyProject('Untitled project'), result.patch);
+    const doc = buildInfrastructure(applied);
+    expect(doc.hardware?.cpu_cores).toBe(32);
+    expect(doc.hardware?.memory_gib).toBe(256);
+    expect(doc.hardware?.drives?.capacity).toEqual({ media: 'nvme', count: 6, size_tb: 3.84 });
+    expect(doc.storage?.volumes).toEqual([
+      { name: 'Volume1', size_gib: 4546, resiliency: 'two_way' },
+      { name: 'Volume2', size_gib: 2048, resiliency: 'two_way' },
+    ]);
+  });
+
+  it('refuses another major version', () => {
+    const doc = JSON.parse(text) as Record<string, unknown>;
+    const result = parseSurveyorPlan(JSON.stringify({ ...doc, schemaVersion: '2.0' }));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('not 1.x');
+  });
+
+  it('a Surveyor 2.9 four-way mirror volume in a plan manifest is no longer skipped', () => {
+    const result = parseSurveyorPlan(JSON.stringify({ schemaVersion: '1.0', inputs: { hardware: { nodeCount: 4, rackAware: true }, volumes: [{ name: 'Z', plannedSizeTB: 1, resiliency: 'four-way-mirror' }] } }));
+    if (!result.ok) throw new Error(result.error);
+    expect(result.patch.volumes).toEqual([{ name: 'Z', sizeGiB: 1024, resiliency: 'four-way' }]);
   });
 });

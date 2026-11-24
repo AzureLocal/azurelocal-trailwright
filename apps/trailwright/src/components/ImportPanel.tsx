@@ -43,7 +43,7 @@ export const ImportPanel: FC<{ onApplied?: () => void }> = ({ onApplied }) => {
   return (
     <div className="space-y-3">
       <label htmlFor="import-file" className="block text-sm font-medium text-gray-700">
-        Open a Surveyor plan or a Trailwright project (JSON)
+        Open a Surveyor sizing handoff or plan, or a Trailwright project (JSON)
       </label>
       <input id="import-file" type="file" accept=".json,application/json" onChange={(e) => void onFile(e)} />
 

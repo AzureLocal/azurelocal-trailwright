@@ -17,6 +17,7 @@ import { catalog } from '../src/questions/catalog';
 import { ask } from '../src/questions/engine';
 import { runRules } from '../src/rules';
 import { HardwareScreen } from '../src/screens/HardwareScreen';
+import { hardwareVendorOf, sbeDecision } from '../src/model/sbe';
 import { project } from './helpers';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -55,15 +56,21 @@ describe('Solution Builder Extension (SBE): the exports write the registry keys'
 
   it('the handoff and the project JSON carry the answer', () => {
     const p = project();
-    expect(buildHandoffMarkdown(p)).toContain('Solution Builder Extension package: required, available at D:/sbe/vendor');
+    expect(buildHandoffMarkdown(p)).toContain('Solution Builder Extension package: required (the design says so); available at D:/sbe/vendor');
     expect(buildHandoffMarkdown(p)).toContain('Install it during the build: no (default)');
     expect(JSON.parse(buildProjectJson(p)).hardware.sbe.sourcePath).toBe('D:/sbe/vendor');
   });
 
-  it('an older project file without the block comes in as required, no side-load', () => {
+  it('an older project file without the block comes in as vendor (the schema default), no side-load', () => {
     const old = JSON.parse(buildProjectJson(createEmptyProject('old'))) as { hardware: Record<string, unknown> };
     delete old.hardware.sbe;
-    expect(projectSchema.parse(old).hardware.sbe).toMatchObject({ requirement: 'required', delivery: 'skip', sourcePath: '' });
+    expect(projectSchema.parse(old).hardware.sbe).toMatchObject({ requirement: 'vendor', delivery: 'skip', sourcePath: '' });
+  });
+
+  it('vendor (the default) is written as vendor, with the location when one is given', () => {
+    const sbe = sbeOf(buildInfrastructureYml(project({ hardware: { vendor: 'Dell', sbe: { requirement: 'vendor', sourcePath: 'D:/sbe/dell' } } })));
+    expect(sbe).toEqual({ requirement: 'vendor', source_path: 'D:/sbe/dell', delivery: 'skip' });
+    expect(createEmptyProject('new').hardware.sbe.requirement).toBe('vendor');
   });
 });
 
@@ -84,6 +91,40 @@ describe('Solution Builder Extension (SBE): findings', () => {
   it('a typed password is refused as a secret name', () => {
     const found = runRules(project({ landingZone: { keyVaultName: 'kv-example' }, hardware: { sbe: { sourceUsername: 'svc', sourcePasswordSecret: 'P@ssw0rd!Typed' } } })).filter((f) => f.id === 'SBE-004');
     expect(found[0]?.severity).toBe('error');
+  });
+});
+
+describe('Solution Builder Extension (SBE): vendor follows the toolkit vendor catalog', () => {
+  const ids = (change: Parameters<typeof project>[0]) => runRules(project(change)).map((f) => f.id);
+  const vendor = (name: string, sourcePath = '') => project({ hardware: { vendor: name, sbe: { requirement: 'vendor', sourcePath } } });
+
+  it('Dell, HPE and DataON: required, so a missing location is SBE-001', () => {
+    for (const name of ['Dell', 'HPE', 'DataON', 'dell']) {
+      expect(sbeDecision(vendor(name))).toMatchObject({ state: 'required', from: 'vendor catalog' });
+      expect(runRules(vendor(name)).map((f) => f.id), name).toContain('SBE-001');
+      expect(runRules(vendor(name, 'D:/sbe')).map((f) => f.id), name).not.toContain('SBE-001');
+    }
+  });
+  it('Lenovo: the cluster downloads it, so SBE-005 asks the design to state it', () => {
+    expect(sbeDecision(vendor('Lenovo')).state).toBe('vendor_downloads');
+    const found = runRules(vendor('Lenovo')).filter((f) => f.id.startsWith('SBE-'));
+    expect(found.map((f) => [f.id, f.severity])).toEqual([['SBE-005', 'info']]);
+  });
+  it('a vendor the catalog does not know, or none: unknown, SBE-005', () => {
+    expect(sbeDecision(vendor('Contoso')).state).toBe('unknown');
+    expect(ids({ hardware: { vendor: '', sbe: { requirement: 'vendor' } } })).toContain('SBE-005');
+  });
+  it('the vendor of a validated simplified provisioning model counts', () => {
+    const p = project({ hardware: { vendor: '', sbe: { requirement: 'vendor' } }, provisioning: { osInstall: 'simplified', hardwareSku: 'lenovo-mx650-v3' } });
+    expect(hardwareVendorOf(p)).toBe('Lenovo');
+    expect(sbeDecision(p).state).toBe('vendor_downloads');
+  });
+  it('a stated answer wins over the catalog', () => {
+    expect(sbeDecision(project({ hardware: { vendor: 'Lenovo', sbe: { requirement: 'required' } } }))).toMatchObject({ state: 'required', from: 'design' });
+    expect(ids({ hardware: { vendor: 'Contoso', sbe: { requirement: 'not_applicable', notApplicableReason: 'No SBE.' } } })).not.toContain('SBE-005');
+  });
+  it('the handoff says what the catalog decided', () => {
+    expect(buildHandoffMarkdown(vendor('Dell', 'D:/sbe'))).toContain("Solution Builder Extension package: required: Dell's package is a manual download");
   });
 });
 
@@ -150,10 +191,18 @@ describe('Solution Builder Extension (SBE): the screen and the prerequisites', (
     });
     expect(useProjectStore.getState().project.hardware.sbe.sourcePath).toBe('D:/sbe/other');
     expect((container.querySelector('#sbe-delivery') as HTMLSelectElement).value).toBe('skip');
+    expect(container.querySelector('[data-testid="sbe-decision"]')?.textContent).toMatch(/^For this design: /);
+    expect([...(container.querySelector('#sbe-requirement') as HTMLSelectElement).options].map((o) => o.value)).toEqual(['vendor', 'required', 'not_applicable']);
   });
 
   it('the README prerequisites carry the same statement', () => {
     const readme = readFileSync(resolve(__dirname, '..', '..', '..', 'README.md'), 'utf8').replace(/\r\n/g, '\n');
     expect(readme).toContain(SBE_PREREQUISITE);
+  });
+});
+
+describe('Solution Builder Extension (SBE): the vendor catalog lookup', () => {
+  it('a vendor named like an object property is unknown, as the toolkit finds no file for it', () => {
+    for (const name of ['constructor', '__proto__', 'toString']) expect(sbeDecision(project({ hardware: { vendor: name, sbe: { requirement: 'vendor' } } })).state, name).toBe('unknown');
   });
 });

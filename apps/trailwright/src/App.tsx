@@ -7,6 +7,7 @@ import { exportKinds } from './exports';
 import { downloadFile } from './imports/download';
 import { steps, visibleSteps } from './steps/steps';
 import { StepNav } from './components/StepNav';
+import { CatalogQuestions } from './components/CatalogQuestions';
 import { useProjectStore } from './model/store';
 import { runRules } from './rules';
 import { ProjectScreen } from './screens/ProjectScreen';
@@ -152,6 +153,7 @@ function ProjectShell() {
                   step.visible(project) ? (
                     <>
                       {built[step.path]}
+                      <CatalogQuestions screen={step.path} />
                       <StepNav path={step.path} gate={step.gate} />
                     </>
                   ) : (

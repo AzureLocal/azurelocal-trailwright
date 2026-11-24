@@ -150,11 +150,14 @@ export const machineQuestions: Question[] = [
     owner: 'datacenter',
     kind: 'select',
     options: [
+      { value: 'vendor', label: "Decided by the vendor (default): the automation's vendor catalog says", description: 'Required for a vendor whose package is a manual download (Dell, HPE, DataON); not required for a vendor whose cluster downloads it (Lenovo Premier).' },
       { value: 'required', label: 'Required: the package is on a share' },
       { value: 'not_applicable', label: 'Not applicable (give the reason)' },
     ],
-    // The registry leaves the key optional (the vendor catalog decides when it is absent), so an older file without it stays complete.
+    // The registry leaves the key optional and defaults it to vendor (the vendor catalog decides, also when it is absent), so an older file
+    // without it stays complete.
     requiredWhen: () => false,
+    recommended: () => ({ value: 'vendor', reason: "The schema default: the automation's vendor catalog decides from hardware.vendor." }),
   },
   {
     id: 'hardware.sbe.not_applicable_reason',

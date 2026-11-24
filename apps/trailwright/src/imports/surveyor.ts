@@ -25,6 +25,8 @@ function mapResiliency(input: string): Resiliency | undefined {
       return 'two-way';
     case 'three-way-mirror':
       return 'three-way';
+    case 'four-way-mirror':
+      return 'four-way';
     case 'nested-two-way':
     case 'nested-two-way-mirror':
       return 'nested-two-way';
@@ -35,6 +37,77 @@ function mapResiliency(input: string): Resiliency | undefined {
   }
 }
 
+// The infrastructure.yml (schema 5) resiliency spellings the sizing handoff uses, as the design model spells them.
+const HANDOFF_RESILIENCY: Record<string, Resiliency> = { two_way: 'two-way', three_way: 'three-way', four_way: 'four-way', parity: 'parity', nested_two_way: 'nested-two-way' };
+const HANDOFF_MEDIA = ['nvme', 'ssd', 'hdd'] as const;
+
+// The Surveyor sizing handoff (kind azurelocal-sizing-handoff, schemaVersion 1.x; Surveyor docs/reference/sizing-handoff.md): the sized
+// cluster in the infrastructure.yml vocabulary. Machines, topology, cores, memory and drives per machine and the volumes come in;
+// the sizing results go into the notes.
+export function parseSizingHandoff(parsed: Record<string, unknown>): { ok: true; patch: ImportPatch } | { ok: false; error: string } {
+  const version = parsed.schemaVersion;
+  if (typeof version !== 'string' || version.split('.')[0] !== '1') return { ok: false, error: `Sizing handoff schemaVersion ${JSON.stringify(version)} is not 1.x; this Trailwright reads version 1.` };
+  const cluster = isRecord(parsed.cluster) ? parsed.cluster : {};
+  const hardware = isRecord(parsed.hardware) ? parsed.hardware : undefined;
+  if (!hardware) return { ok: false, error: 'Sizing handoff without hardware' };
+  const nodeCount = Number(cluster.node_count);
+  if (!Number.isInteger(nodeCount) || nodeCount < 1 || nodeCount > 64) return { ok: false, error: `cluster.node_count must be an integer from 1 to 64 (got ${String(cluster.node_count)})` };
+  const drives = isRecord(hardware.drives) ? hardware.drives : {};
+  const tier = (v: unknown): { media: (typeof HANDOFF_MEDIA)[number]; count: number; sizeTB: number } | undefined => {
+    if (!isRecord(v)) return undefined;
+    const media = HANDOFF_MEDIA.find((m) => m === v.media);
+    const count = Number(v.count);
+    const sizeTB = Number(v.size_tb);
+    return media && Number.isInteger(count) && count >= 0 && Number.isFinite(sizeTB) && sizeTB >= 0 ? { media, count, sizeTB } : undefined;
+  };
+  const capacity = tier(drives.capacity);
+  const cache = tier(drives.cache);
+  const cores = Number(hardware.cpu_cores);
+  const memory = Number(hardware.memory_gib);
+  const nodes: ImportPatch['nodes'] = Array.from({ length: nodeCount }, (_, i) => ({
+    name: `node${i + 1}`,
+    ip: '',
+    cores: Number.isFinite(cores) ? cores : 0,
+    memoryGiB: Number.isFinite(memory) ? memory : 0,
+    drives: (capacity?.count ?? 0) + (cache?.count ?? 0),
+  }));
+  const volumes: ImportPatch['volumes'] = [];
+  const storage = isRecord(parsed.storage) ? parsed.storage : {};
+  if (Array.isArray(storage.volumes)) {
+    for (const v of storage.volumes) {
+      if (!isRecord(v)) continue;
+      const resiliency = typeof v.resiliency === 'string' ? HANDOFF_RESILIENCY[v.resiliency] : undefined;
+      const sizeGiB = Number(v.size_gib);
+      if (resiliency && Number.isFinite(sizeGiB)) volumes.push({ name: String(v.name ?? ''), sizeGiB: Math.round(sizeGiB), resiliency });
+    }
+  }
+  const plan = isRecord(parsed.plan) ? parsed.plan : {};
+  const planName = typeof plan.name === 'string' && plan.name.trim() ? plan.name.trim() : undefined;
+  const sizing = isRecord(parsed.sizing) ? parsed.sizing : {};
+  const health = isRecord(sizing.health) ? sizing.health : {};
+  const facts: string[] = [];
+  if (Number.isFinite(Number(sizing.effective_usable_tb))) facts.push(`effective usable capacity ${String(sizing.effective_usable_tb)} TB`);
+  if (Number.isFinite(Number(sizing.utilization_pct))) facts.push(`volumes use ${String(sizing.utilization_pct)}% of it`);
+  if (Number(sizing.workload_vcpus) > 0) facts.push(`workloads ${String(sizing.workload_vcpus)} vCPUs and ${String(sizing.workload_memory_gb)} GB memory`);
+  if (typeof health.passed === 'boolean') facts.push(health.passed ? 'the sizing health check passed' : `the sizing health check found ${String(health.errors ?? '?')} errors and ${String(health.warnings ?? '?')} warnings`);
+  if (cluster.topology === 'rack_aware') facts.push('rack-aware cluster');
+  const release = typeof parsed.targetRelease === 'string' ? parsed.targetRelease : undefined;
+  const surveyor = typeof parsed.surveyorVersion === 'string' ? parsed.surveyorVersion : undefined;
+  const origin = [surveyor ? `Surveyor ${surveyor}` : '', release ? `sized against ${release}` : ''].filter(Boolean).join(', ');
+  const notes = `Imported from the Surveyor sizing handoff${planName ? ` "${planName}"` : ''}${origin ? ` (${origin})` : ''}${facts.length ? `: ${facts.join('; ')}.` : '.'}`;
+  return {
+    ok: true,
+    patch: {
+      nodes,
+      volumes,
+      notes,
+      ...(planName ? { name: planName } : {}),
+      ...(capacity ? { driveLayout: { capacity, cache: cache ?? { media: 'nvme' as const, count: 0, sizeTB: 0 } } } : {}),
+      ...(cluster.topology === 'rack_aware' ? { topology: 'rack-aware' as const } : cluster.topology === 'standard' ? { topology: 'standard' as const } : {}),
+    },
+  };
+}
+
 export function parseSurveyorPlan(text: string): { ok: true; patch: ImportPatch } | { ok: false; error: string } {
   let parsed: unknown;
   try {
@@ -43,6 +116,7 @@ export function parseSurveyorPlan(text: string): { ok: true; patch: ImportPatch 
     return { ok: false, error: 'Invalid JSON' };
   }
   if (!isRecord(parsed)) return { ok: false, error: 'Invalid JSON: expected an object' };
+  if (parsed.kind === 'azurelocal-sizing-handoff') return parseSizingHandoff(parsed);
 
   // Two files come out of Surveyor: a saved project (kind azurelocal-surveyor-project, numeric schemaVersion 1)
   // and a plan manifest (string schemaVersion 1.x). Both carry the same inputs.
@@ -52,7 +126,7 @@ export function parseSurveyorPlan(text: string): { ok: true; patch: ImportPatch 
   if (!isProject && !isManifest) {
     return {
       ok: false,
-      error: `Not a Surveyor file: expected a saved project (kind azurelocal-surveyor-project, schemaVersion 1) or a plan manifest (schemaVersion 1.x); got schemaVersion ${JSON.stringify(schemaVersion)}.`,
+      error: `Not a Surveyor file: expected a sizing handoff (kind azurelocal-sizing-handoff), a saved project (kind azurelocal-surveyor-project, schemaVersion 1) or a plan manifest (schemaVersion 1.x); got schemaVersion ${JSON.stringify(schemaVersion)}.`,
     };
   }
   if (!isRecord(parsed.inputs)) return { ok: false, error: 'Missing inputs' };

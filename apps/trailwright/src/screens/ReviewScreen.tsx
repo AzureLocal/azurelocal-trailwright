@@ -5,12 +5,47 @@ import type { Finding } from '../rules/types';
 import { exportKinds } from '../exports';
 import { downloadFile } from '../imports/download';
 import { ImportPanel } from '../components/ImportPanel';
+import { DISCOVERY_NOTE } from '../components/DiscoveryNote';
+import { buildInfrastructure } from '../exports/infrastructureYml';
+import { missingByOwner } from '../questions/engine';
+import { ownerLabels, type Owner } from '../questions/types';
 
 const groups: { severity: Finding['severity']; title: string }[] = [
   { severity: 'error', title: 'Errors' },
   { severity: 'warning', title: 'Warnings' },
   { severity: 'info', title: 'Information' },
 ];
+
+// What infrastructure.yml still needs, from the question catalog over the whole design, grouped by who usually knows it. Questions
+// that do not apply to this design are not counted.
+const Readiness: FC = () => {
+  const { project } = useProjectStore();
+  const missing = missingByOwner(buildInfrastructure(project));
+  const owners = (Object.keys(missing) as Owner[]).filter((o) => missing[o].length > 0);
+  const total = owners.reduce((n, o) => n + missing[o].length, 0);
+  const discoverable = owners.reduce((n, o) => n + missing[o].filter((a) => a.question.discovery).length, 0);
+  return (
+    <div className="space-y-2" data-testid="readiness">
+      <h2 className="text-lg font-medium text-gray-800">Still needed for infrastructure.yml</h2>
+      {total === 0 ? (
+        <p className="text-sm text-gray-700">Nothing: every question that applies to this design is answered.</p>
+      ) : (
+        <>
+          <p className="text-sm text-gray-700">
+            {total} answers, by who usually knows them.{discoverable > 0 && ` ${discoverable} of them ${DISCOVERY_NOTE}.`}
+          </p>
+          <ul className="space-y-1 text-sm text-gray-800">
+            {owners.map((o) => (
+              <li key={o}>
+                <strong>{ownerLabels[o]}</strong> ({missing[o].length}): {missing[o].map((a) => `${a.question.label}${a.index !== undefined ? ` (machine ${a.index + 1})` : ''}`).join(', ')}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+};
 
 export const ReviewScreen: FC = () => {
   const { project } = useProjectStore();
@@ -60,6 +95,8 @@ export const ReviewScreen: FC = () => {
           );
         })}
       </div>
+
+      <Readiness />
 
       <div className="space-y-3">
         <h2 className="text-lg font-medium text-gray-800">Export</h2>

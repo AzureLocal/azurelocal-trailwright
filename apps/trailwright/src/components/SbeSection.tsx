@@ -7,11 +7,12 @@ export const SBE_PREREQUISITE =
   "Download your hardware vendor's Solution Builder Extension package for your model and the Azure Local version you deploy. It is a requirement: you need it to update the cluster, and the automation reads it from a share and checks it before the cluster is created. Installing it during the build is optional (off by default).";
 export const SBE_LEARN_URL = 'https://learn.microsoft.com/azure/azure-local/update/solution-builder-extension';
 
-type Props = { sbe: Hardware['sbe']; onChange: (patch: Partial<Hardware['sbe']>) => void };
+// decision: what the requirement comes to for this design (src/model/sbe.ts), shown under the choice.
+type Props = { sbe: Hardware['sbe']; decision?: string; onChange: (patch: Partial<Hardware['sbe']>) => void };
 
 // Where the Solution Builder Extension (SBE) package is, whether the requirement applies, and whether to side-load it at build time.
 // The password of the account that reads the share is a Key Vault secret name, never typed here as a value.
-export const SbeSection: FC<Props> = ({ sbe, onChange }) => (
+export const SbeSection: FC<Props> = ({ sbe, decision, onChange }) => (
   <div className="space-y-4" data-testid="sbe-section">
     <h2 className="text-lg font-medium text-gray-800">Solution Builder Extension (SBE) package</h2>
     <p className="text-sm text-gray-700" data-testid="sbe-prerequisite">
@@ -30,11 +31,17 @@ export const SbeSection: FC<Props> = ({ sbe, onChange }) => (
       value={sbe.requirement}
       onChange={(requirement) => onChange({ requirement: requirement as Hardware['sbe']['requirement'] })}
       options={[
+        { value: 'vendor', label: "Decided by the vendor (default): the automation's vendor catalog says" },
         { value: 'required', label: 'Required: the package is on a share' },
         { value: 'not_applicable', label: 'Not applicable (give the reason)' },
       ]}
-      hint="Not applicable is for hardware without a Solution Builder Extension, or a cluster that downloads it with the vendor credential."
+      hint="Decided by the vendor follows the automation's vendor catalog: required for vendors whose package is a manual download (Dell, HPE, DataON), not required for a vendor whose cluster downloads it (Lenovo Premier). Not applicable is for hardware without a Solution Builder Extension, or a cluster that downloads it with the vendor credential."
     />
+    {decision && (
+      <p className="text-sm text-gray-700" data-testid="sbe-decision">
+        For this design: {decision}.
+      </p>
+    )}
     {sbe.requirement === 'not_applicable' ? (
       <TextInput id="sbe-reason" label="Why it does not apply" value={sbe.notApplicableReason} onChange={(notApplicableReason) => onChange({ notApplicableReason })} hint="One sentence, for example: no Solution Builder Extension exists for this hardware model." />
     ) : (

@@ -146,7 +146,7 @@ describe('every choice of the design has a value the schema takes', () => {
     ['RDMA left to the adapter, and RDMA off', (p) => { p.networking = { ...p.networking, intents: p.networking.intents.map((i, k) => ({ ...i, overrideAdapter: true, networkDirect: k ? 'Disabled' : 'Enabled', networkDirectTechnology: 'Auto' })) }; }],
     ['network cards with every RDMA kind and role', (p) => { p.networking = { ...p.networking, cards: [{ label: 'Slot 3', make: 'Example NIC Vendor', model: 'Example 25GbE NIC', ports: [{ osName: 'pNIC01', speedGbps: 25, rdma: 'none', role: 'intent:Management_Compute' }, { osName: 'pNIC02', speedGbps: 25, rdma: 'iWARP', role: 'cluster:1' }, { osName: 'pNIC03', speedGbps: 25, rdma: 'RoCE', role: 'cluster:2' }, { osName: 'pNIC04', speedGbps: 25, rdma: 'RoCEv2', role: 'iscsi:a' }, { osName: 'pNIC05', speedGbps: 10, rdma: 'none', role: 'unused' }, { osName: '', speedGbps: 10, rdma: 'none', role: 'unused' }] }] }; }],
     ['monitoring with an existing rule and an endpoint', (p) => { p.operations = { ...p.operations, monitoring: true, useExistingDcr: true, dcrName: 'dcr-iic-azl-01', agentPrivateLinks: true, dceName: 'dce-iic-azl-01' }; }],
-    ['the full build of the release', (p) => { p.release = { ...p.release, build: '12.2610.1004.50' }; }],
+    ['the full build of the release', (p) => { p.release = { ...p.release, build: '12.2611.1004.9' }; }],
     ['disconnected operations', (p) => { p.deployment = { ...p.deployment, mode: 'disconnected' }; p.hardware = { ...p.hardware, witness: 'file-share', witnessPath: '\\\\files.example.invalid\\witness' }; p.disconnected = { ...p.disconnected, domainSuffix: 'improbability.cloud', ingressIp: '192.0.2.40', ingressGateway: '192.0.2.1', managementIp: '192.0.2.41', dnsServer: '192.0.2.4', timeServers: '192.0.2.4, 192.0.2.5' }; }],
   ];
 
@@ -207,7 +207,7 @@ describe('where a value of the design goes', () => {
   it('writes simplified machine provisioning with the site, the image, the share and each machine\'s BMC and MAC', () => {
     const doc = exported(sample('private path with SDN, simplified'));
     expect(doc.provisioning).toEqual({
-      os_version: '12.2610.1004.50',
+      os_version: '12.2611.1004.9',
       simplified: { site_name: 'iic-site-01', resource_group: 'rg-iic-azl-01', maintenance_iso: 'latest', admin: { username: 'azladmin', password: 'keyvault://kv-iic-mgmt-01/provisioning-admin-password' }, media_share: { name: 'ztp-virtual-usb', host: '198.51.100.5' }, ntp: { configuration: 'Manual', server: 'time.example.com' } },
     });
     expect(doc.nodes[0]).toEqual({ name: 'node1', management: { ip_address: '192.0.2.11', mac_address: '00:00:5E:00:53:11' }, serial_number: 'EXAMPLE-0001', bmc: { ip_address: '198.51.100.11' } });

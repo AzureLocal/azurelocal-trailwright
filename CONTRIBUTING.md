@@ -21,7 +21,7 @@ npm run test:browser # Playwright journeys (builds and previews the app)
 
 ## Rules of the road
 
-- **Release wording:** the tool plans against Azure Local 12.2610 (latest). Write "12.2610 (latest)" in text a person reads.
+- **Release wording:** the tool plans against Azure Local 12.2611 (latest). Write "12.2611 (latest)" in text a person reads.
 - **Every rule needs a Microsoft Learn URL** and a case in `apps/trailwright/tests/ruleCases.ts`. After changing a rule run `npm run docs:rules --workspace apps/trailwright` and commit `docs/RULES.md`; a test fails when it is stale.
 - **infrastructure.yml:** the contract is the Azure Local Toolkit's schema 5 (`config/variables/schema/infrastructure.schema.json` in azurelocal-toolkit). Do not edit the copies here: when the toolkit moves, copy its schema over `apps/trailwright/src/infra/infrastructure.schema.json` and `apps/trailwright/public/schema/infrastructure.schema.json`, run `npm run schema:types --workspace apps/trailwright`, set `SCHEMA_VERSION` in `src/infra/types.ts`, and update the exporter and `docs/INFRASTRUCTURE-YML.md`. The exporter writes only keys the schema has.
 - **Environment file and Terraform exports:** values the design cannot know stay `CHANGE-ME`; never invent one. The vendored schema in `tests/fixtures` is a copy of the deploy automation contract: refresh it, do not edit it.

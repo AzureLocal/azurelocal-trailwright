@@ -6,7 +6,7 @@ Azure Local Trailwright is a guided design tool for Azure Local. You answer ques
 
 Surveyor answers "does it fit" for sizing. Trailwright answers "how is it built." Neither tool deploys anything.
 
-Every question and every rule comes from Microsoft Learn and follows the current Azure Local release, 12.2610 (latest). There is no release to choose. If you know the full build you will deploy (for example 12.2609.x.y), you can enter it on the Project step; exports carry it as written and never guess it. The rules are listed in [RULES.md](RULES.md).
+Every question and every rule comes from Microsoft Learn and follows the current Azure Local release, 12.2611 (latest). There is no release to choose. If you know the full build you will deploy (for example 12.2609.x.y), you can enter it on the Project step; exports carry it as written and never guess it. The rules are listed in [RULES.md](RULES.md).
 
 ## Before you start
 
@@ -35,8 +35,10 @@ The steps appear in the left sidebar in groups. A step is shown only when your e
 | Provisioning and deployment method | Operating system install from ISO or simplified machine provisioning (USB drive, ownership voucher, site settings, and for azurelocal-ztp the provisioning image, the SMB share for the images and each machine's BMC address and management port MAC), and the portal wizard or ARM template. The ARM template is required for three- and four-node switchless clusters and custom storage IPs. |
 | Azure resources | Subscription, tenant, resource group, naming prefix, Key Vault, diagnostic storage, retention, resource provider object ID, custom location. |
 | Operations | The update method (Azure portal or PowerShell), monitoring with Insights (workspace, data collection rule, alerts), backup and disaster recovery. |
-| Review and export | All findings grouped by step, and the exports. |
+| Review and export | All findings grouped by step, what `infrastructure.yml` still needs (grouped by who usually knows it), and the exports. |
 | As-built compare | Load an as-built snapshot (`as-built-snapshot.v1`, for example made from an Azure Local Ranger manifest) and see what matches, drifts or is missing against the design. See [AS-BUILT.md](AS-BUILT.md). |
+
+Under its own fields, a step can show **More for infrastructure.yml**: the questions the automation's file asks that the step's fields do not, for example each machine's rack position, the time servers or the BMC login. Only the questions that apply to your design are shown, and only their answers are exported: choose local identity and the Active Directory questions go away, choose simplified provisioning and the BMC login appears. Items that hardware discovery (`Invoke-HardwareDiscovery.ps1`) can collect say so. The Azure resources step turns the optional Azure foundation and CI/CD questions on. See [INFRASTRUCTURE-YML.md](INFRASTRUCTURE-YML.md).
 
 ## Reading findings
 
@@ -47,6 +49,7 @@ A finding names the field it concerns, gives a message, and links to the Microso
 On the Project step or the Review step, choose a file:
 
 - **Trailwright project JSON:** Trailwright asks before replacing the current design.
+- **Surveyor sizing handoff:** the file Surveyor's **Sizing handoff for Trailwright** (Reports) downloads. Trailwright takes the machines, single rack or rack aware, cores and memory per machine, the drive layout and the volumes, and puts the sizing results in the notes.
 - **Surveyor project or plan JSON:** both Surveyor formats are accepted. Trailwright maps the nodes, volumes, plan name, drive layout and notes, and shows a preview of conflicts with the current design. Nothing changes until you choose **Apply import**.
 
 A file that is neither format is refused, and Trailwright gives the reason.
@@ -84,5 +87,5 @@ Trailwright does not deploy anything. It does not hold secrets. The page footer 
 
 - **Findings will not clear:** Check the fields named in the finding and read the linked Microsoft Learn page.
 - **A step is missing:** Steps appear only when earlier answers need them. For example, SAN questions appear only for hybrid and disaggregated architectures.
-- **An import is refused:** Check that the file is a Trailwright project JSON or a Surveyor project or plan JSON. Trailwright shows the reason for refusing a file.
+- **An import is refused:** Check that the file is a Trailwright project JSON, a Surveyor sizing handoff, or a Surveyor project or plan JSON. Trailwright shows the reason for refusing a file.
 - **A download does not start:** Select the export button again. If it still does not start, check your browser's download settings.

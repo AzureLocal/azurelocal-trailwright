@@ -73,7 +73,7 @@ export const ProvisioningScreen: FC = () => {
             <h3 className="font-medium text-gray-800">Automated provisioning (azurelocal-ztp)</h3>
             <p className="text-xs text-gray-600">What infrastructure.yml needs so that azurelocal-ztp can run simplified machine provisioning: the provisioning image and the SMB share on the management host that the BMCs mount the images from. Each machine also needs its BMC address and the MAC of its management port, below.</p>
             <div className="grid gap-4 md:grid-cols-2">
-              <TextInput id="prov-maintenance-iso" label="Provisioning image" value={prov.maintenanceIso} placeholder="latest" hint="latest, a train such as 2610, a build such as 10.2610.0.3063, or a Microsoft download URL." onChange={(maintenanceIso) => set({ maintenanceIso })} />
+              <TextInput id="prov-maintenance-iso" label="Provisioning image" value={prov.maintenanceIso} placeholder="latest" hint="latest, a train such as 2611, a build such as 10.2610.0.3063, or a Microsoft download URL." onChange={(maintenanceIso) => set({ maintenanceIso })} />
               <TextInput id="prov-media-share" label="SMB share for the provisioning images" value={prov.mediaShareName} placeholder="ztp-virtual-usb" hint="Letters, digits and hyphens. On the management host." onChange={(mediaShareName) => set({ mediaShareName })} />
               <TextInput id="prov-media-host" label="Management host address, as the BMCs reach it" value={prov.mediaShareHost} placeholder="198.51.100.5" onChange={(mediaShareHost) => set({ mediaShareHost })} />
             </div>

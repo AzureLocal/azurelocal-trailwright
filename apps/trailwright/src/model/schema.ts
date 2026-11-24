@@ -12,7 +12,7 @@ const metaSchema = z.object({
 const releaseSchema = z.object({
   // Recorded for the handoff; the rules always follow the current release.
   version: z.string().default(CURRENT_RELEASE),
-  // Optional: the full build string of the deployed release (for example 12.2610.1004.50), when it is known. Handoff and automation files use it; Trailwright never guesses it.
+  // Optional: the full build string of the deployed release (for example 12.2611.1004.9), when it is known. Handoff and automation files use it; Trailwright never guesses it.
   build: z.string().default(''),
 });
 
@@ -48,7 +48,8 @@ const nodeSchema = z.object({
 // automation reads it from a share and checks it before the cluster is created. Installing it during the build is optional and off.
 const sbeSchema = z
   .object({
-    requirement: z.enum(['required', 'not_applicable']).default('required'),
+    // vendor (the default, as in the toolkit's schema since 5.6.28): the automation's vendor catalog decides from hardware.vendor (src/model/sbe.ts).
+    requirement: z.enum(['vendor', 'required', 'not_applicable']).default('vendor'),
     // Why no package is needed (not_applicable only), for example hardware without an SBE.
     notApplicableReason: z.string().default(''),
     // The share or folder where the downloaded package is available to the automation.
@@ -406,6 +407,9 @@ export const projectSchema = z.object({
   storage: storageSchema,
   operations: operationsSchema,
   findings: z.array(findingSchema),
+  // Answers to the schema 5 questions the screens do not ask (src/questions/answers.ts), as an infrastructure.yml document.
+  // The export fills them in where the screens give no value, and leaves out the ones that do not apply.
+  answers: z.record(z.string(), z.unknown()).default({}),
 });
 
 export type Project = z.infer<typeof projectSchema>;

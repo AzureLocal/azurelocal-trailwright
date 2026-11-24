@@ -35,7 +35,7 @@ test('a Surveyor plan shows its conflicts and applies on confirmation', async ({
   await step(page, 'Review and export').click();
   await expect(page.getByRole('heading', { name: /Review/ }).first()).toBeVisible();
   await page.waitForLoadState('networkidle');
-  await page.getByLabel('Open a Surveyor plan or a Trailwright project (JSON)').setInputFiles({
+  await page.getByLabel('Open a Surveyor sizing handoff or plan, or a Trailwright project (JSON)').setInputFiles({
     name: 'plan.json',
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(manifest)),
@@ -54,7 +54,7 @@ test('a file that is neither a project nor a plan is refused with a reason', asy
   await step(page, 'Review and export').click();
   await expect(page.getByRole('heading', { name: /Review/ }).first()).toBeVisible();
   await page.waitForLoadState('networkidle');
-  await page.getByLabel('Open a Surveyor plan or a Trailwright project (JSON)').setInputFiles({
+  await page.getByLabel('Open a Surveyor sizing handoff or plan, or a Trailwright project (JSON)').setInputFiles({
     name: 'bad.json',
     mimeType: 'application/json',
     buffer: Buffer.from('{"hello":1}'),
@@ -64,7 +64,7 @@ test('a file that is neither a project nor a plan is refused with a reason', asy
 
 test('a saved Surveyor project file (as Surveyor 2.8.0 writes it) imports from the first screen', async ({ page }) => {
   await page.goto('/#/project');
-  await page.getByLabel('Open a Surveyor plan or a Trailwright project (JSON)').setInputFiles(resolve(process.cwd(), 'tests', 'fixtures', 'surveyor-project.json'));
+  await page.getByLabel('Open a Surveyor sizing handoff or plan, or a Trailwright project (JSON)').setInputFiles(resolve(process.cwd(), 'tests', 'fixtures', 'surveyor-project.json'));
   await expect(page.getByText(/Conflicts|No conflicts/)).toBeVisible();
   await page.getByRole('button', { name: 'Apply import' }).click();
   await expect(page.getByLabel('Project name')).toHaveValue('Azure Local plan');
@@ -72,4 +72,15 @@ test('a saved Surveyor project file (as Surveyor 2.8.0 writes it) imports from t
   await expect(page.getByRole('button', { name: /Remove node/ })).toHaveCount(2);
   await step(page, 'Storage').click();
   await expect(page.getByLabel('Volume 1 name')).toHaveValue('Volume1');
+});
+test('a Surveyor sizing handoff (as Surveyor writes it) starts the design from the sized cluster', async ({ page }) => {
+  await page.goto('/#/project');
+  await page.getByLabel('Open a Surveyor sizing handoff or plan, or a Trailwright project (JSON)').setInputFiles(resolve(process.cwd(), 'tests', 'fixtures', 'surveyor-sizing-handoff.json'));
+  await expect(page.getByText(/Conflicts|No conflicts/)).toBeVisible();
+  await page.getByRole('button', { name: 'Apply import' }).click();
+  await expect(page.getByLabel('Project name')).toHaveValue('Example plan');
+  await step(page, 'Hardware and topology').click();
+  await expect(page.getByRole('button', { name: /Remove node/ })).toHaveCount(4);
+  await step(page, 'Storage').click();
+  await expect(page.getByLabel('Volume 2 name')).toHaveValue('Volume2');
 });

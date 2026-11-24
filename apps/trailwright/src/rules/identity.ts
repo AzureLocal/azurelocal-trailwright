@@ -1,10 +1,10 @@
 import type { Rule } from './types';
 
-const RELEASES = ['2607', '2608', '2609', '2610'];
+const RELEASES = ['2607', '2608', '2609', '2610', '2611'];
 
-const KV_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-local-identity-with-key-vault?view=azloc-2610';
-const PREREQ_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-prerequisites?view=azloc-2610';
-const OVERVIEW_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-local-identity-with-key-vault-overview?view=azloc-2610#tool-compatibility-in-azure-local-environments-configured-with-azure-key-vault';
+const KV_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-local-identity-with-key-vault?view=azloc-2611';
+const PREREQ_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-prerequisites?view=azloc-2611';
+const OVERVIEW_URL = 'https://learn.microsoft.com/azure/azure-local/deploy/deployment-local-identity-with-key-vault-overview?view=azloc-2611#tool-compatibility-in-azure-local-environments-configured-with-azure-key-vault';
 
 export const identityRules: Rule[] = [
   {

@@ -2,7 +2,7 @@
 // machine name of every machine; rack aware adds the zone; Storage Spaces Direct adds the drives.
 import type { Draft } from '../../infra/types';
 import type { Question } from '../types';
-import { arcMachineName, isRackAware, isSimplified, learn, nodeCount, storageAutoIpOff, usesS2d } from '../when';
+import { arcMachineName, isPlanningScope, isRackAware, isSimplified, learn, nodeCount, nodeIp, nodeMac, storageAutoIpOff, usesS2d } from '../when';
 
 const step = 'machines' as const;
 const ipv4 = /^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
@@ -34,6 +34,7 @@ export const machineQuestions: Question[] = [
   {
     id: 'nodes.management.ip_address',
     path: 'nodes[].management.ip_address',
+    read: (d, i) => (i === undefined ? undefined : nodeIp(d.nodes?.[i])),
     step,
     group: 'Machines',
     label: 'Management address',
@@ -47,6 +48,7 @@ export const machineQuestions: Question[] = [
     id: 'nodes.management.mac_address',
     discovery: true,
     path: 'nodes[].management.mac_address',
+    read: (d, i) => (i === undefined ? undefined : nodeMac(d.nodes?.[i])),
     step,
     group: 'Machines',
     label: 'Management port MAC',
@@ -54,12 +56,13 @@ export const machineQuestions: Question[] = [
     learnUrl: learn.simplified,
     owner: 'datacenter',
     kind: 'mac',
-    requiredWhen: isSimplified,
+    // A planning scope (Trailwright, Surveyor) leaves the MACs to hardware discovery.
+    requiredWhen: (d) => isSimplified(d) && !isPlanningScope(d),
     check: (v, d, i) => {
       if (typeof v !== 'string') return undefined;
       if (!mac.test(v)) return 'AA:BB:CC:DD:EE:FF or AA-BB-CC-DD-EE-FF.';
       const norm = (m: unknown) => (typeof m === 'string' ? m.toUpperCase().replace(/-/g, ':') : undefined);
-      const others = (d.nodes ?? []).filter((_, j) => j !== i).map((n) => norm(n?.management?.mac_address));
+      const others = (d.nodes ?? []).filter((_, j) => j !== i).map((n) => norm(nodeMac(n)));
       return others.includes(norm(v)) ? `${v} is the management MAC of another machine.` : undefined;
     },
   },

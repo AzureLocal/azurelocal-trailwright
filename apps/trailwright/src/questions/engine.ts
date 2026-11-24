@@ -17,7 +17,7 @@ export function ask(q: Question, d: Draft): AskedQuestion[] {
   const applies = q.appliesWhen ? q.appliesWhen(d) : true;
   const fixed = applies && q.fixedWhen ? q.fixedWhen(d) : undefined;
   return expand(q, d).map(({ path, index }) => {
-    const value = getAt(d, path);
+    const value = (q.read ? q.read(d, index) : undefined) ?? getAt(d, path);
     const answered = isAnswered(value);
     const required = applies && !fixed && (q.requiredWhen ? q.requiredWhen(d) : true);
     let problem: string | undefined;

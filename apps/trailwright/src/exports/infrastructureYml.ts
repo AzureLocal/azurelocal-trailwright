@@ -106,14 +106,63 @@ function scenario(p: P): Draft['scenario'] {
   };
 }
 
+// How the management port gets its address before the deployment, from the answer to networking.management.ip_assignment (static, dhcp or
+// preconfigured; dhcp is a DHCP reservation for the port's MAC, which the schema calls dhcp_reservation). Static when not answered.
+const MANAGEMENT_ASSIGNMENT = { static: 'static', dhcp: 'dhcp_reservation', dhcp_reservation: 'dhcp_reservation', preconfigured: 'preconfigured' } as const;
+const managementAssignmentOf = (p: P): (typeof MANAGEMENT_ASSIGNMENT)[keyof typeof MANAGEMENT_ASSIGNMENT] => {
+  const answered = (p.answers as Draft | undefined)?.networking?.management?.ip_assignment as string | undefined;
+  return (answered && MANAGEMENT_ASSIGNMENT[answered as keyof typeof MANAGEMENT_ASSIGNMENT]) || 'static';
+};
+
+type Adapter = NonNullable<NonNullable<Draft['nodes']>[number]['network_adapters']>[number];
+const TRAFFIC = ['management', 'compute', 'storage'] as const;
+
+// The ports of every machine (the design has one card layout for all of them), as nodes[].network_adapters of schema 5.2: the port's name
+// is the name the intents and the storage networks use, its role is what the intent carries, and the management port (the first port of
+// the intent that carries management traffic) owns the management address, which the machine's IP and MAC fill in. The other ports have
+// no host address (ip_assignment none: Network ATC or the storage networks give it). The MAC of the other ports is not known to a design:
+// hardware discovery writes it (the file's scope is trailwright, a planning scope, which does not require it). The port's slot is the
+// label of its card, its index the order on the card, and the make, model, speed and RDMA kind are the card's.
+function adapters(p: P, node: P['hardware']['nodes'][number]): Adapter[] | undefined {
+  const simplified = p.provisioning.osInstall === 'simplified';
+  const trafficOf = new Map(p.networking.intents.map((i) => [i.name, TRAFFIC.filter((t) => i.traffic.includes(t))]));
+  const ports = p.networking.cards.flatMap((card) => card.ports.map((port, k) => ({ card, port, k })).filter((x) => text(x.port.osName)));
+  const intentOf = (role: string): string | undefined => (role.startsWith('intent:') ? role.slice('intent:'.length) : undefined);
+  const carries = (role: string): readonly string[] => trafficOf.get(intentOf(role) ?? '') ?? [];
+  const owner = ports.find((x) => carries(x.port.role).includes('management'));
+  const list = ports.map(({ card, port, k }): Adapter => {
+    const isOwner = port === owner?.port;
+    const roles: NonNullable<Adapter['roles']> = [...(carries(port.role) as NonNullable<Adapter['roles']>)];
+    // The maintenance environment of simplified provisioning reaches Azure through the management port.
+    if (isOwner && simplified) roles.push('provisioning');
+    return {
+      name: text(port.osName),
+      ...(isOwner && text(node.managementMac) ? { mac_address: text(node.managementMac) } : {}),
+      slot: text(card.label),
+      port_index: k + 1,
+      vendor: text(card.make),
+      model: text(card.model),
+      speed_gbps: port.speedGbps,
+      rdma: RDMA[port.rdma],
+      roles: roles.length ? roles : ['unused'],
+      ip_assignment: isOwner ? managementAssignmentOf(p) : 'none',
+      ...(isOwner && text(node.ip) ? { ip_address: text(node.ip) } : {}),
+    };
+  });
+  // The management port first: a question about the machine's address reads it there.
+  return list.sort((a, b) => Number(b.ip_assignment !== 'none') - Number(a.ip_assignment !== 'none'));
+}
+
 function nodes(p: P): Draft['nodes'] {
   const simplified = p.provisioning.osInstall === 'simplified';
   const ownStorageIps = usesS2d(p) && !p.networking.storageAutoIp;
   return p.hardware.nodes.map((n, i) => {
     const storageIps = (n.storageIps ?? []).map(text);
+    const ports = adapters(p, n);
     return {
       name: n.name,
-      management: { ip_address: n.ip, ...(simplified ? { mac_address: n.managementMac } : {}) },
+      // The management address and MAC are on the management port. A design without ports has only the older form, when it has an address.
+      ...(ports?.length ? { network_adapters: ports } : { management: { ip_address: n.ip, ...(simplified ? { mac_address: n.managementMac } : {}) } }),
       serial_number: n.serial,
       ...(simplified ? { bmc: { ip_address: n.bmcIp } } : {}),
       ...(p.hardware.topology === 'rack-aware' ? { zone: zoneNameOf(p, i) } : {}),
@@ -316,7 +365,7 @@ export function buildInfrastructure(p: Project): Draft {
   const cloud = !fileShare && witnessTypeFor(p) === 'Cloud';
   const build = text(p.release.build);
   const doc: Draft = {
-    _metadata: { schema_version: SCHEMA_VERSION, scope: 'full', file_version: '1.0.0', generated_by: 'azurelocal-trailwright' },
+    _metadata: { schema_version: SCHEMA_VERSION, scope: 'trailwright', file_version: '1.0.0', generated_by: 'azurelocal-trailwright' },
     scenario: scenario(p),
     site: { customer: p.project.customer, time_zone: p.provisioning.osInstall === 'simplified' ? p.provisioning.timeZone : undefined, code: p.project.siteCode, name: p.project.siteName, owner: p.project.owner },
     environment: { name: environmentNameOf(p), type: p.project.environmentType === '' ? undefined : p.project.environmentType },
@@ -359,6 +408,8 @@ export function buildInfrastructure(p: Project): Draft {
   };
   // The answers to the questions the screens do not ask fill in what the screens leave out (src/questions/answers.ts).
   const out = known(withAnswers(known(doc) ?? {}, p.answers as Draft)) ?? {};
+  // The management address mode is on the management port now (above): the deprecated site-wide key would repeat it.
+  if (out.networking?.management) delete out.networking.management.ip_assignment;
   const kv = out.cluster?.key_vault;
   if (kv?.name && holdsReferencesOf(out, kv.name)) kv.create_new = false;
   return out;

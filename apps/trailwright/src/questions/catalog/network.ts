@@ -3,11 +3,11 @@
 import type { Draft } from '../../infra/types';
 import { firstHost, freeRun, inSubnet, isCidr, isIpv4, range, toNumber } from '../../infra/ip';
 import type { Question } from '../types';
-import { hasStorageNetwork, isSimplified, isSwitchless, learn, storageAutoIpOff, usesDhcp, usesSan } from '../when';
+import { hasStorageNetwork, isSimplified, isSwitchless, learn, nodeIp, storageAutoIpOff, usesDhcp, usesSan } from '../when';
 
 const step = 'network' as const;
 const mgmt = (d: Draft) => d.networking?.management ?? {};
-const nodeIps = (d: Draft): string[] => (d.nodes ?? []).map((n) => n?.management?.ip_address).filter(isIpv4);
+const nodeIps = (d: Draft): string[] => (d.nodes ?? []).map((n) => nodeIp(n)).filter(isIpv4);
 const reserved = ['10.244.0.0/16', '10.96.0.0/24'];
 const publicDns = ['8.8.8.8', '8.8.4.4', '1.1.1.1', '1.0.0.1', '9.9.9.9', '149.112.112.112', '208.67.222.222', '208.67.220.220'];
 

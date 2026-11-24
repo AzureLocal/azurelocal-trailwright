@@ -103,6 +103,9 @@ export type Question = {
   recommended?: (d: Draft) => Recommendation | undefined;
   // A value Trailwright can fill in from other answers, offered with one click.
   suggest?: (d: Draft, index?: number) => unknown;
+  // Where the answer is when the document may hold it somewhere other than path (a machine's management address is on the document's
+  // management port, nodes[].network_adapters, or in the older nodes[].management). Read first; path is the fallback.
+  read?: (d: Draft, index?: number) => unknown;
   // Extra check on a given value: a message when it's wrong.
   check?: (value: unknown, d: Draft, index?: number) => string | undefined;
 };

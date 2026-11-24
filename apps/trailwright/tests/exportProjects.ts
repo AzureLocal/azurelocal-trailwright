@@ -83,6 +83,21 @@ export const exportProjects: Array<[string, () => Project]> = [
     } as Project['answers'];
     return p;
   }],
+  ['ports on every machine: cards, the management port with its MAC, simplified provisioning, a DHCP reservation', () => {
+    const p = createExampleProject();
+    const port = (osName: string, role: string) => ({ osName, speedGbps: 25, rdma: 'RoCEv2' as const, role });
+    p.networking = {
+      ...p.networking,
+      cards: [
+        { label: 'Integrated NIC', make: 'Mellanox', model: 'ConnectX-6 Lx', ports: [port('pNIC01', 'intent:Management_Compute'), port('pNIC02', 'intent:Management_Compute')] },
+        { label: 'Slot 3 NIC', make: 'Mellanox', model: 'ConnectX-6 Lx', ports: [port('pNIC03', 'intent:Storage'), port('pNIC04', 'intent:Storage')] },
+      ],
+    };
+    p.provisioning = { ...p.provisioning, osInstall: 'simplified', hardwareSku: 'dell-ax-750', timeZone: 'UTC', timeServer: 'time.example.com', siteName: 'iic-site-01', siteResourceGroup: 'rg-iic-azl-01', adminKeyVaultName: 'kv-iic-mgmt-01', osVersion: '12.2611.1004.9', maintenanceIso: 'latest', mediaShareName: 'ztp-virtual-usb', mediaShareHost: '198.51.100.5' };
+    p.hardware = { ...p.hardware, nodes: p.hardware.nodes.map((n, i) => ({ ...n, bmcIp: `198.51.100.${11 + i}`, managementMac: `00:00:5E:00:53:${11 + i}` })) };
+    p.answers = { networking: { management: { ip_assignment: 'dhcp' } } } as Project['answers'];
+    return p;
+  }],
   ['empty design', () => {
     const p = createExampleProject();
     p.hardware = { ...p.hardware, nodes: [] };

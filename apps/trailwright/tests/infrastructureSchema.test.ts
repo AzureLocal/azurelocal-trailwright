@@ -4,6 +4,8 @@ import Ajv2020 from 'ajv/dist/2020';
 import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
 import { buildInfrastructureYml } from '../src/exports';
+import type { Draft } from '../src/infra/types';
+import { askAll } from '../src/questions/engine';
 import { SCHEMA_VERSION } from '../src/infra/types';
 import type { Project } from '../src/model/schema';
 import { exportProjects } from './exportProjects';
@@ -38,7 +40,8 @@ describe(`infrastructure.yml follows the toolkit's schema ${SCHEMA_VERSION}`, ()
     const doc = exported(ad());
     // The version the vendored schema names as current.
     expect(SCHEMA_VERSION).toBe(currentVersionOf(schema));
-    expect(doc._metadata).toEqual({ schema_version: SCHEMA_VERSION, scope: 'full', file_version: '1.0.0', generated_by: 'azurelocal-trailwright' });
+    // A planning scope: the design is complete except for the MACs of the ports, which hardware discovery fills in.
+    expect(doc._metadata).toEqual({ schema_version: SCHEMA_VERSION, scope: 'trailwright', file_version: '1.0.0', generated_by: 'azurelocal-trailwright' });
     expect(SCHEMA_VERSION).toMatch(new RegExp(schema.properties._metadata.properties.schema_version.pattern as string));
   });
 
@@ -236,6 +239,43 @@ describe('where a value of the design goes', () => {
     expect(doc.hardware).toMatchObject({ vendor: 'Dell', model: 'AX-750' });
     expect(doc.sdn).toEqual({ enabled: true, prefix: 'sdn01', dns_records: 'dynamic' });
     expect(doc.networking.logical_networks).toEqual([{ name: 'lnet-compute', vlan_id: 110, address_prefix: '192.0.2.128/25', gateway: '192.0.2.129', dns_servers: ['192.0.2.10'], ip_pool: { start: '192.0.2.140', end: '192.0.2.200' } }]);
+  });
+
+  it('describes the ports of every machine in network_adapters, the management port first, and not the older management key', () => {
+    const doc = exported(sample('ports on every machine'));
+    expect(doc.nodes[0].management).toBeUndefined();
+    expect(doc.nodes[0].network_adapters).toEqual([
+      { name: 'pNIC01', mac_address: '00:00:5E:00:53:11', slot: 'Integrated NIC', port_index: 1, vendor: 'Mellanox', model: 'ConnectX-6 Lx', speed_gbps: 25, rdma: 'roce_v2', roles: ['management', 'compute', 'provisioning'], ip_assignment: 'dhcp_reservation', ip_address: '192.0.2.11' },
+      { name: 'pNIC02', slot: 'Integrated NIC', port_index: 2, vendor: 'Mellanox', model: 'ConnectX-6 Lx', speed_gbps: 25, rdma: 'roce_v2', roles: ['management', 'compute'], ip_assignment: 'none' },
+      { name: 'pNIC03', slot: 'Slot 3 NIC', port_index: 1, vendor: 'Mellanox', model: 'ConnectX-6 Lx', speed_gbps: 25, rdma: 'roce_v2', roles: ['storage'], ip_assignment: 'none' },
+      { name: 'pNIC04', slot: 'Slot 3 NIC', port_index: 2, vendor: 'Mellanox', model: 'ConnectX-6 Lx', speed_gbps: 25, rdma: 'roce_v2', roles: ['storage'], ip_assignment: 'none' },
+    ]);
+    // Every machine has the same ports, with its own address and MAC; the intents name them.
+    expect(doc.nodes[1].network_adapters[0]).toMatchObject({ name: 'pNIC01', mac_address: '00:00:5E:00:53:12', ip_address: '192.0.2.12' });
+    expect(doc.networking.intents.map((i: Doc) => i.adapters)).toEqual([['pNIC01', 'pNIC02'], ['pNIC03', 'pNIC04']]);
+    // The deprecated site-wide key is not written: the management port says how it gets its address.
+    expect(doc.networking.management.ip_assignment).toBeUndefined();
+  });
+
+  it('a machine without an address is an open question, not an invalid file', () => {
+    const p = sample('ports on every machine');
+    p.hardware = { ...p.hardware, nodes: p.hardware.nodes.map((n, i) => ({ ...n, ip: i === 0 ? '' : n.ip })) };
+    const doc = exported(p);
+    expect(problems(doc)).toEqual([]);
+    expect(doc.nodes[0].network_adapters[0].ip_address).toBeUndefined();
+    const missing = askAll(doc as Draft).filter((a) => a.applies && a.required && !a.answered).map((a) => a.path);
+    expect(missing).toContain('nodes.0.management.ip_address');
+    expect(missing).not.toContain('nodes.1.management.ip_address');
+  });
+
+  it('writes the management address mode from the answer, and no MAC where a design cannot know it', () => {
+    for (const [answer, mode] of [['static', 'static'], ['dhcp', 'dhcp_reservation'], ['preconfigured', 'preconfigured'], [undefined, 'static']] as const) {
+      const p = sample('ports on every machine');
+      p.answers = answer ? ({ networking: { management: { ip_assignment: answer } } } as Project['answers']) : {};
+      const ports = exported(p).nodes[0].network_adapters as Doc[];
+      expect(ports.map((a) => a.ip_assignment)).toEqual([mode, 'none', 'none', 'none']);
+      expect(ports.filter((a) => a.mac_address).map((a) => a.name)).toEqual(['pNIC01']);
+    }
   });
 
   it('writes the Network ATC overrides only when the design overrides, as numbers and booleans', () => {

@@ -26,6 +26,15 @@ export const usesDhcp = (d: Draft) => d.networking?.management?.use_dhcp === tru
 // How each machine's management port gets its address before deployment: static (the schema default), dhcp or
 // preconfigured. Not use_dhcp, which is the deployment's ARM useDhcp.
 export const ipAssignment = (d: Draft) => d.networking?.management?.ip_assignment ?? 'static';
+// A planning scope marks a whole design written by a planning tool (Trailwright, Surveyor): complete except for what hardware discovery
+// fills in, the MACs of the ports.
+export const isPlanningScope = (d: Draft) => d._metadata?.scope === 'trailwright' || d._metadata?.scope === 'surveyor';
+// The port of a machine that owns its management address: nodes[].network_adapters with role management and an ip_assignment other than none.
+type NodeOf = NonNullable<Draft['nodes']>[number];
+export const managementPort = (n: NodeOf | undefined) => n?.network_adapters?.find((a) => a?.roles?.includes('management') && a.ip_assignment !== 'none');
+// A machine's management address and management MAC: on its management port (schema 5.2), else in nodes[].management (5.0 and 5.1).
+export const nodeIp = (n: NodeOf | undefined): string | undefined => managementPort(n)?.ip_address ?? n?.management?.ip_address;
+export const nodeMac = (n: NodeOf | undefined): string | undefined => managementPort(n)?.mac_address ?? n?.management?.mac_address;
 // The Arc machine name of node i: arc_machine_name, else the deprecated arc_resource_name, else the host name.
 export const arcMachineName = (d: Draft, i: number): string | undefined => {
   const n = d.nodes?.[i];

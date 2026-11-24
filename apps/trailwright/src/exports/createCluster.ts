@@ -127,26 +127,39 @@ export function sanNetworkList(p: Project): Record<string, unknown> {
   };
 }
 
+// The intents of the template, by the rule of the Azure Local Toolkit (azurelocal-toolkit scripts/common/arm-deployment/AzlArmDeployment.psm1,
+// Get-AzlIntentParameter), so the ARM parameters of Trailwright and of the toolkit's New-AzureLocalArmParameters.ps1 are the same:
+//  - overrideAdapterProperty is always true, as in Microsoft's quickstart parameters file, and the adapter values are sent with it;
+//  - RDMA and jumbo frames belong to the storage traffic: an intent without storage traffic gets RDMA off and the default 1514 packet,
+//    an intent with it RDMA on and 9014, unless the design overrides the adapter properties of the intent;
+//  - overrideVirtualSwitchConfiguration and overrideQosPolicy are true exactly when the design overrides them.
 export function intentList(p: Project): unknown[] {
-  return p.networking.intents.map((i) => ({
-    name: i.name,
-    trafficType: i.traffic.map(cap),
-    adapter: i.adapters,
-    overrideVirtualSwitchConfiguration: i.overrideVSwitch ?? false,
-    virtualSwitchConfigurationOverrides: i.overrideVSwitch ? { enableIov: i.enableIov ?? 'true', loadBalancingAlgorithm: i.loadBalancingAlgorithm ?? 'Dynamic' } : { enableIov: '', loadBalancingAlgorithm: '' },
-    overrideQosPolicy: i.overrideQos ?? false,
-    qosPolicyOverrides: {
-      priorityValue8021Action_Cluster: i.qosClusterPriority ?? '7',
-      priorityValue8021Action_SMB: i.qosSmbPriority ?? '3',
-      bandwidthPercentage_SMB: i.qosSmbBandwidth ?? '50',
-    },
-    overrideAdapterProperty: i.overrideAdapter ?? false,
-    adapterPropertyOverrides: {
-      jumboPacket: i.jumboPacket ?? '9014',
-      networkDirect: i.networkDirect ?? 'Enabled',
-      networkDirectTechnology: i.networkDirect === 'Disabled' || i.networkDirectTechnology === 'Auto' ? '' : (i.networkDirectTechnology ?? 'RoCEv2'),
-    },
-  }));
+  return p.networking.intents.map((i) => {
+    const hasStorage = i.traffic.includes('storage');
+    const adapter = i.overrideAdapter ?? false;
+    const direct = adapter ? (i.networkDirect === 'Enabled' ? 'Enabled' : 'Disabled') : hasStorage ? 'Enabled' : 'Disabled';
+    const jumbo = adapter && i.jumboPacket ? i.jumboPacket : hasStorage ? '9014' : '1514';
+    return {
+      name: i.name,
+      trafficType: i.traffic.map(cap),
+      adapter: i.adapters,
+      overrideVirtualSwitchConfiguration: i.overrideVSwitch ?? false,
+      virtualSwitchConfigurationOverrides: i.overrideVSwitch ? { enableIov: i.enableIov ?? 'true', loadBalancingAlgorithm: i.loadBalancingAlgorithm ?? 'Dynamic' } : { enableIov: '', loadBalancingAlgorithm: '' },
+      overrideQosPolicy: i.overrideQos ?? false,
+      qosPolicyOverrides: {
+        priorityValue8021Action_Cluster: i.qosClusterPriority ?? '7',
+        priorityValue8021Action_SMB: i.qosSmbPriority ?? '3',
+        bandwidthPercentage_SMB: i.qosSmbBandwidth ?? '50',
+      },
+      overrideAdapterProperty: true,
+      adapterPropertyOverrides: {
+        jumboPacket: jumbo,
+        networkDirect: direct,
+        // The technology is sent only with RDMA on: the design's choice, else RoCEv2 (the toolkit's default, as Microsoft's quickstart).
+        networkDirectTechnology: direct === 'Enabled' ? (adapter && i.networkDirectTechnology && i.networkDirectTechnology !== 'Auto' ? i.networkDirectTechnology : 'RoCEv2') : '',
+      },
+    };
+  });
 }
 
 export function buildCreateClusterParams(p: Project, mode: 'Validate' | 'Deploy' = 'Validate'): Params {

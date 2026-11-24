@@ -11,6 +11,8 @@ const checkIp = (v: unknown) => (typeof v === 'string' && !ipv4.test(v) ? 'An IP
 // The Solution Builder Extension questions: all apply unless the requirement is declared not applicable.
 const sbeNotApplicable = (d: Draft) => d.hardware?.sbe?.requirement === 'not_applicable';
 const sbeApplies = (d: Draft) => !sbeNotApplicable(d);
+// hardware.sbe.version is asked (it is, for every design with an SBE): so are the family and the publisher that go with it.
+const sbeVersionAsked = sbeApplies;
 
 export const machineQuestions: Question[] = [
   {
@@ -135,6 +137,7 @@ export const machineQuestions: Question[] = [
   // What simplified provisioning needs from the hardware.
   { id: 'hardware.bmc.username', path: 'hardware.bmc.username', step, group: 'BMC login', label: 'BMC user name', help: 'The user name, or a keyvault:// reference to the secret holding it. Used for every machine.', owner: 'datacenter', kind: 'text', appliesWhen: isSimplified },
   { id: 'hardware.bmc.password', path: 'hardware.bmc.password', step, group: 'BMC login', label: 'BMC password secret', help: 'keyvault://<vault>/<secret>. Never the password itself.', owner: 'datacenter', kind: 'kvref', appliesWhen: isSimplified },
+  { id: 'hardware.bmc.verify_certificate', path: 'hardware.bmc.verify_certificate', step, group: 'BMC login', label: 'Check the BMCs’ TLS certificates', help: 'Off by default: BMCs ship a self-signed certificate, which the provisioning run accepts. Turn it on once the BMCs carry a certificate that the management host trusts.', owner: 'security', kind: 'boolean', appliesWhen: isSimplified, requiredWhen: () => false },
   // The OEM Solution Builder Extension (SBE) package is a requirement: you need it to update the cluster, and the automation reads it
   // from a share and checks it before the cluster is created. Key names are the toolkit master registry's hardware.sbe.*.
   // Installing it during the build (delivery) is optional and off. Vendor downloads differ and are not checked here; Dell AX and MC need a
@@ -264,4 +267,9 @@ export const machineQuestions: Question[] = [
   },
   { id: 'hardware.sbe.bundle_path', path: 'hardware.sbe.bundle_path', step, group: 'OEM extension (SBE)', label: 'SBE folder', help: 'Optional. Folder on the management host with the OEM’s Solution Builder Extension files as downloaded, used to prepare the machines before Validate. It means the same as the package location above, which is the one read when both are set. Without an SBE the machines keep the OEM drivers the OS already has.', owner: 'datacenter', kind: 'text', appliesWhen: isSimplified },
   { id: 'hardware.sbe.version', path: 'hardware.sbe.version', step, group: 'OEM extension (SBE)', label: 'SBE version', help: 'The OEM’s SBE version validated with the OS version you pin.', owner: 'datacenter', kind: 'text', requiredWhen: () => false },
+  // The identity of the package, asked whenever its version is: the deployment sends the family and the publisher with it.
+  { id: 'hardware.sbe.family', path: 'hardware.sbe.family', step, group: 'OEM extension (SBE)', label: 'SBE family', help: 'The SBE family of the hardware, for example 16G-45n0c-Intel. Read from the package manifest when the package folder is given.', owner: 'datacenter', kind: 'text', appliesWhen: sbeVersionAsked, requiredWhen: () => false },
+  { id: 'hardware.sbe.publisher', path: 'hardware.sbe.publisher', step, group: 'OEM extension (SBE)', label: 'SBE publisher', help: 'The publisher of the SBE, for example Dell.', owner: 'datacenter', kind: 'text', appliesWhen: sbeVersionAsked, requiredWhen: () => false, suggest: (d) => d.hardware?.vendor || undefined },
+  { id: 'hardware.sbe.manifest_source', path: 'hardware.sbe.manifest_source', step, group: 'OEM extension (SBE)', label: 'SBE manifest location', help: 'A URL or a file path of the SBE manifest.', owner: 'datacenter', kind: 'text', appliesWhen: sbeVersionAsked, requiredWhen: () => false },
+  { id: 'hardware.sbe.manifest_creation_date', path: 'hardware.sbe.manifest_creation_date', step, group: 'OEM extension (SBE)', label: 'SBE manifest creation date', help: 'As the manifest states it.', owner: 'datacenter', kind: 'text', appliesWhen: sbeVersionAsked, requiredWhen: () => false },
 ];

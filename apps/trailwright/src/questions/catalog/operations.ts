@@ -1,6 +1,20 @@
 // Operations, network devices, and the two optional parts: the Azure foundation and CI/CD.
+import { isCidr } from '../../infra/ip';
 import type { Question } from '../types';
 import { backupOn, drOn, learn, monitoringOn, wantsDevops, wantsLandingZone } from '../when';
+
+// Every virtual network needs at least one address range (landing_zone.networks[].address_space, in CIDR form).
+const checkNetworks = (v: unknown): string | undefined => {
+  if (!Array.isArray(v)) return undefined;
+  for (const [i, row] of (v as Record<string, unknown>[]).entries()) {
+    const name = typeof row?.name === 'string' && row.name.trim() ? row.name.trim() : `Network ${i + 1}`;
+    const space = Array.isArray(row?.address_space) ? (row.address_space as unknown[]) : [];
+    if (space.length === 0) return `${name} needs at least one address range, for example 10.0.0.0/16.`;
+    const bad = space.find((c) => !isCidr(c));
+    if (bad !== undefined) return `${name}: "${String(bad)}" is not an address range in CIDR form, for example 10.0.0.0/16.`;
+  }
+  return undefined;
+};
 
 export const operationsQuestions: Question[] = [
   { id: 'sdn.enabled', path: 'sdn.enabled', step: 'operations', group: 'Software defined networking', label: 'Enable SDN enabled by Azure Arc?', help: 'Logical networks and network security groups for Azure Local VMs, managed from Azure.', learnUrl: learn.decision11, owner: 'network', kind: 'boolean', requiredWhen: () => false },
@@ -40,7 +54,7 @@ export const operationsQuestions: Question[] = [
   // Optional: the Azure foundation (Part 2 of the implementation steps).
   { id: 'landing_zone.subscriptions', path: 'landing_zone.subscriptions', step: 'landing-zone', group: 'Subscriptions', label: 'Subscriptions by role', owner: 'azure', kind: 'table', appliesWhen: wantsLandingZone, requiredWhen: () => false, columns: [{ key: 'name', label: 'Name', kind: 'text', required: true }, { key: 'id', label: 'Subscription ID', kind: 'guid' }, { key: 'role', label: 'Role', kind: 'select', required: true, options: ['connectivity', 'identity', 'management', 'security', 'devops', 'workload', 'azure_local'].map((v) => ({ value: v, label: v.replace('_', ' ') })) }] },
   { id: 'landing_zone.resource_groups', path: 'landing_zone.resource_groups', step: 'landing-zone', group: 'Resource groups', label: 'Resource groups', owner: 'azure', kind: 'table', appliesWhen: wantsLandingZone, requiredWhen: () => false, columns: [{ key: 'name', label: 'Name', kind: 'text', required: true }, { key: 'subscription', label: 'Subscription', kind: 'text' }, { key: 'location', label: 'Region', kind: 'text' }, { key: 'purpose', label: 'Purpose', kind: 'text' }] },
-  { id: 'landing_zone.networks', path: 'landing_zone.networks', step: 'landing-zone', group: 'Networks', label: 'Azure virtual networks', owner: 'network', kind: 'table', appliesWhen: wantsLandingZone, requiredWhen: () => false, columns: [{ key: 'name', label: 'Name', kind: 'text', required: true }, { key: 'role', label: 'Role', kind: 'select', options: [{ value: 'hub', label: 'Hub' }, { value: 'spoke', label: 'Spoke' }] }, { key: 'resource_group', label: 'Resource group', kind: 'text' }] },
+  { id: 'landing_zone.networks', path: 'landing_zone.networks', step: 'landing-zone', group: 'Networks', label: 'Azure virtual networks', owner: 'network', kind: 'table', appliesWhen: wantsLandingZone, requiredWhen: () => false, check: checkNetworks, columns: [{ key: 'name', label: 'Name', kind: 'text', required: true }, { key: 'address_space', label: 'Address space (CIDR, comma separated)', kind: 'list', required: true, placeholder: '10.0.0.0/16' }, { key: 'role', label: 'Role', kind: 'select', options: [{ value: 'hub', label: 'Hub' }, { value: 'spoke', label: 'Spoke' }] }, { key: 'resource_group', label: 'Resource group', kind: 'text' }] },
   { id: 'landing_zone.virtual_machines', path: 'landing_zone.virtual_machines', step: 'landing-zone', group: 'Management VMs', label: 'Domain controllers, jump box, WAC, syslog', owner: 'azure', kind: 'table', appliesWhen: wantsLandingZone, requiredWhen: () => false, columns: [{ key: 'name', label: 'Name', kind: 'text', required: true }, { key: 'role', label: 'Role', kind: 'select', required: true, options: ['domain_controller', 'jumpbox', 'windows_admin_center', 'syslog', 'management', 'other'].map((v) => ({ value: v, label: v.replace(/_/g, ' ') })) }, { key: 'private_ip', label: 'Address', kind: 'ipv4' }, { key: 'size', label: 'Size', kind: 'text' }] },
   { id: 'landing_zone.log_analytics.name', path: 'landing_zone.log_analytics.name', step: 'landing-zone', group: 'Log Analytics', label: 'Log Analytics workspace', owner: 'operations', kind: 'text', appliesWhen: wantsLandingZone, requiredWhen: () => false },
 

@@ -111,13 +111,20 @@ export const StorageScreen: FC = () => {
                   options={[...allowedResiliency(nodeCount), ...(project.hardware.topology === 'rack-aware' ? (['four-way'] as const) : [])].map((r) => ({ value: r, label: resiliencyLabels[r] }))}
                   onChange={(v) => updateVolume(index, { resiliency: v as Volume['resiliency'] })}
                 />
+                <SelectInput
+                  id={`volume-${index}-provisioning`}
+                  label={`Volume ${index + 1} provisioning`}
+                  value={volume.provisioning ?? ''}
+                  options={[{ value: '', label: 'Not set' }, { value: 'thin', label: 'Thin' }, { value: 'fixed', label: 'Fixed' }]}
+                  onChange={(v) => updateVolume(index, { provisioning: v === 'thin' || v === 'fixed' ? v : undefined })}
+                />
                 <button type="button" onClick={() => save({ volumes: volumes.filter((_, i) => i !== index) })} className={removeClass}>
                   Remove volume {index + 1}
                 </button>
               </li>
             ))}
           </ul>
-          <button type="button" onClick={() => save({ volumes: [...volumes, { name: `volume${volumes.length + 1}`, sizeGiB: 1024, resiliency: 'two-way' }] })} className={addClass}>
+          <button type="button" onClick={() => save({ volumes: [...volumes, { name: `volume${volumes.length + 1}`, sizeGiB: 1024, resiliency: project.storage.defaultResiliency ?? 'two-way' }] })} className={addClass}>
             Add volume
           </button>
         </div>

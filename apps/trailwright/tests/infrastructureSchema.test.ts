@@ -17,6 +17,9 @@ const schemaFile = resolve(__dirname, '..', 'src', 'infra', 'infrastructure.sche
 const schema = JSON.parse(readFileSync(schemaFile, 'utf8')) as Record<string, any>;
 const validate = new Ajv2020({ allErrors: true, strict: false }).compile(schema);
 
+// The version a schema names as current in the history of _metadata.schema_version ("The current version is 5.6.31.").
+const currentVersionOf = (s: Record<string, any>): string | undefined => /The current version is (\d+\.\d+\.\d+)\./.exec(s.properties._metadata.properties.schema_version.description as string)?.[1];
+
 type Doc = Record<string, any>;
 const exported = (p: Project): Doc => parse(buildInfrastructureYml(p)) as Doc;
 // What the schema reports, without the 'if' lines that only repeat the failing rule under them.
@@ -33,9 +36,26 @@ describe(`infrastructure.yml follows the toolkit's schema ${SCHEMA_VERSION}`, ()
 
   it('writes the version of the vendored schema, for the whole instance', () => {
     const doc = exported(ad());
-    expect(SCHEMA_VERSION).toBe('5.6.28');
+    // The version the vendored schema names as current.
+    expect(SCHEMA_VERSION).toBe(currentVersionOf(schema));
     expect(doc._metadata).toEqual({ schema_version: SCHEMA_VERSION, scope: 'full', file_version: '1.0.0', generated_by: 'azurelocal-trailwright' });
     expect(SCHEMA_VERSION).toMatch(new RegExp(schema.properties._metadata.properties.schema_version.pattern as string));
+  });
+
+  // The toolkit (config/variables) generates the schema. With AZL_TOOLKIT_ROOT set (CI checks the toolkit out next to this
+  // repository) the vendored copies must be the toolkit's: the same content (line endings aside) and the same version.
+  // npm run schema:sync copies the toolkit's files here and regenerates the types.
+  const toolkitRoot = process.env.AZL_TOOLKIT_ROOT;
+  const lf = (file: string): string => readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+  const toolkitFile = (...parts: string[]): string => resolve(toolkitRoot ?? '', 'config', 'variables', 'schema', ...parts);
+  it.skipIf(!toolkitRoot)("the vendored schema is the toolkit's, in content and in version", () => {
+    expect(lf(schemaFile)).toBe(lf(toolkitFile('infrastructure.schema.json')));
+    expect(lf(resolve(__dirname, '..', 'public', 'schema', 'infrastructure.schema.json'))).toBe(lf(toolkitFile('infrastructure.schema.json')));
+    expect(SCHEMA_VERSION).toBe(currentVersionOf(JSON.parse(readFileSync(toolkitFile('infrastructure.schema.json'), 'utf8'))));
+  });
+
+  it.skipIf(!toolkitRoot)("the vendored part of the schema that Trailwright writes is the toolkit's", () => {
+    expect(lf(resolve(__dirname, '..', 'src', 'infra', 'trailwright.schema.json'))).toBe(lf(toolkitFile('tools', 'trailwright.schema.json')));
   });
 
   it('publishes the same schema as the one it is tested against', () => {
@@ -185,7 +205,7 @@ describe('where a value of the design goes', () => {
     expect(doc.identity.active_directory.lcm_user).toEqual({ username: 'lcmuser01', password: 'keyvault://kv-example/lcm-password' });
     expect(doc.hardware.sbe.source_password).toBe('keyvault://kv-example/sbe-share-reader');
     expect(doc.key_vaults).toEqual([{ name: 'kv-example', subscription_id: '00000000-0000-0000-0000-000000000000', resource_group: 'rg-example-azl-001', purpose: 'deployment' }]);
-    expect(doc.cluster.key_vault).toEqual({ name: 'kv-example', create_new: true, soft_delete_retention_days: 30 });
+    expect(doc.cluster.key_vault).toEqual({ name: 'kv-example', create_new: false, soft_delete_retention_days: 30 });
     const noVault = ad();
     noVault.landingZone = { ...noVault.landingZone, keyVaultName: '' };
     noVault.identity = { ...noVault.identity, keyVaultName: '' };

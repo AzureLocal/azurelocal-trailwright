@@ -62,6 +62,7 @@ export const clusterQuestions: Question[] = [
       { value: 'deploy', label: 'Deploy' },
     ],
   },
+  { id: 'deployment.events_directory', path: 'deployment.events_directory', step: 'cluster', group: 'Instance', label: 'Folder for the run event feeds', help: 'Where the toolkit runs write their event feeds and Azure Local Sonar reads them. Leave empty for the default folder under ProgramData. Keep it outside any git working tree.', owner: 'operations', kind: 'text', requiredWhen: () => false, placeholder: '%ProgramData%/AzureLocalToolkit/events' },
 
   // Outbound
   { id: 'networking.outbound.proxy.url', path: 'networking.outbound.proxy.url', step: 'outbound', group: 'Proxy', label: 'Proxy URL', placeholder: 'http://proxy.example.com:8080', learnUrl: learn.decision10, owner: 'network', kind: 'text', appliesWhen: usesProxy, check: (v) => (typeof v === 'string' && !/^https?:\/\//.test(v) ? 'http:// or https:// and the port.' : undefined) },
@@ -107,7 +108,6 @@ export const clusterQuestions: Question[] = [
   { id: 'provisioning.simplified.media_share.name', path: 'provisioning.simplified.media_share.name', step: 'provisioning', group: 'Simplified provisioning (ZTP)', label: 'SMB share for the provisioning images', help: 'On the management host. The BMCs mount the images from it.', owner: 'datacenter', kind: 'text', appliesWhen: isSimplified, recommended: () => ({ value: 'ztp-virtual-usb', reason: 'The name azurelocal-ztp uses.' }) },
   { id: 'provisioning.simplified.media_share.host', path: 'provisioning.simplified.media_share.host', step: 'provisioning', group: 'Simplified provisioning (ZTP)', label: 'Management host address, as the BMCs reach it', help: 'Or name the adapter below when the address changes, as on a VPN.', owner: 'network', kind: 'ipv4', appliesWhen: isSimplified, requiredWhen: (d) => !d.provisioning?.simplified?.media_share?.host_adapter },
   { id: 'provisioning.simplified.media_share.host_adapter', path: 'provisioning.simplified.media_share.host_adapter', step: 'provisioning', group: 'Simplified provisioning (ZTP)', label: 'Or: the adapter whose address the BMCs reach', owner: 'network', kind: 'text', appliesWhen: isSimplified, requiredWhen: () => false },
-  { id: 'hardware.sbe.allow_unvalidated', path: 'hardware.sbe.allow_unvalidated', step: 'provisioning', group: 'Simplified provisioning (ZTP)', label: 'Allow an SBE the OEM hasn’t validated with this version (test only)', owner: 'architect', kind: 'boolean', appliesWhen: isSimplified, requiredWhen: () => false },
 
   // Security
   {

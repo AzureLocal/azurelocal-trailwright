@@ -167,6 +167,37 @@ describe('values taken from the design', () => {
   });
 });
 
+describe('the intents follow the toolkit rule (AzlArmDeployment.psm1)', () => {
+  type Intent = { name: string; overrideAdapterProperty: boolean; overrideQosPolicy: boolean; overrideVirtualSwitchConfiguration: boolean; adapterPropertyOverrides: { jumboPacket: string; networkDirect: string; networkDirectTechnology: string } };
+  const intents = (p: Project) => buildCreateClusterParams(p).intentList as Intent[];
+
+  it('sends the adapter values of every intent, with RDMA and jumbo frames only on storage traffic', () => {
+    const p = createExampleProject();
+    p.networking.intents = [
+      makeIntent({ name: 'Management_Compute', traffic: ['management', 'compute'], adapters: ['a', 'b'] }),
+      makeIntent({ name: 'Storage', traffic: ['storage'], adapters: ['c', 'd'] }),
+      makeIntent({ name: 'All', traffic: ['management', 'compute', 'storage'], adapters: ['e', 'f'] }),
+    ];
+    const [mgmt, storage, all] = intents(p);
+    for (const i of [mgmt, storage, all]) expect(i.overrideAdapterProperty).toBe(true);
+    expect(mgmt.adapterPropertyOverrides).toEqual({ jumboPacket: '1514', networkDirect: 'Disabled', networkDirectTechnology: '' });
+    expect(storage.adapterPropertyOverrides).toEqual({ jumboPacket: '9014', networkDirect: 'Enabled', networkDirectTechnology: 'RoCEv2' });
+    expect(all.adapterPropertyOverrides).toEqual({ jumboPacket: '9014', networkDirect: 'Enabled', networkDirectTechnology: 'RoCEv2' });
+    expect([mgmt, storage, all].map((i) => [i.overrideQosPolicy, i.overrideVirtualSwitchConfiguration])).toEqual([[false, false], [false, false], [false, false]]);
+  });
+
+  it('the design override wins, with the technology only when RDMA is on', () => {
+    const p = createExampleProject();
+    p.networking.intents = [
+      makeIntent({ name: 'Storage', traffic: ['storage'], adapters: ['a', 'b'], overrideAdapter: true, jumboPacket: '4088', networkDirect: 'Enabled', networkDirectTechnology: 'iWARP' }),
+      makeIntent({ name: 'Other', traffic: ['management', 'compute'], adapters: ['c', 'd'], overrideAdapter: true, jumboPacket: '9014', networkDirect: 'Enabled', networkDirectTechnology: 'Auto' }),
+    ];
+    const [storage, other] = intents(p);
+    expect(storage.adapterPropertyOverrides).toEqual({ jumboPacket: '4088', networkDirect: 'Enabled', networkDirectTechnology: 'iWARP' });
+    expect(other.adapterPropertyOverrides).toEqual({ jumboPacket: '9014', networkDirect: 'Enabled', networkDirectTechnology: 'RoCEv2' });
+  });
+});
+
 describe('switchless storage addresses (three and four nodes)', () => {
   it('gives each node one address per link, with the two ends of a link in one subnet', () => {
     const lists = switchlessStorageIps(['Node1', 'Node2', 'Node3'], 1, ['10.0.1.0/24', '10.0.2.0/24', '10.0.3.0/24']);

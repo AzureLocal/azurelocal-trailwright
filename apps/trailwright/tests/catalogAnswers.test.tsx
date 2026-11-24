@@ -46,7 +46,8 @@ describe('the questions the screens do not ask', () => {
   });
 
   it.each(exportProjects)('are never written by the screens (%s), so nothing is asked twice', (_label, make) => {
-    const doc = buildInfrastructure(make());
+    // Without the answers: a design may carry them (the Azure foundation sample), and those are the questions' own values.
+    const doc = buildInfrastructure({ ...make(), answers: {} });
     for (const q of extraQuestions) for (const path of concrete(q.path, doc)) expect(getAt(doc, path), `${q.id} at ${path}`).toBeUndefined();
   });
 });

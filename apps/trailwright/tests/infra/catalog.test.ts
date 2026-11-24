@@ -262,6 +262,15 @@ describe('the toolkit examples come through Trailwright', () => {
     expect(problems).toEqual([]);
   });
 
+  it('asks for the address space of every Azure virtual network, in CIDR form', () => {
+    const problemOf = (networks: unknown) => askAll({ landing_zone: { networks } } as Draft).find((a) => a.path === 'landing_zone.networks')?.problem;
+    expect(problemOf([{ name: 'vnet-hub', role: 'hub' }])).toBe('vnet-hub needs at least one address range, for example 10.0.0.0/16.');
+    expect(problemOf([{ name: 'vnet-hub', address_space: ['10.0.0.0/33'] }])).toContain('is not an address range in CIDR form');
+    expect(problemOf([{ name: 'vnet-hub', address_space: ['10.0.0.0/16'] }, { name: 'vnet-spoke', address_space: ['10.1.0.0/16', '10.2.0.0/24'] }])).toBeUndefined();
+    const column = catalog.find((q) => q.id === 'landing_zone.networks')!.columns!.find((c) => c.key === 'address_space')!;
+    expect(column).toMatchObject({ kind: 'list', required: true });
+  });
+
   it('pruning a SAN design drops S2D answers and keeps the SAN', () => {
     const doc = load('infrastructure.example.yml');
     const san = prune({ ...doc, scenario: { ...doc.scenario, storage_architecture: 'san' }, storage: { ...doc.storage, san: { type: 'iscsi' } } });

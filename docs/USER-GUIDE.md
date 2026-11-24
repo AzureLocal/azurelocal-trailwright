@@ -49,7 +49,7 @@ A finding names the field it concerns, gives a message, and links to the Microso
 On the Project step or the Review step, choose a file:
 
 - **Trailwright project JSON:** Trailwright asks before replacing the current design.
-- **Surveyor sizing handoff:** the file Surveyor's **Sizing handoff for Trailwright** (Reports) downloads. Trailwright takes the machines, single rack or rack aware, cores and memory per machine, the drive layout and the volumes, and puts the sizing results in the notes.
+- **Surveyor sizing handoff:** the file Surveyor's **Sizing handoff for Trailwright** (Reports) downloads. Trailwright takes the machines, single rack or rack aware, cores and memory per machine, the drive layout and the volumes (with thin or fixed provisioning, `provisioning_type` of handoff 1.1 or `provisioning` of 1.0), and puts the sizing results in the notes: the hyperthreading setting, the default resiliency (a volume you add afterwards starts with it) and the infrastructure volume Surveyor reserved. A plan has 1 to 16 machines. Imported into a design that already has data, the sizing is merged by machine position: each machine keeps its name, address, serial number, BMC, MAC, zone and storage addresses, machines beyond the plan's count are removed, and the preview lists the drive layout, each volume and the identity a machine would lose.
 - **Surveyor project or plan JSON:** both Surveyor formats are accepted. Trailwright maps the nodes, volumes, plan name, drive layout and notes, and shows a preview of conflicts with the current design. Nothing changes until you choose **Apply import**.
 
 A file that is neither format is refused, and Trailwright gives the reason.
@@ -62,7 +62,7 @@ Each export has its own button on the Review step.
 |---|---|
 | Design handoff (Markdown, PDF) | Every answer and the deployment commands, for the people who build the cluster. |
 | infrastructure.yml | The file the Azure Local Toolkit and azurelocal-ztp read, in the toolkit's schema 5 layout. It holds only what the design knows; see [INFRASTRUCTURE-YML.md](INFRASTRUCTURE-YML.md) for where each value goes and what you add by hand. |
-| Environment file (deploy automation) | The cluster facts of the deploy automation's `environment.yml`. What a design cannot know is `CHANGE-ME` with a TODO comment. See [ENVIRONMENT-FILE.md](ENVIRONMENT-FILE.md). |
+| Environment file (deploy automation), deprecated | The cluster facts of the deploy automation's `environment.yml`. Retired in favour of `infrastructure.yml`: it stays for one release and is then removed. What a design cannot know is `CHANGE-ME` with a TODO comment. See [ENVIRONMENT-FILE.md](ENVIRONMENT-FILE.md). |
 | Terraform variables | `terraform.tfvars.json` for the deploy automation's cluster-deploy Terraform root (local identity with a cloud witness). |
 | ARM parameters, validate | Parameter file for Microsoft's template with `deploymentMode` set to `Validate`. |
 | ARM parameters, deploy | The same file with `deploymentMode` set to `Deploy`. |

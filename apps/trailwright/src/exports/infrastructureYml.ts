@@ -243,7 +243,7 @@ function identity(p: P, vault: string): Draft['identity'] {
 function storage(p: P): Draft['storage'] {
   const st = p.storage;
   return {
-    ...(usesS2d(p) ? { configuration_mode: CONFIGURATION_MODE[st.configurationMode], volumes: st.volumes.filter((v) => text(v.name)).map((v) => ({ name: v.name, size_gib: v.sizeGiB, resiliency: RESILIENCY[v.resiliency] })) } : {}),
+    ...(usesS2d(p) ? { configuration_mode: CONFIGURATION_MODE[st.configurationMode], volumes: st.volumes.filter((v) => text(v.name)).map((v) => ({ name: v.name, size_gib: v.sizeGiB, resiliency: RESILIENCY[v.resiliency], provisioning_type: v.provisioning })) } : {}),
     ...(usesSan(p)
       ? { san: { type: SAN_TYPE[p.deployment.sanType], infra_volume_lun_id: st.infraVolLunId, performance_history_lun_id: st.infraPerfLunId, luns: st.sanLuns.filter((l) => text(l.name)).map((l) => ({ name: l.name, size_gib: l.sizeGiB })) } }
       : {}),
@@ -321,12 +321,14 @@ export function buildInfrastructure(p: Project): Draft {
     site: { customer: p.project.customer, time_zone: p.provisioning.osInstall === 'simplified' ? p.provisioning.timeZone : undefined, code: p.project.siteCode, name: p.project.siteName, owner: p.project.owner },
     environment: { name: environmentNameOf(p), type: p.project.environmentType === '' ? undefined : p.project.environmentType },
     azure: { tenant_id: lz.tenantId, location: lz.region, subscription_id: lz.subscriptionId, resource_group: lz.resourceGroup, hci_resource_provider_object_id: lz.hciResourceProviderObjectId, custom_location: lz.customLocation },
-    // The vault the references in this file name. The deployment creates it in the resource group of the instance.
+    // The vault the references in this file name: it holds the secrets that are read before the deployment, so it exists first (see create_new of cluster.key_vault below).
     ...(vault && text(lz.subscriptionId) && text(lz.resourceGroup) ? { key_vaults: [{ name: vault, subscription_id: text(lz.subscriptionId), resource_group: text(lz.resourceGroup), purpose: 'deployment' }] } : {}),
     cluster: {
       name: clusterNameOf(p),
       naming_prefix: lz.namingPrefix,
       witness: fileShare ? { type: 'file_share', path: p.hardware.witnessPath } : cloud ? { type: 'cloud', storage_account: lz.witnessStorageAccount } : { type: 'none' },
+      // The cluster deployment creates the vault only when no secret is read from it before the deployment. A vault that holds the secrets
+      // the references of this file name already exists, so create_new is then false (below), and the deployment uses it.
       key_vault: vault ? { name: vault, create_new: true, soft_delete_retention_days: lz.keyVaultRetentionDays } : undefined,
       ...(text(lz.diagnosticStorageAccountName) ? { diagnostics: { storage_account: text(lz.diagnosticStorageAccountName), logs_retention_days: lz.logsRetentionDays, storage_account_type: 'Standard_LRS' } } : {}),
     },
@@ -356,7 +358,18 @@ export function buildInfrastructure(p: Project): Draft {
     ...(text(lz.subscriptionName) ? { landing_zone: { subscriptions: [{ name: text(lz.subscriptionName), id: lz.subscriptionId, role: 'azure_local' as const }] } } : {}),
   };
   // The answers to the questions the screens do not ask fill in what the screens leave out (src/questions/answers.ts).
-  return known(withAnswers(known(doc) ?? {}, p.answers as Draft)) ?? {};
+  const out = known(withAnswers(known(doc) ?? {}, p.answers as Draft)) ?? {};
+  const kv = out.cluster?.key_vault;
+  if (kv?.name && holdsReferencesOf(out, kv.name)) kv.create_new = false;
+  return out;
+}
+
+// Whether a keyvault://<vault>/<secret> reference to the vault is written anywhere in the document: those secrets are read before the
+// deployment, so the vault exists and the cluster deployment must use it instead of creating one of the same name.
+function holdsReferencesOf(doc: unknown, vault: string): boolean {
+  const prefix = `keyvault://${vault.toLowerCase()}/`;
+  const walk = (v: unknown): boolean => (typeof v === 'string' ? v.toLowerCase().startsWith(prefix) : Array.isArray(v) ? v.some(walk) : v && typeof v === 'object' ? Object.values(v).some(walk) : false);
+  return walk(doc);
 }
 
 export function buildInfrastructureYml(p: Project): string {

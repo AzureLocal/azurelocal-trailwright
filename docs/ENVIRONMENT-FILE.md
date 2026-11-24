@@ -1,5 +1,7 @@
 # Environment file and Terraform variables (deploy automation)
 
+> **Deprecated.** The environment file (`environment/azure-local/environment.yml`) is retired: `infrastructure.yml` (the Azure Local Toolkit's schema 5, see [INFRASTRUCTURE-YML.md](INFRASTRUCTURE-YML.md)) is the one file every tool of the chain reads, from planning to day 2. The environment file export stays for **one release** so a pipeline can move over, carries a deprecation notice in its header, and is removed in the next release. Use the **infrastructure.yml** export instead. The Terraform variables export is unchanged.
+
 Azure Local deploy automation reads an environment file (`environment/azure-local/environment.yml`) that is checked by a JSON Schema which **rejects unknown keys**. A Trailwright `infrastructure.yml` is a design record in a different shape and is refused by that schema. Two exports bridge the gap:
 
 | Export | File | Use |

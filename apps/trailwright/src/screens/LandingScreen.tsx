@@ -26,7 +26,7 @@ export const docLinks: { href: string; title: string; text: string }[] = [
   { href: `${DOCS_URL}/RULES.md`, title: 'Validation rules', text: 'Every rule, its severity and its Microsoft Learn source. Generated from the code.' },
   { href: `${DOCS_URL}/USER-GUIDE.md#exporting`, title: 'Exports', text: 'What each export contains and who uses it.' },
   { href: `${DOCS_URL}/INFRASTRUCTURE-YML.md`, title: 'infrastructure.yml field reference', text: 'Every section and field, and where in the design it comes from.' },
-  { href: `${DOCS_URL}/ENVIRONMENT-FILE.md`, title: 'Environment file and Terraform variables', text: 'How the design maps to the deploy automation files.' },
+  { href: `${DOCS_URL}/ENVIRONMENT-FILE.md`, title: 'Environment file and Terraform variables (deprecated)', text: 'The environment file is retired in favour of infrastructure.yml; how the design maps to the old deploy automation files.' },
   { href: `${DOCS_URL}/AS-BUILT.md`, title: 'As-built compare', text: 'The snapshot format and how drift is reported.' },
 ];
 

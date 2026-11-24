@@ -67,6 +67,22 @@ export const exportProjects: Array<[string, () => Project]> = [
     p.hardware = { ...p.hardware, sbe: { requirement: 'required', notApplicableReason: '', sourcePath: '\\\\files.example.invalid\\sbe\\vendor', sourceUsername: 'EXAMPLE\\svc-sbe-read', sourcePasswordSecret: 'sbe-share-reader', delivery: 'winrm_copy' } };
     return p;
   }],
+  ['Azure foundation: subscriptions, networks with their address space, management VMs', () => {
+    const p = ad();
+    p.answers = {
+      landing_zone: {
+        subscriptions: [{ name: 'sub-example-connectivity', role: 'connectivity' }, { name: 'sub-example-azurelocal', role: 'azure_local' }],
+        resource_groups: [{ name: 'rg-example-network', subscription: 'sub-example-connectivity', location: 'eastus', purpose: 'Hub network' }],
+        networks: [
+          { name: 'vnet-example-hub', role: 'hub', resource_group: 'rg-example-network', address_space: ['10.0.0.0/16'] },
+          { name: 'vnet-example-spoke', role: 'spoke', resource_group: 'rg-example-network', address_space: ['10.1.0.0/16', '10.2.0.0/24'] },
+        ],
+        virtual_machines: [{ name: 'example-dc-01', role: 'domain_controller', private_ip: '10.0.1.4', size: 'Standard_D2s_v5' }],
+        log_analytics: { name: 'law-example-azl' },
+      },
+    } as Project['answers'];
+    return p;
+  }],
   ['empty design', () => {
     const p = createExampleProject();
     p.hardware = { ...p.hardware, nodes: [] };

@@ -3,7 +3,7 @@
 import type { Draft } from '../../infra/types';
 import { firstHost, freeRun, inSubnet, isCidr, isIpv4, range, toNumber } from '../../infra/ip';
 import type { Question } from '../types';
-import { hasStorageNetwork, isSwitchless, learn, storageAutoIpOff, usesDhcp, usesSan } from '../when';
+import { hasStorageNetwork, isSimplified, isSwitchless, learn, storageAutoIpOff, usesDhcp, usesSan } from '../when';
 
 const step = 'network' as const;
 const mgmt = (d: Draft) => d.networking?.management ?? {};
@@ -92,6 +92,47 @@ export const networkQuestions: Question[] = [
       { value: 'preconfigured', label: 'Already configured', description: 'The port is already set up, and the tools don’t change it.' },
     ],
     recommended: () => ({ value: 'static', reason: 'The address is on the port from the first boot, with no DHCP reservations to keep in step.' }),
+  },
+  {
+    id: 'networking.management.provisioning_network',
+    path: 'networking.management.provisioning_network',
+    step,
+    group: 'Management network',
+    label: 'How does the provisioning image get its address, before the machine is claimed?',
+    help: 'Simplified provisioning: the maintenance environment reaches Azure through a port with the provisioning role. dhcp: a DHCP server answers on that port’s network. static: no DHCP there, so a static management port needs another port with DHCP for this.',
+    owner: 'network',
+    kind: 'select',
+    appliesWhen: isSimplified,
+    requiredWhen: () => false,
+    options: [
+      { value: 'dhcp', label: 'DHCP on the provisioning network' },
+      { value: 'static', label: 'No DHCP on the provisioning network' },
+    ],
+    recommended: () => ({ value: 'dhcp', reason: 'The maintenance environment takes its address from DHCP.' }),
+  },
+  {
+    id: 'networking.management.provisioning_dhcp_range.start',
+    path: 'networking.management.provisioning_dhcp_range.start',
+    step,
+    group: 'Management network',
+    label: 'DHCP range of the provisioning network: first address',
+    help: 'Inside the management subnet. The Device stage scans the range (TCP 20001) for each machine’s maintenance environment. Without it the scan covers the start of the management subnet.',
+    owner: 'network',
+    kind: 'ipv4',
+    appliesWhen: (d) => isSimplified(d) && d.networking?.management?.provisioning_network !== 'static',
+    requiredWhen: () => false,
+  },
+  {
+    id: 'networking.management.provisioning_dhcp_range.end',
+    path: 'networking.management.provisioning_dhcp_range.end',
+    step,
+    group: 'Management network',
+    label: 'DHCP range of the provisioning network: last address',
+    help: 'At most 4096 addresses from the first.',
+    owner: 'network',
+    kind: 'ipv4',
+    appliesWhen: (d) => isSimplified(d) && d.networking?.management?.provisioning_network !== 'static',
+    requiredWhen: (d) => !!d.networking?.management?.provisioning_dhcp_range?.start,
   },
   {
     id: 'networking.management.use_dhcp',

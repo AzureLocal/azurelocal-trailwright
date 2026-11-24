@@ -37,8 +37,16 @@ export const EXTRA_QUESTION_IDS: readonly string[] = [
   'hardware.sbe.node_pull_url',
   'hardware.sbe.bundle_path',
   'hardware.sbe.version',
+  'hardware.sbe.family',
+  'hardware.sbe.publisher',
+  'hardware.sbe.manifest_source',
+  'hardware.sbe.manifest_creation_date',
+  'hardware.bmc.verify_certificate',
   // Network
   'networking.management.ip_assignment',
+  'networking.management.provisioning_network',
+  'networking.management.provisioning_dhcp_range.start',
+  'networking.management.provisioning_dhcp_range.end',
   'networking.ntp_servers',
   'networking.oob.subnet',
   'networking.oob.gateway',
@@ -50,10 +58,10 @@ export const EXTRA_QUESTION_IDS: readonly string[] = [
   'identity.entra.groups',
   // Instance
   'cluster.deployment_mode',
+  'deployment.events_directory',
   // Operating system
   'provisioning.iso.image_source',
   'provisioning.simplified.media_share.host_adapter',
-  'hardware.sbe.allow_unvalidated',
   // Operations
   'operations.notifications.emails',
   'operations.disaster_recovery.recovery_vault',

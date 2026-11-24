@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { applyPatch, parseSurveyorPlan, previewConflicts } from '../src/imports/surveyor';
+import { applyPatch, parseSizingHandoff, parseSurveyorPlan, previewConflicts } from '../src/imports/surveyor';
+import { createExampleProject } from '../src/examples/exampleLab';
 import { parseProjectFile } from '../src/imports/projectFile';
 import { buildInfrastructure } from '../src/exports/infrastructureYml';
 import { createEmptyProject } from '../src/model/defaults';
@@ -37,11 +38,11 @@ describe('Surveyor import', () => {
     expect(result.patch.notes).toContain('Imported from Surveyor');
   });
 
-  it('rejects another major version and a node count outside 1 to 64', () => {
+  it('rejects another major version and a node count outside 1 to 16', () => {
     const version = parseSurveyorPlan(JSON.stringify({ ...manifest(1), schemaVersion: '2.0' }));
     expect(version.ok).toBe(false);
     if (!version.ok) expect(version.error).toContain('2.0');
-    for (const n of [0, 100]) {
+    for (const n of [0, 17, 100]) {
       const r = parseSurveyorPlan(JSON.stringify(manifest(n)));
       expect(r.ok).toBe(false);
       if (!r.ok) expect(r.error).toContain('nodeCount');
@@ -94,8 +95,8 @@ describe('a real Surveyor 2.8.0 project file', () => {
     expect(result.patch.nodes).toHaveLength(2);
     expect(result.patch.nodes[0]).toMatchObject({ cores: 64, memoryGiB: 256, drives: 4 });
     expect(result.patch.volumes).toEqual([
-      { name: 'Volume1', sizeGiB: 4135, resiliency: 'two-way' },
-      { name: 'Volume2', sizeGiB: 4135, resiliency: 'two-way' },
+      { name: 'Volume1', sizeGiB: 4135, resiliency: 'two-way', provisioning: 'fixed' },
+      { name: 'Volume2', sizeGiB: 4135, resiliency: 'two-way', provisioning: 'fixed' },
     ]);
     expect(result.patch.name).toBe('Azure Local plan');
     expect(result.patch.driveLayout).toEqual({ capacity: { media: 'nvme', count: 4, sizeTB: 3.84 }, cache: { media: 'nvme', count: 0, sizeTB: 0 } });
@@ -137,25 +138,50 @@ describe('the Surveyor sizing handoff', () => {
     expect(result.patch.nodes[0]).toMatchObject({ name: 'node1', ip: '', cores: 32, memoryGiB: 256, drives: 6 });
     expect(result.patch.driveLayout).toEqual({ capacity: { media: 'nvme', count: 6, sizeTB: 3.84 }, cache: { media: 'nvme', count: 0, sizeTB: 0 } });
     expect(result.patch.volumes).toEqual([
-      { name: 'Volume1', sizeGiB: 4135, resiliency: 'two-way' },
-      { name: 'Volume2', sizeGiB: 1862, resiliency: 'two-way' },
+      { name: 'Volume1', sizeGiB: 4135, resiliency: 'two-way', provisioning: 'fixed' },
+      { name: 'Volume2', sizeGiB: 1862, resiliency: 'two-way', provisioning: 'thin' },
     ]);
     expect(result.patch.topology).toBe('standard');
     expect(result.patch.name).toBe('Example plan');
     expect(result.patch.notes).toContain('sized against Azure Local 12.2611');
     expect(result.patch.notes).toContain('effective usable capacity 25.04 TB');
     expect(result.patch.notes).toContain('the sizing health check passed');
+    // The values the design has no field for are in the notes, and the default resiliency starts new volumes.
+    expect(result.patch.notes).toContain('hyperthreading on');
+    expect(result.patch.notes).toContain('default volume resiliency three_way');
+    expect(result.patch.notes).toContain('infrastructure volume 0.25 TB');
+    expect(result.patch.defaultResiliency).toBe('three-way');
+  });
+
+  it('reads provisioning_type, and provisioning from a 1.0 file', () => {
+    const doc = JSON.parse(text) as Record<string, any>;
+    doc.storage.volumes = [
+      { name: 'New', size_gib: 100, resiliency: 'two_way', provisioning_type: 'thin' },
+      { name: 'Old', size_gib: 100, resiliency: 'two_way', provisioning: 'fixed' },
+      { name: 'Neither', size_gib: 100, resiliency: 'two_way' },
+    ];
+    const result = parseSizingHandoff(doc);
+    if (!result.ok) throw new Error(result.error);
+    expect(result.patch.volumes.map((v) => v.provisioning)).toEqual(['thin', 'fixed', undefined]);
+  });
+
+  it('refuses a plan of more than 16 machines', () => {
+    const doc = JSON.parse(text) as Record<string, any>;
+    doc.cluster.node_count = 17;
+    const result = parseSizingHandoff(doc);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('1 to 16');
   });
 
   it('a rack-aware handoff with a four-way mirror and a cache tier', () => {
     const doc = JSON.parse(text) as Record<string, any>;
     doc.cluster = { node_count: 4, topology: 'rack_aware' };
     doc.hardware.drives.cache = { media: 'ssd', count: 2, size_tb: 1.6 };
-    doc.storage.volumes = [{ name: 'Zoned', size_gib: 1024, resiliency: 'four_way', provisioning: 'fixed' }];
+    doc.storage.volumes = [{ name: 'Zoned', size_gib: 1024, resiliency: 'four_way', provisioning_type: 'fixed' }];
     const result = parseSurveyorPlan(JSON.stringify(doc));
     if (!result.ok) throw new Error(result.error);
     expect(result.patch.topology).toBe('rack-aware');
-    expect(result.patch.volumes).toEqual([{ name: 'Zoned', sizeGiB: 1024, resiliency: 'four-way' }]);
+    expect(result.patch.volumes).toEqual([{ name: 'Zoned', sizeGiB: 1024, resiliency: 'four-way', provisioning: 'fixed' }]);
     expect(result.patch.driveLayout?.cache).toEqual({ media: 'ssd', count: 2, sizeTB: 1.6 });
     expect(result.patch.nodes[0].drives).toBe(8);
   });
@@ -169,9 +195,38 @@ describe('the Surveyor sizing handoff', () => {
     expect(doc.hardware?.memory_gib).toBe(256);
     expect(doc.hardware?.drives?.capacity).toEqual({ media: 'nvme', count: 6, size_tb: 3.84 });
     expect(doc.storage?.volumes).toEqual([
-      { name: 'Volume1', size_gib: 4135, resiliency: 'two_way' },
-      { name: 'Volume2', size_gib: 1862, resiliency: 'two_way' },
+      { name: 'Volume1', size_gib: 4135, resiliency: 'two_way', provisioning_type: 'fixed' },
+      { name: 'Volume2', size_gib: 1862, resiliency: 'two_way', provisioning_type: 'thin' },
     ]);
+    expect(applied.storage.defaultResiliency).toBe('three-way');
+  });
+
+  it('imports into a design that has data: the machines keep their identity, and the preview lists what changes', () => {
+    const result = parseSizingHandoff(JSON.parse(text));
+    if (!result.ok) throw new Error(result.error);
+    const before = createExampleProject();
+    const identity = before.hardware.nodes.map((n) => ({ name: n.name, ip: n.ip, serial: n.serial }));
+    expect(identity[0].ip).toBe('192.0.2.11');
+    const conflicts = previewConflicts(before, result.patch);
+    const fields = conflicts.map((c) => c.field);
+    expect(fields).toContain('nodes.count');
+    expect(fields).toContain('storage.driveLayout');
+    expect(fields.some((f) => f.startsWith('volumes['))).toBe(true);
+    const after = applyPatch(before, result.patch);
+    expect(after.hardware.nodes).toHaveLength(4);
+    expect(after.hardware.nodes.slice(0, identity.length).map((n) => ({ name: n.name, ip: n.ip, serial: n.serial }))).toEqual(identity);
+    expect(after.hardware.nodes[0]).toMatchObject({ cores: 32, memoryGiB: 256, drives: 6 });
+    expect(after.hardware.nodes[3]).toMatchObject({ name: 'node4', ip: '' });
+  });
+
+  it('lists the identity of a machine that is not in the plan as lost', () => {
+    const result = parseSizingHandoff({ ...JSON.parse(text), cluster: { node_count: 1, topology: 'standard' } });
+    if (!result.ok) throw new Error(result.error);
+    const before = createExampleProject();
+    const lost = previewConflicts(before, result.patch).find((c) => c.field.startsWith('nodes[1]'));
+    expect(lost?.current).toContain('management address 192.0.2.12');
+    expect(lost?.current).toContain('serial number EXAMPLE-0002');
+    expect(applyPatch(before, result.patch).hardware.nodes).toHaveLength(1);
   });
 
   it('refuses another major version', () => {

@@ -13,7 +13,8 @@
     "test:contracts": "vitest run tests/infrastructureSchema.test.ts tests/rulesDoc.test.ts",
     "docs:rules": "node scripts/generate-rules.mjs",
     "lint": "eslint .",
-    "schema:types": "node scripts/schema-types.mjs"
+    "schema:types": "node scripts/schema-types.mjs",
+    "schema:sync": "node scripts/sync-schema.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.1",

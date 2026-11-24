@@ -31,7 +31,7 @@ export interface AzureLocalInfrastructureYml {
    */
   _metadata: {
     /**
-     * The schema version this file follows. Major 5. A minor version adds optional keys only; a major version can rename or remove keys. Each key's description says which version added it ('since'). Version history, in order: 5.2 adds nodes[].network_adapters, BIOS settings, the site IP range and the maintenance environment's network. 5.3 adds the BIOS phases (bios_during_provisioning), networking.management.static_method and provisioning_dhcp_range, nodes[].maintenance_address, provisioning.simplified.maintenance_password, and the SAN details (storage.san.array, fibre_channel and iscsi, nodes[].san); it also adds _metadata.scope: ztp for a file that holds only what azurelocal-ztp reads. 5.4 puts every azurelocal-ztp setting in this schema, so no tool keeps a key of its own: the BIOS actions ZTP derives from the hardware inventory (provisioning.simplified.isolate_san_adapters and enable_embedded_nics, nodes[].san.hbas[].type), the Azure resource choices, timeouts, retries, the USB image and the maintenance environment of simplified provisioning, and hardware.bmc.rfs_write_attribute and verify_certificate. 5.4.1 adds provisioning.simplified.timeouts.adapters_minutes. 5.4.2 adds hardware.sbe.delivery and node_pull_url (how the SBE package reaches the nodes during OS configuration). 5.4.3 adds os_configuration.clear_storage, the switch that lets the OS configuration run wipe leftover local storage. 5.4.4 adds os_configuration.network (confirm_minutes, stable_seconds: the commit-confirmed window of a guarded network change) and os_configuration.remoting with transport, bootstrap_transport and allowed_source_cidrs. 5.5 puts the CI/CD infrastructure in devops (the project, its settings, the environments, the Azure sign-in, the runners with their network and roles) and adds the domain join (identity.active_directory.domain_join_account, join_options, local_admin_members). 5.6 adds the deployment block (the timeouts, polling, approval and resume of the toolkit's Validate and Deploy run) and the remote management security profile: scenario.environment_class, the profile keys of os_configuration.remoting (allow_any_source, trusted_hosts, use_https, isolation_confirmed, certificate; bootstrap_transport also takes smb and auto) and a purpose marker on networking.logical_networks[] and networking.cluster_networks[] (the values management and oob of networking.vlans[].purpose also count). A missing scenario.environment_class means production. 5.6.1 adds identity.active_directory.security_groups[].local_groups. 5.6.2 identifies the adapters of nodes[].network_adapters[] by hardware facts (mac_address is required; port_index, pci_location, vendor, os_name_override and allowed_vlans are optional). 5.6.3 adds enabled, ip_allocation_method and nsg_name to networking.logical_networks[]. A file written for 5.6.0 stays valid: a minor version adds optional keys only, except that 5.6.2 requires the MAC of every adapter. 5.6.4 adds the SBE package as a requirement: hardware.sbe.requirement and not_applicable_reason (whether the OEM package is required, or not applicable with a reason), source_path (the share or folder where the downloaded package is available to the automation), source_username and source_password (the read credential, a Key Vault reference), and the optional package_sha256 and package_size_bytes. The build-time side-load (delivery) is unchanged and stays off by default. 5.6.5 adds landing_zone.policy (required_tags, management_group): the tag names and the management group of the Tier 1 tag policy, which the Azure Policy task assigns in audit mode. 5.6.6 adds operations.monitoring.action_group: the name of the Azure Monitor action group that the alerting task creates. 5.6.7 adds security.defender_for_cloud: the free level of Microsoft Defender for Cloud that Azure Local needs. 5.6.8 adds security.defender_for_cloud.security_contact_email. 5.6.9 adds the storage keys the volume and storage path scripts read: storage.pool, storage.csv, storage.paths and, on storage.volumes, provisioning_type, file_system, parity_percent, media_type and deduplication. 5.6.10 adds what the SAN deployment needs: networking.cluster_network_properties and, for iSCSI, storage.san.iscsi.networks, jumbo_packet and chap.mutual. 5.6.11 adds what the logical network, network security group and VM image scripts read: networking.network_security_groups (name and rules with name, priority, direction, access, protocol, source and destination address prefixes and port ranges, description), networking.logical_networks[].vm_switch_name and storage.vm_images (name, os_type, publisher, offer, sku, version, storage_path). 5.6.12 adds operations.monitoring.retention_days and removes operations.notifications.teams_webhook and operations.monitoring.health_alerts. 5.6.13 adds the secrets section (provider, file directory, command) and lets a secret reference use the env://, file:// and command:// forms besides keyvault://. 5.6.14 adds hardware.inventory (output_directory, file_name_prefix, format, timeout_seconds), which Get-HardwareInventory.ps1 reads. 5.6.15 adds what Enable-ArcSdn.ps1 reads: sdn.acknowledge_maintenance_window and sdn.acknowledge_dns_record, the rules of sdn.prefix, and sdn.dns_records (read now); it removes sdn.default_access_policy. 5.6.16 adds storage.san.luns[].unique_id (how New-SanVolume.ps1 finds the disk of a LUN) and removes security.backup_key_vault. 5.6.17 adds landing_zone.management_groups[].role and azure.automation_identity.object_id (the two keys the Terraform landing zone and identity modules need) and makes the Terraform and Ansible code readers of the file (New-IacVariableFiles.ps1). 5.6.19 adds provisioning.iso.image_uri (the address Invoke-MountGoldImageISO.ps1 gives the BMC virtual media), landing_zone.subscriptions[].billing_scope and workload, point_to_site.protocols, root_certificate_name and root_certificate, bastion.network and the nat_gateway object of landing_zone.connectivity, and a list of values for landing_zone.virtual_machines[].os. 5.6.20 adds operations.updates.install_after_deployment and operations.updates.target_version (read by Start-SolutionUpdateAfterDeployment.ps1) and removes keys that no tool read (see MIGRATION, To 5.6.20). 5.6.21 adds landing_zone.network_security_groups[] (the network security groups of the Azure landing zone networks: name and rules, created by New-LandingZoneNsg.ps1) and security.baseline_settings[] (type, name, value and acknowledge_weaker_security of the security baseline settings that Set-SecurityBaselines.ps1 changes with Set-AzsSecurity). 5.6.23 adds landing_zone.networks[].allow_forwarded_traffic, allow_gateway_transit and use_remote_gateways (the options of the virtual network peerings Deploy-VirtualNetworks.ps1 makes) and identity.active_directory.precreate_computer_objects (Set-ADConfiguration.ps1 pre-creates the computer objects of the machines and the cluster). 5.6.24 adds hardware.sbe.partner_properties[] (name and value pairs that the hardware vendor's SBE asks for; ARM partnerProperties) and hardware.sbe.partner_credentials[] (secret_name and secret: the secret that the SBE needs, which the deployment template writes into the cluster Key Vault under secret_name; secret is a reference, never the value; ARM partnerCredentiallist). 5.6.25 adds devops.pipelines.runner_label and devops.pipelines.environments.* (the runner label and the approval environment of each of the toolkit's pipelines; task 05 sets them as pipeline variables). 5.6.26 removes registry entries that only the old variables.yml layout had (environment.env_name, env_type, env_owner and env_description, site.env_name and identity.active_directory.security_groups_by_role); a file never accepted them, so a file of any 5.6 version stays valid. 5.6.27 adds devops.pipelines.service_connection and devops.pipelines.variable_group (Azure DevOps: the names of the service connection and the variable group task 05 creates and the pipelines take as run parameters); a file without them stays valid. 5.6.28 adds the keys every pipeline, Ansible role, Terraform module and config template reads instead of a value of its own (devops.pipelines.infrastructure_file, handoff_path and tool_versions, devops.state.*, devops.runners[].*, devops.runner_network.*, devops.runner_access, identity.active_directory functional levels and DNS forwarders, landing_zone connectivity, virtual machine, policy and key vault keys, security.defender_for_cloud alert keys, network_devices[] ports, MTU and HA, hardware.sbe.requirement vendor); every key is optional, so a file of any 5.6 version stays valid. The current version is 5.6.28.
+     * The schema version this file follows. Major 5. A minor version adds optional keys only; a major version can rename or remove keys. Each key's description says which version added it ('since'). Version history, in order: 5.2 adds nodes[].network_adapters, BIOS settings, the site IP range and the maintenance environment's network. 5.3 adds the BIOS phases (bios_during_provisioning), networking.management.static_method and provisioning_dhcp_range, nodes[].maintenance_address, provisioning.simplified.maintenance_password, and the SAN details (storage.san.array, fibre_channel and iscsi, nodes[].san); it also adds _metadata.scope: ztp for a file that holds only what azurelocal-ztp reads. 5.4 puts every azurelocal-ztp setting in this schema, so no tool keeps a key of its own: the BIOS actions ZTP derives from the hardware inventory (provisioning.simplified.isolate_san_adapters and enable_embedded_nics, nodes[].san.hbas[].type), the Azure resource choices, timeouts, retries, the USB image and the maintenance environment of simplified provisioning, and hardware.bmc.rfs_write_attribute and verify_certificate. 5.4.1 adds provisioning.simplified.timeouts.adapters_minutes. 5.4.2 adds hardware.sbe.delivery and node_pull_url (how the SBE package reaches the nodes during OS configuration). 5.4.3 adds os_configuration.clear_storage, the switch that lets the OS configuration run wipe leftover local storage. 5.4.4 adds os_configuration.network (confirm_minutes, stable_seconds: the commit-confirmed window of a guarded network change) and os_configuration.remoting with transport, bootstrap_transport and allowed_source_cidrs. 5.5 puts the CI/CD infrastructure in devops (the project, its settings, the environments, the Azure sign-in, the runners with their network and roles) and adds the domain join (identity.active_directory.domain_join_account, join_options, local_admin_members). 5.6 adds the deployment block (the timeouts, polling, approval and resume of the toolkit's Validate and Deploy run) and the remote management security profile: scenario.environment_class, the profile keys of os_configuration.remoting (allow_any_source, trusted_hosts, use_https, isolation_confirmed, certificate; bootstrap_transport also takes smb and auto) and a purpose marker on networking.logical_networks[] and networking.cluster_networks[] (the values management and oob of networking.vlans[].purpose also count). A missing scenario.environment_class means production. 5.6.1 adds identity.active_directory.security_groups[].local_groups. 5.6.2 identifies the adapters of nodes[].network_adapters[] by hardware facts (mac_address is required; port_index, pci_location, vendor, os_name_override and allowed_vlans are optional). 5.6.3 adds enabled, ip_allocation_method and nsg_name to networking.logical_networks[]. A file written for 5.6.0 stays valid: a minor version adds optional keys only, except that 5.6.2 requires the MAC of every adapter. 5.6.4 adds the SBE package as a requirement: hardware.sbe.requirement and not_applicable_reason (whether the OEM package is required, or not applicable with a reason), source_path (the share or folder where the downloaded package is available to the automation), source_username and source_password (the read credential, a Key Vault reference), and the optional package_sha256 and package_size_bytes. The build-time side-load (delivery) is unchanged and stays off by default. 5.6.5 adds landing_zone.policy (required_tags, management_group): the tag names and the management group of the Tier 1 tag policy, which the Azure Policy task assigns in audit mode. 5.6.6 adds operations.monitoring.action_group: the name of the Azure Monitor action group that the alerting task creates. 5.6.7 adds security.defender_for_cloud: the free level of Microsoft Defender for Cloud that Azure Local needs. 5.6.8 adds security.defender_for_cloud.security_contact_email. 5.6.9 adds the storage keys the volume and storage path scripts read: storage.pool, storage.csv, storage.paths and, on storage.volumes, provisioning_type, file_system, parity_percent, media_type and deduplication. 5.6.10 adds what the SAN deployment needs: networking.cluster_network_properties and, for iSCSI, storage.san.iscsi.networks, jumbo_packet and chap.mutual. 5.6.11 adds what the logical network, network security group and VM image scripts read: networking.network_security_groups (name and rules with name, priority, direction, access, protocol, source and destination address prefixes and port ranges, description), networking.logical_networks[].vm_switch_name and storage.vm_images (name, os_type, publisher, offer, sku, version, storage_path). 5.6.12 adds operations.monitoring.retention_days and removes operations.notifications.teams_webhook and operations.monitoring.health_alerts. 5.6.13 adds the secrets section (provider, file directory, command) and lets a secret reference use the env://, file:// and command:// forms besides keyvault://. 5.6.14 adds hardware.inventory (output_directory, file_name_prefix, format, timeout_seconds), which Get-HardwareInventory.ps1 reads. 5.6.15 adds what Enable-ArcSdn.ps1 reads: sdn.acknowledge_maintenance_window and sdn.acknowledge_dns_record, the rules of sdn.prefix, and sdn.dns_records (read now); it removes sdn.default_access_policy. 5.6.16 adds storage.san.luns[].unique_id (how New-SanVolume.ps1 finds the disk of a LUN) and removes security.backup_key_vault. 5.6.17 adds landing_zone.management_groups[].role and azure.automation_identity.object_id (the two keys the Terraform landing zone and identity modules need) and makes the Terraform and Ansible code readers of the file (New-IacVariableFiles.ps1). 5.6.19 adds provisioning.iso.image_uri (the address Invoke-MountGoldImageISO.ps1 gives the BMC virtual media), landing_zone.subscriptions[].billing_scope and workload, point_to_site.protocols, root_certificate_name and root_certificate, bastion.network and the nat_gateway object of landing_zone.connectivity, and a list of values for landing_zone.virtual_machines[].os. 5.6.20 adds operations.updates.install_after_deployment and operations.updates.target_version (read by Start-SolutionUpdateAfterDeployment.ps1) and removes keys that no tool read (see MIGRATION, To 5.6.20). 5.6.21 adds landing_zone.network_security_groups[] (the network security groups of the Azure landing zone networks: name and rules, created by New-LandingZoneNsg.ps1) and security.baseline_settings[] (type, name, value and acknowledge_weaker_security of the security baseline settings that Set-SecurityBaselines.ps1 changes with Set-AzsSecurity). 5.6.23 adds landing_zone.networks[].allow_forwarded_traffic, allow_gateway_transit and use_remote_gateways (the options of the virtual network peerings Deploy-VirtualNetworks.ps1 makes) and identity.active_directory.precreate_computer_objects (Set-ADConfiguration.ps1 pre-creates the computer objects of the machines and the cluster). 5.6.24 adds hardware.sbe.partner_properties[] (name and value pairs that the hardware vendor's SBE asks for; ARM partnerProperties) and hardware.sbe.partner_credentials[] (secret_name and secret: the secret that the SBE needs, which the deployment template writes into the cluster Key Vault under secret_name; secret is a reference, never the value; ARM partnerCredentiallist). 5.6.25 adds devops.pipelines.runner_label and devops.pipelines.environments.* (the runner label and the approval environment of each of the toolkit's pipelines; task 05 sets them as pipeline variables). 5.6.26 removes registry entries that only the old variables.yml layout had (environment.env_name, env_type, env_owner and env_description, site.env_name and identity.active_directory.security_groups_by_role); a file never accepted them, so a file of any 5.6 version stays valid. 5.6.27 adds devops.pipelines.service_connection and devops.pipelines.variable_group (Azure DevOps: the names of the service connection and the variable group task 05 creates and the pipelines take as run parameters); a file without them stays valid. 5.6.28 adds the keys every pipeline, Ansible role, Terraform module and config template reads instead of a value of its own (devops.pipelines.infrastructure_file, handoff_path and tool_versions, devops.state.*, devops.runners[].*, devops.runner_network.*, devops.runner_access, identity.active_directory functional levels and DNS forwarders, landing_zone connectivity, virtual machine, policy and key vault keys, security.defender_for_cloud alert keys, network_devices[] ports, MTU and HA, hardware.sbe.requirement vendor); every key is optional, so a file of any 5.6 version stays valid. 5.6.29 adds deployment.events_directory (the one folder where the toolkit runs write their event feeds and Sonar reads them); a file without it stays valid. 5.6.30 adds landing_zone.budgets[] (the Cost Management budgets that Deploy-CostBudgets.ps1 creates: name, scope, subscription, resource_group, amount, time_grain, start_date, end_date, thresholds, forecast_thresholds, contact_emails); a file without it stays valid. 5.6.31 adds operations.monitoring.action_group_enable_if_disabled (whether the alerting task enables an action group that exists but is disabled; default false, report only); a file without it stays valid. The current version is 5.6.31.
      */
     schema_version: string;
     /**
@@ -369,7 +369,7 @@ export interface AzureLocalInfrastructureYml {
     };
   };
   /**
-   * How the toolkit's ARM Validate and Deploy run (Invoke-AzureLocalArmDeployment.ps1) waits, asks for approval and recovers. Optional; every key has a default; a -Settings value on the command line wins over this block. (since 5.6)
+   * How the toolkit's ARM Validate and Deploy run (Invoke-AzureLocalArmDeployment.ps1) waits, asks for approval and recovers, and where the runs write their event feeds (events_directory). Optional; every key has a default; a -Settings value on the command line wins over this block. (since 5.6)
    */
   deployment?: {
     /**
@@ -431,7 +431,7 @@ export interface AzureLocalInfrastructureYml {
      */
     deployment_settings_api_version?: string;
     /**
-     * The solution version the nodes run (four numeric parts, for example 12.2610.1004.50). The precondition SbeValidatedWithSolution compares it with the solution versions the OEM's SBE discovery catalog lists for the configured SBE. Leave empty to use the ZTP handoff's solution version, else the version derived from the nodes' OS build (reported as derived; only builds that map unambiguously). The OS configuration also passes it to the Arc registration of a machine installed from an ISO as -TargetSolutionVersion, the version the first deployment uses; without it the registration cmdlet asks which version to use, which an unattended run cannot answer.
+     * The solution version the nodes run (four numeric parts, for example 12.2611.1004.9). The precondition SbeValidatedWithSolution compares it with the solution versions the OEM's SBE discovery catalog lists for the configured SBE. Leave empty to use the ZTP handoff's solution version, else the version derived from the nodes' OS build (reported as derived; only builds that map unambiguously). The OS configuration also passes it to the Arc registration of a machine installed from an ISO as -TargetSolutionVersion, the version the first deployment uses; without it the registration cmdlet asks which version to use, which an unattended run cannot answer.
      */
     solution_version?: string;
     /**
@@ -466,6 +466,10 @@ export interface AzureLocalInfrastructureYml {
      * Where the pre-cluster verification gate writes report.json, summary.md and precluster-verification-events.jsonl, and where the ARM run looks for the latest result. Default: arm-report\verification\live in the environment data folder (the folder that holds provisioning.simplified.evidence_path, else media_path, else the folder of the infrastructure file). (since 5.6)
      */
     pre_cluster_verification_report_directory?: string;
+    /**
+     * Schema 5.6.29. The one folder where the toolkit's runs write their event feeds (os-configuration-events.jsonl of the OS configuration run, arm-deployment-events.jsonl of the ARM Validate and Deploy run) and where azurelocal-sonar reads them, so a plain run and a plain Sonar launch meet. Environment variables such as %ProgramData% are expanded; a relative path is relative to the folder of the infrastructure file. Default when not set: <ProgramData>\AzureLocalToolkit\<cluster.name>\events (on Linux and macOS <temp>/AzureLocalToolkit/<cluster.name>/events); a run given -ReportDirectory then writes its feed into that report directory instead, so set this key when a pipeline or an operator passes -ReportDirectory and Sonar should still follow the run. -EventLogPath of the OS configuration run and osConfigEventsPath/armEventsPath of Sonar's own config still win. Lines are appended, so one folder keeps every run of the cluster; Sonar shows the latest. Keep it outside any git working tree.
+     */
+    events_directory?: string;
     /**
      * Opt in to registering the mandatory Azure Local resource providers (Microsoft Learn: Assign required permissions for Azure Local deployment) that are not registered in the subscription, and waiting until they are Registered, when the precondition ResourceProviders runs in Mode Validate or Deploy. Default false: the run never changes Azure by itself and a mandatory provider that is not registered fails the precondition, with the Register-AzResourceProvider command for each. Needs Owner or Contributor on the subscription. Never done in Plan or with WhatIf. Set by the -RegisterResourceProviders switch. (since 5.6)
      */
@@ -1209,7 +1213,7 @@ export interface AzureLocalInfrastructureYml {
        */
       domain_controllers?: Ipv4[];
       /**
-       * Whether the instance uses group managed service accounts. Default false. Learn 2610 does not require a KDS root key for Azure Local (the Active Directory preparation never mentions one); a KDS root key matters only for gMSA, so the pre-cluster verification (ID-AD-012) checks it only when this is true. (since 5.6)
+       * Whether the instance uses group managed service accounts. Default false. Learn 2611 does not require a KDS root key for Azure Local (the Active Directory preparation never mentions one); a KDS root key matters only for gMSA, so the pre-cluster verification (ID-AD-012) checks it only when this is true. (since 5.6)
        */
       use_gmsa?: boolean;
       /**
@@ -1220,6 +1224,10 @@ export interface AzureLocalInfrastructureYml {
        * Schema 5.6.23. Whether Set-ADConfiguration.ps1 creates the computer objects of the machines (nodes[].name) and of the cluster (cluster.name) in the OU before the deployment. Microsoft Learn allows this instead of letting the deployment create them (Custom Active Directory configuration for your Azure Local instance; Prestage cluster computer objects). The cluster object is created disabled. Default false: the domain join of the OS configuration and the deployment create the objects.
        */
       precreate_computer_objects?: boolean;
+      /**
+       * Schema 5.6.28. Whether Set-ADConfiguration.ps1 creates the parent OUs of ou_path that are missing, from the domain down, before it runs New-HciAdObjectsPreCreation. Microsoft's cmdlet creates only the OU itself and stops when its parent does not exist; Microsoft Learn (Prepare Active Directory for Azure Local deployment, Considerations for large scale deployments) recommends one OU per instance under a single parent OU. A parent that exists is never changed, and no group policy setting is made on a parent it creates. Default false: a missing parent stops the script with exit code 1 and nothing is created.
+       */
+      create_parent_ous?: boolean;
       /**
        * Schema 5.6.28. Forest functional level of a new forest that the toolkit's Ansible domain controller role creates (a landing_zone.virtual_machines[] entry with role domain_controller and dc_promotion new_forest); ignored for a replica. WinThreshold is the Windows Server 2016 level: the highest a Windows Server 2022 domain controller supports and the lowest a new forest may have. Win2025 needs every domain controller on Windows Server 2025 (Microsoft Learn: Active Directory Domain Services functional levels, https://learn.microsoft.com/windows-server/identity/ad-ds/active-directory-functional-levels).
        */
@@ -1635,7 +1643,7 @@ export interface AzureLocalInfrastructureYml {
       alerts_to_admins?: boolean;
     };
     /**
-     * What the cluster sends to Microsoft as telemetry. Not read by the tools yet.
+     * What the cluster sends to Microsoft as diagnostic data. streaming_data, episodic_data_upload and eu_location are deployment settings (the ARM deployment reads them; Microsoft Learn documents no way to change them afterwards). diagnostic_level is the desired diagnostic level of the instance resource, which Invoke-TelemetryConfiguration-Orchestrated.ps1 (operational foundations, phase 05, task 03) sets after the deployment.
      */
     telemetry?: {
       /**
@@ -1650,6 +1658,10 @@ export interface AzureLocalInfrastructureYml {
        * true keeps the diagnostic data in the EU data boundary.
        */
       eu_location?: boolean;
+      /**
+       * Schema 5.6.32. The desired level of diagnostic data the Azure Local instance sends to Microsoft: Off, Basic or Enhanced (the desiredProperties.diagnosticLevel of the Microsoft.AzureStackHCI/clusters resource; Microsoft Learn, Update-AzStackHciCluster -DesiredPropertyDiagnosticLevel, and az stack-hci cluster update --desired-properties diagnostic-level). Invoke-TelemetryConfiguration-Orchestrated.ps1 (operational foundations, phase 05, task 03) sets it on the instance when it differs and then syncs the machines. Absent: the script does nothing. There is no Full level.
+       */
+      diagnostic_level?: 'Off' | 'Basic' | 'Enhanced';
     };
   };
   /**
@@ -1686,7 +1698,7 @@ export interface AzureLocalInfrastructureYml {
      */
     update_method?: 'portal' | 'powershell';
     /**
-     * Schema 5.6.20. Updates after the deployment. Start-SolutionUpdateAfterDeployment.ps1 (scripts/lifecycle/updates/powershell) reads both keys. Learn: Update Azure Local by using PowerShell.
+     * Schema 5.6.20. Updates after the deployment and the monthly update. Start-AzureLocalSolutionUpdate.ps1 (scripts/deploy/08-day2-operations/task-02-start-solution-update/powershell) reads both keys; with -Mode OnDemand (the monthly update) it does not read install_after_deployment. Get-AvailableSolutionUpdate.ps1 (task 01, the check for updates) reads target_version. Learn: Update Azure Local by using PowerShell.
      */
     updates?: {
       /**
@@ -1694,7 +1706,7 @@ export interface AzureLocalInfrastructureYml {
        */
       install_after_deployment?: boolean;
       /**
-       * The solution version to install: latest (default; the highest solution update that is ready to install), or four numbers, for example 12.2610.1004.50, which the update service must list (Get-SolutionUpdate). Standalone Solution Builder Extension updates are not chosen.
+       * The solution version to install: latest (default; the highest solution update that is ready to install), or four numbers, for example 12.2611.1004.9, which the update service must list (Get-SolutionUpdate). Standalone Solution Builder Extension updates are not chosen.
        */
       target_version?: string;
     };
@@ -1799,6 +1811,29 @@ export interface AzureLocalInfrastructureYml {
       azure_verification_for_vms?: boolean;
     };
     /**
+     * Schema 5.6.32. Collection of the Windows Security, System and Application event logs of the machines into the Log Analytics workspace of operations.monitoring, with a data collection rule of the Azure Monitor Agent. Invoke-SecurityLogging-Orchestrated.ps1 (operational foundations, phase 04, task 04) creates the rule and associates it with the Arc machine of every node. Microsoft Learn (Collect Windows events with Azure Monitor Agent): the Security log of such a rule goes to the Event table with the other logs; the SecurityEvent table is filled only by a paid connector, which the toolkit does not set up.
+     */
+    security_logging?: {
+      /**
+       * Schema 5.6.32. true to collect the event logs. false or absent: Invoke-SecurityLogging-Orchestrated.ps1 does nothing and exits 0. It also needs operations.monitoring.enabled true and the workspace of operations.monitoring.log_analytics_workspace.
+       */
+      enabled?: boolean;
+      /**
+       * Schema 5.6.32. Name of the data collection rule the script creates in operations.monitoring.workspace_resource_group, in the region of the workspace. A rule of this name that exists is checked, never changed: the script reports a rule that collects other logs.
+       */
+      data_collection_rule?: string;
+      /**
+       * Schema 5.6.32. Which Security log events the rule collects, as the portal offers them (Microsoft Learn, Collect Windows events): success_and_failure (Audit success and Audit failure) or failure (Audit failure only).
+       */
+      security_audit?: 'success_and_failure' | 'failure';
+      /**
+       * Schema 5.6.32. The levels of the System and Application logs the rule collects (Microsoft Learn, Collect Windows events: Critical, Error, Warning, Information, Verbose). Default critical, error and warning.
+       *
+       * @minItems 1
+       */
+      event_levels?: ['critical' | 'error' | 'warning' | 'information' | 'verbose', ...('critical' | 'error' | 'warning' | 'information' | 'verbose')[]];
+    };
+    /**
      * Azure Monitor for the instance. Only Azure Monitor (monitoring) and the notification addresses are read by the tools so far (the monitoring scripts of phase 02, operational foundations); the rest is not read yet. Sonar reads its own settings.
      */
     monitoring?: {
@@ -1807,7 +1842,7 @@ export interface AzureLocalInfrastructureYml {
        */
       enabled: boolean;
       /**
-       * Name of the Log Analytics workspace. Deploy-LogAnalyticsWorkspace.ps1 creates it; Deploy-DataCollectionEndpoint.ps1 looks it up and takes the region of the endpoint from it. The Insights data collection rule sends to it.
+       * Name of the Log Analytics workspace. Deploy-LogAnalyticsWorkspace.ps1 creates it; Deploy-DataCollectionEndpoint.ps1 looks it up and takes the region of the endpoint from it. The Insights data collection rule sends to it: Enable-HciInsights.ps1 stops when the rule sends to no workspace of this name in operations.monitoring.workspace_resource_group.
        */
       log_analytics_workspace?: string;
       /**
@@ -1819,7 +1854,7 @@ export interface AzureLocalInfrastructureYml {
        */
       retention_days?: number;
       /**
-       * Name of the existing data collection rule that Insights for Azure Local uses. Enable-HciInsights.ps1 (phase 02, task 03) looks it up in operations.monitoring.workspace_resource_group and associates it with the Arc machine of every node; it never creates or changes the rule. Microsoft Learn documents no template for the rule and says not to build your own, so create it once in the Azure portal (the instance, Capabilities, Insights, Get Started) and put its name here. Learn names the AzureStackHCI- prefix for the rule the portal creates.
+       * Name of the existing data collection rule that Insights for Azure Local uses. Enable-HciInsights.ps1 (phase 02, task 03) looks it up in operations.monitoring.workspace_resource_group, checks (read only) that it collects what Microsoft Learn lists for Insights (the five performance counters and the event log channels Microsoft-Windows-Health/Operational and Microsoft-Windows-SDDC-Management/Operational) and sends to a Log Analytics workspace (operations.monitoring.log_analytics_workspace when set), and associates it with the Arc machine of every node; it never creates or changes the rule. Microsoft Learn documents no template for the rule and says not to build your own, so create it once in the Azure portal (the instance, Capabilities, Insights, Get Started) and put its name here. Learn names the AzureStackHCI- prefix for the rule the portal creates.
        */
       data_collection_rule?: string;
       /**
@@ -1831,6 +1866,10 @@ export interface AzureLocalInfrastructureYml {
        */
       action_group?: string;
       /**
+       * Schema 5.6.31. What Deploy-ActionGroup.ps1 (and its Azure CLI twin) does with an action group that exists but is disabled (a disabled group sends nothing to any receiver). false (default): the group is reported as Disabled with a warning and left disabled, because a person may have disabled it on purpose. true: the run enables it (Update-AzActionGroup -Enabled, az monitor action-group update --enabled true) and reports Enabled. Adding a receiver never changes the enabled state.
+       */
+      action_group_enable_if_disabled?: boolean;
+      /**
        * Address that receives the alerts (a team mailbox). Deploy-ActionGroup.ps1 makes it an email receiver of the action group, next to the addresses of operations.notifications.emails.
        */
       alert_email?: string;
@@ -1841,7 +1880,7 @@ export interface AzureLocalInfrastructureYml {
    */
   provisioning?: {
     /**
-     * The solution version the machines run: latest, latest-preview, or a version such as 12.2610.1004.50. Pin a version. Simplified provisioning installs it, and the SBE must be validated with it.
+     * The solution version the machines run: latest, latest-preview, or a version such as 12.2611.1004.9. Pin a version. Simplified provisioning installs it, and the SBE must be validated with it.
      */
     os_version: string;
     /**
@@ -2290,6 +2329,62 @@ export interface AzureLocalInfrastructureYml {
        * What the resource group is for, in words.
        */
       purpose?: string;
+    }[];
+    /**
+     * Cost Management budgets of the landing zone (schema 5.6.30; Microsoft Learn: Tutorial: Create and manage budgets). A budget is free: it tracks the cost of a subscription or a resource group and sends an e-mail when a threshold is passed; it never stops or deletes anything. Deploy-CostBudgets.ps1 and Deploy-CostBudgets.azcli.ps1 (phase 01, task 04) create each entry, and update an existing budget of the same name to what the file says. Leave the list out for no budget.
+     */
+    budgets?: {
+      /**
+       * Name of the budget, unique in its scope: 1 to 63 letters, digits, hyphens and underscores (Microsoft Learn: Naming rules and restrictions, Microsoft.Consumption budgets).
+       */
+      name: string;
+      /**
+       * What the budget tracks: subscription (the whole subscription) or resource_group (one resource group of the subscription, named in resource_group).
+       */
+      scope?: 'subscription' | 'resource_group';
+      /**
+       * Name of a subscription in landing_zone.subscriptions. Empty: azure.subscription_id.
+       */
+      subscription?: string;
+      /**
+       * The resource group the budget tracks. Required when scope is resource_group, and not allowed otherwise. The resource group must exist (task 03).
+       */
+      resource_group?: string;
+      /**
+       * The amount of the budget for one time grain, in the billing currency of the subscription (a Cost Management budget carries no currency of its own). Greater than 0.
+       */
+      amount: number;
+      /**
+       * The period the amount covers; the tracked cost starts again at 0 at the start of each period: Monthly, Quarterly or Annually (the BillingMonth, BillingQuarter and BillingAnnual grains of the API are for Web Direct accounts only and are not offered). Azure cannot change the time grain of an existing budget: the scripts report it and change nothing; delete the budget or use another name.
+       */
+      time_grain?: 'Monthly' | 'Quarterly' | 'Annually';
+      /**
+       * First day of the budget, YYYY-MM-01: the first of a month, on or after 2017-06-01 and not more than twelve months ahead (Microsoft Learn: Budgets - Create Or Update). Empty: the first day of the current month (UTC) when the budget is created; an existing budget keeps its start date.
+       */
+      start_date?: string;
+      /**
+       * Last day of the budget, YYYY-MM-DD, after start_date. Empty: Azure sets ten years after the start date; an existing budget keeps its end date.
+       */
+      end_date?: string;
+      /**
+       * Percentages of the amount at which an e-mail is sent when the actual cost passes them, each greater than 0 and at most 1000. Together with forecast_thresholds at most five (a budget has at most five notifications). Default 80 and 100.
+       *
+       * @maxItems 5
+       */
+      thresholds?: [] | [number] | [number, number] | [number, number, number] | [number, number, number, number] | [number, number, number, number, number];
+      /**
+       * Percentages of the amount at which an e-mail is sent when the forecast cost of the period passes them (an early warning), each greater than 0 and at most 1000. Empty: no forecast alert.
+       *
+       * @maxItems 5
+       */
+      forecast_thresholds?:
+        [] | [number] | [number, number] | [number, number, number] | [number, number, number, number] | [number, number, number, number, number];
+      /**
+       * E-mail addresses that get the alert of every threshold. At least one.
+       *
+       * @minItems 1
+       */
+      contact_emails: [string, ...string[]];
     }[];
     /**
      * Azure Policy of the landing zone. Tier 1 is the tag policy: the built-in policy 'Require a tag on resources' assigned in audit mode (enforcement mode DoNotEnforce, so non-compliance is reported and nothing is denied) at one management group, once for each required tag. Optional.
@@ -2902,7 +2997,7 @@ export interface AzureLocalInfrastructureYml {
       deployment_branch?: string;
     }[];
     /**
-     * Schema 5.6.25. What the toolkit's own pipelines (the files under pipelines/) select: the runner label and the approval environment of each pipeline. Task 05 sets them as repository variables (GitHub) or project CI/CD variables (GitLab); Azure DevOps cannot read a variable there and takes them as run parameters (the task lists the values). The pipeline files hold no runner label, pool or environment name of their own.
+     * Schema 5.6.25. What the toolkit's own pipelines (the files under pipelines/) select: the runner label and the approval environment of each pipeline. Task 05 sets them as repository variables (GitHub) or project CI/CD variables (GitLab); Azure DevOps cannot read a variable there, so task 05 writes them into pipelines/azure-devops/variables/approval-environments.yml and pipeline-settings.yml, which the pipelines read when they are compiled (D126: no run parameter carries a deployment value). The pipeline files hold no runner label, pool or environment name of their own.
      */
     pipelines?: {
       /**
@@ -2933,21 +3028,34 @@ export interface AzureLocalInfrastructureYml {
          * Schema 5.6.25. The environment that gates the Terraform apply and the on-premises Ansible jobs of the Terraform and Ansible sample pipelines (pipelines/github-actions/azure-local-deploy.yml, pipelines/azure-devops/azure-local-deploy.yml, pipelines/gitlab/.gitlab-ci.yml).
          */
         terraform_deployment?: string;
+        /**
+         * Schema 5.6.28. The environment that gates every day 2 job that changes the cluster: the update (pipelines/github-actions/day2-update.yml, pipelines/gitlab/stages/day2-update.yml, pipelines/azure-devops/day2-update.yml), the node maintenance, the changing operations of the cluster operations pipeline, and the storage performance test of the validation pipeline. One environment for all of them on purpose: on Azure DevOps its Exclusive lock check then keeps an update and a node reboot from running on the cluster at the same time. Give it the approvers of your change process.
+         */
+        operations?: string;
       };
       /**
-       * Schema 5.6.27. Azure DevOps only. The name of the Azure Resource Manager service connection (workload identity federation) that task 05 creates and that the Azure DevOps pipelines sign in through; task 01 puts the same name in the subject of the federated credential. The pipelines (pipelines/azure-devops/*.yml) take it as a run parameter with no default, and task 05 lists the value to enter. Required when devops.platform is azure_devops; GitHub and GitLab ignore it.
+       * Schema 5.6.28. When the toolkit's scheduled pipelines run. A schedule is a five-field cron expression in UTC (the same syntax on GitHub Actions, GitLab CI and Azure DevOps; the platforms do not follow daylight saving time). GitHub Actions and Azure DevOps read a schedule only from the pipeline file (a cron expression cannot come from a variable there), so the sample pipeline file carries the default below and a test keeps the two equal; when you change the key, change the cron line of your copy of the pipeline file too. GitLab keeps a schedule in the project (CI/CD > Schedules), not in the file: create it with this value.
+       */
+      schedules?: {
+        /**
+         * Schema 5.6.28. When the day 2 check for updates runs (pipelines/github-actions/day2-check-updates.yml, pipelines/gitlab/stages/day2-check-updates.yml, pipelines/azure-devops/day2-check-updates.yml; owner directive D74: check for updates on a schedule). Five-field cron in UTC; empty means no schedule. The update agent of the cluster checks once a day (Learn: Use Azure Update Manager to update Azure Local), so daily is enough; the minute is not 0 because GitHub delays scheduled runs at the start of an hour, when many start at once. The run fails when the check finds something that needs attention (exit code 1), so the platform's own notification for a failed run is the alert. D126: the key works on all three platforms: task 05 writes it into the cron line of the GitHub workflow and of the Azure DevOps pipeline (with devops.repository.default_branch as the branch of the Azure DevOps schedule) and creates or updates the GitLab project schedule (deactivates it when the key is empty).
+         */
+        check_for_updates?: string;
+      };
+      /**
+       * Schema 5.6.27. Azure DevOps only. The name of the Azure Resource Manager service connection (workload identity federation) that task 05 creates and that the Azure DevOps pipelines sign in through; task 01 puts the same name in the subject of the federated credential. The pipelines (pipelines/azure-devops/*.yml) read it as AZL_SERVICE_CONNECTION, a compile-time variable of pipelines/azure-devops/variables/pipeline-settings.yml that task 05 writes (D126: not a run parameter). Required when devops.platform is azure_devops; GitHub and GitLab ignore it.
        */
       service_connection?: string;
       /**
-       * Schema 5.6.27. Azure DevOps only. The name of the variable group (Pipelines > Library) task 05 writes the sign-in values (ARM_*) and the state settings (TF_BACKEND_*) to. With entries in devops.environments[] there is one group per environment, named <variable_group>-<environment>. The Azure DevOps pipelines that link a group (azure-local-deploy.yml, os-configuration.yml) take its name as a run parameter with no default, and task 05 lists the value to enter. Required when devops.platform is azure_devops; GitHub and GitLab ignore it.
+       * Schema 5.6.27. Azure DevOps only. The name of the variable group (Pipelines > Library) task 05 writes the sign-in values (ARM_*) and the state settings (TF_BACKEND_*) to. With entries in devops.environments[] there is one group per environment, named <variable_group>-<environment>. The Azure DevOps pipelines that link a group (azure-local-deploy.yml, os-configuration.yml) read its name as AZL_VARIABLE_GROUP of pipelines/azure-devops/variables/pipeline-settings.yml, which task 05 writes with a group entry (D126: not a run parameter); task 05 also writes the group <name> for the repository, which the pipelines read. Required when devops.platform is azure_devops; GitHub and GitLab ignore it.
        */
       variable_group?: string;
       /**
-       * Schema 5.6.28. The path, in the deployment repository, of the infrastructure file the toolkit's pipelines pass to the scripts (-InfrastructureFile). Task 05 sets it as AZL_INFRASTRUCTURE_FILE (GitHub repository variable, GitLab project variable); the Azure DevOps pipelines take it as a run parameter with no default, and task 05 lists the value to enter. The pipeline files hold no path of their own.
+       * Schema 5.6.28. The path, in the deployment repository, of the infrastructure file the toolkit's pipelines pass to the scripts (-InfrastructureFile). Task 05 sets it as AZL_INFRASTRUCTURE_FILE (GitHub repository variable, GitLab project variable); the Azure DevOps pipelines read it as AZL_INFRASTRUCTURE_FILE of pipelines/azure-devops/variables/pipeline-settings.yml, which task 05 writes (D126: not a run parameter). The pipeline files hold no path of their own.
        */
       infrastructure_file?: string;
       /**
-       * Schema 5.6.28. The repository path of the ZTP handoff files (a handoff file or a directory of *.ztp-handoff.json) the OS configuration pipelines pass to the script (-HandoffPath). A path that does not exist (a cluster installed from ISO) is not passed. Task 05 sets it as AZL_HANDOFF_PATH (GitHub, GitLab); the Azure DevOps pipeline takes it as a run parameter with no default (none for no handoff), and task 05 lists the value to enter. A run can instead take the artifact of a ZTP run (its run ID).
+       * Schema 5.6.28. The repository path of the ZTP handoff files (a handoff file or a directory of *.ztp-handoff.json) the OS configuration pipelines pass to the script (-HandoffPath). A path that does not exist (a cluster installed from ISO) is not passed. Task 05 sets it as AZL_HANDOFF_PATH (GitHub, GitLab); the Azure DevOps pipeline reads it as AZL_HANDOFF_PATH of pipelines/azure-devops/variables/pipeline-settings.yml (none for no handoff), which task 05 writes (D126: not a run parameter). A run can instead take the artifact of a ZTP run (its run ID).
        */
       handoff_path?: string;
       /**
@@ -3046,7 +3154,7 @@ export interface AzureLocalInfrastructureYml {
        */
       registration_secret?: string;
       /**
-       * The Azure Pipelines agent pool, or the GitHub runner group. A ztp runner gets its own. Required on Azure DevOps (task 06 stops without it, there is no default pool); the Azure DevOps pipelines take the pool of the general runner as their agent pool parameter.
+       * The Azure Pipelines agent pool, or the GitHub runner group. A ztp runner gets its own. Required on Azure DevOps (task 06 stops without it, there is no default pool); the Azure DevOps pipelines read the pool of the general runner as AZL_AGENT_POOL of pipelines/azure-devops/variables/pipeline-settings.yml, which task 05 writes (D126).
        */
       pool?: string;
       /**

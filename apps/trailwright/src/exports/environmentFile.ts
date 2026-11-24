@@ -45,6 +45,8 @@ export function buildEnvironmentFile(p: Project): string {
   }
 
   const header = [
+    ' DEPRECATED: the environment file is retired. infrastructure.yml (the Azure Local Toolkit schema 5, one file for every tool) replaces it.',
+    ' This export stays for one release so a pipeline can move over; the next release removes it. Export infrastructure.yml instead.',
     ` Azure Local environment file (cluster facts), written by azurelocal-trailwright from the project "${p.meta.name}".`,
     ` Release: 12.${p.release.version} (latest). Contract: the deploy automation's azure-local environment schema (unknown keys are rejected).`,
     ' This file holds ONLY what the design knows. Every CHANGE-ME value, and the landing-zone block at the end, must be filled in',

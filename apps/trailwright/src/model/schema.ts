@@ -206,6 +206,8 @@ const volumeSchema = z.object({
   name: z.string(),
   sizeGiB: z.number(),
   resiliency: z.enum(['two-way', 'three-way', 'four-way', 'parity', 'nested-two-way']),
+  // Thin or fixed provisioning (infrastructure.yml storage.volumes[].provisioning_type). Not set leaves it to the deployment's default.
+  provisioning: z.enum(['thin', 'fixed']).optional(),
 });
 
 // The drives in every node (the layout is symmetric): capacity drives and, optionally, a cache tier.
@@ -231,6 +233,8 @@ const storageSchema = z.object({
   // s2d: Storage Spaces Direct only; san: external SAN (disaggregated) only; hybrid: both.
   architecture: z.enum(['s2d', 'san', 'hybrid']).default('s2d'),
   volumes: z.array(volumeSchema),
+  // The resiliency a volume added to the design starts with. Set by a Surveyor import (its default_resiliency); not set: two-way.
+  defaultResiliency: z.enum(['two-way', 'three-way', 'four-way', 'parity', 'nested-two-way']).optional(),
   sanLuns: z.array(sanLunSchema).default([]),
   // Disaggregated deployments: the LUN identifiers of the infrastructure volume (250 GB minimum) and the performance history volume (20 GB minimum).
   infraVolLunId: z.string().default(''),

@@ -152,7 +152,7 @@ export function parseSurveyorPlan(text: string): { ok: true; patch: ImportPatch 
     for (const v of parsed.inputs.volumes) {
       if (!isRecord(v) || typeof v.resiliency !== 'string') continue;
       const resiliency = mapResiliency(v.resiliency);
-      if (resiliency) volumes.push({ name: String(v.name ?? ''), sizeGiB: Math.round(Number(v.plannedSizeTB) * 1024), resiliency });
+      if (resiliency) volumes.push({ name: String(v.name ?? ''), sizeGiB: Math.floor((Number(v.plannedSizeTB) * 1e12) / 2 ** 30), resiliency });
     }
   }
 

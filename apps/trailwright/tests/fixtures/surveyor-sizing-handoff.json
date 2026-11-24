@@ -31,13 +31,13 @@
     "volumes": [
       {
         "name": "Volume1",
-        "size_gib": 4546,
+        "size_gib": 4135,
         "resiliency": "two_way",
         "provisioning": "fixed"
       },
       {
         "name": "Volume2",
-        "size_gib": 2048,
+        "size_gib": 1862,
         "resiliency": "two_way",
         "provisioning": "thin"
       }

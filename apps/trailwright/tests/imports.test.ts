@@ -31,8 +31,8 @@ describe('Surveyor import', () => {
     expect(result.patch.nodes).toHaveLength(3);
     expect(result.patch.nodes[0]).toMatchObject({ name: 'node1', cores: 16, memoryGiB: 256, drives: 6 });
     expect(result.patch.volumes).toEqual([
-      { name: 'Fast', sizeGiB: 2048, resiliency: 'two-way' },
-      { name: 'Big', sizeGiB: Math.round(5.5 * 1024), resiliency: 'parity' },
+      { name: 'Fast', sizeGiB: 1862, resiliency: 'two-way' }, // 2 TB (decimal) in GiB, rounded down
+      { name: 'Big', sizeGiB: 5122, resiliency: 'parity' },
     ]);
     expect(result.patch.notes).toContain('Imported from Surveyor');
   });
@@ -94,8 +94,8 @@ describe('a real Surveyor 2.8.0 project file', () => {
     expect(result.patch.nodes).toHaveLength(2);
     expect(result.patch.nodes[0]).toMatchObject({ cores: 64, memoryGiB: 256, drives: 4 });
     expect(result.patch.volumes).toEqual([
-      { name: 'Volume1', sizeGiB: Math.round(4.44 * 1024), resiliency: 'two-way' },
-      { name: 'Volume2', sizeGiB: Math.round(4.44 * 1024), resiliency: 'two-way' },
+      { name: 'Volume1', sizeGiB: 4135, resiliency: 'two-way' },
+      { name: 'Volume2', sizeGiB: 4135, resiliency: 'two-way' },
     ]);
     expect(result.patch.name).toBe('Azure Local plan');
     expect(result.patch.driveLayout).toEqual({ capacity: { media: 'nvme', count: 4, sizeTB: 3.84 }, cache: { media: 'nvme', count: 0, sizeTB: 0 } });
@@ -137,8 +137,8 @@ describe('the Surveyor sizing handoff', () => {
     expect(result.patch.nodes[0]).toMatchObject({ name: 'node1', ip: '', cores: 32, memoryGiB: 256, drives: 6 });
     expect(result.patch.driveLayout).toEqual({ capacity: { media: 'nvme', count: 6, sizeTB: 3.84 }, cache: { media: 'nvme', count: 0, sizeTB: 0 } });
     expect(result.patch.volumes).toEqual([
-      { name: 'Volume1', sizeGiB: 4546, resiliency: 'two-way' },
-      { name: 'Volume2', sizeGiB: 2048, resiliency: 'two-way' },
+      { name: 'Volume1', sizeGiB: 4135, resiliency: 'two-way' },
+      { name: 'Volume2', sizeGiB: 1862, resiliency: 'two-way' },
     ]);
     expect(result.patch.topology).toBe('standard');
     expect(result.patch.name).toBe('Example plan');
@@ -169,8 +169,8 @@ describe('the Surveyor sizing handoff', () => {
     expect(doc.hardware?.memory_gib).toBe(256);
     expect(doc.hardware?.drives?.capacity).toEqual({ media: 'nvme', count: 6, size_tb: 3.84 });
     expect(doc.storage?.volumes).toEqual([
-      { name: 'Volume1', size_gib: 4546, resiliency: 'two_way' },
-      { name: 'Volume2', size_gib: 2048, resiliency: 'two_way' },
+      { name: 'Volume1', size_gib: 4135, resiliency: 'two_way' },
+      { name: 'Volume2', size_gib: 1862, resiliency: 'two_way' },
     ]);
   });
 
@@ -184,6 +184,6 @@ describe('the Surveyor sizing handoff', () => {
   it('a Surveyor 2.9 four-way mirror volume in a plan manifest is no longer skipped', () => {
     const result = parseSurveyorPlan(JSON.stringify({ schemaVersion: '1.0', inputs: { hardware: { nodeCount: 4, rackAware: true }, volumes: [{ name: 'Z', plannedSizeTB: 1, resiliency: 'four-way-mirror' }] } }));
     if (!result.ok) throw new Error(result.error);
-    expect(result.patch.volumes).toEqual([{ name: 'Z', sizeGiB: 1024, resiliency: 'four-way' }]);
+    expect(result.patch.volumes).toEqual([{ name: 'Z', sizeGiB: 931, resiliency: 'four-way' }]);
   });
 });

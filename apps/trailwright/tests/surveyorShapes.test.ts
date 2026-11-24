@@ -17,7 +17,7 @@ describe('Surveyor import: newer shapes', () => {
     for (const resiliency of ['nested-two-way', 'nested-two-way-mirror']) {
       const r = parseSurveyorPlan(file({}, [{ name: 'N', resiliency, plannedSizeTB: 1 }]));
       expect(r.ok).toBe(true);
-      if (r.ok) expect(r.patch.volumes).toEqual([{ name: 'N', sizeGiB: 1024, resiliency: 'nested-two-way' }]);
+      if (r.ok) expect(r.patch.volumes).toEqual([{ name: 'N', sizeGiB: 931, resiliency: 'nested-two-way' }]);
     }
   });
   it('still skips a resiliency it does not know, and keeps the rest', () => {

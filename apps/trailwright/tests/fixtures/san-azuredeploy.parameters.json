@@ -52,7 +52,7 @@
         },
         "arcNodeResourceIds": {
             "value": [
-                "/subscriptions/86a43cee-777a-4d3e-b9bc-80d6a9c6c73c/resourceGroups/ARMRG/providers/Microsoft.HybridCompute/machines/vhost1"
+                "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/ARMRG/providers/Microsoft.HybridCompute/machines/vhost1"
             ]
         },
         "domainFqdn": {
